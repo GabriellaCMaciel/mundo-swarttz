@@ -230,7 +230,7 @@ function mailKey(e) {
 (function wire() {
   const root = mailUi.root, stage = document.getElementById('mailStage');
   root.querySelector('.mail-close').addEventListener('click', closeMail);
-  mailUi.back.addEventListener('click', closeLetter); // o X solto no canto superior esquerdo: fora da carta
+  mailUi.back.addEventListener('click', closeLetter); // o X solto no canto superior direito: fora da carta
   root.tabIndex = -1;
   root.querySelector('.prev').addEventListener('click', () => { mailGo(mailUi.cur - 1); root.focus({ preventScroll: true }); });
   root.querySelector('.next').addEventListener('click', () => { mailGo(mailUi.cur + 1); root.focus({ preventScroll: true }); });

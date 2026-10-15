@@ -115,7 +115,7 @@ body{margin:0;background:var(--ink);color:var(--paper);font-family:var(--font-di
 .mail-dots button[aria-current="true"]{background:var(--gold)}
 .mail.opening .mail-nav,.mail.opening .mail-foot,.mail.opening .mail-head{opacity:0;pointer-events:none}
 .mail.opening .mail-close{display:none}
-.letter-back{display:none;left:max(12px,var(--sl));right:auto;top:var(--st);z-index:40}
+.letter-back{display:none;right:max(12px,var(--sr));left:auto;top:var(--st);z-index:40} /* o ✕ da carta aberta fica no canto superior direito, fora do papel */
 .mail.opening .letter-back{display:block}
 .mail.reading .env{opacity:.1!important;filter:blur(2px) brightness(.5)}
 .mail .env{transition:transform .7s cubic-bezier(.3,.7,.2,1),opacity .6s,filter .6s}
