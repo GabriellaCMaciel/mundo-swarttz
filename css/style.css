@@ -99,7 +99,7 @@ body{margin:0;background:var(--ink);color:var(--paper);font-family:var(--font-di
 .env-stamp i{display:block;width:100%;height:100%;background:linear-gradient(135deg,var(--gold),var(--pink))}
 .env-flap{left:0;top:0;width:340px;height:125px;z-index:4;transform-origin:50% 0;transform-style:preserve-3d;transform:perspective(800px) rotateX(0deg)} /* o ângulo e o z-index da aba são escritos pelo JS a cada quadro (js/mail.js) */
 .f-out,.f-in{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden}
-.f-in{transform:rotateX(180deg)}
+.f-in{transform:rotateY(180deg)} /* o lado de dentro é o verso: vira em torno do eixo vertical. Com rotateX ele ficaria virado duas vezes e a ponta apareceria para baixo, longe da dobradiça */
 .f-out svg,.f-in svg{display:block;width:100%;height:100%}
 .env-seal{position:absolute;left:50%;bottom:-17px;width:34px;height:34px;margin-left:-17px;border-radius:50%;display:grid;place-items:center;font-size:17px;color:#ffe6a0;background:radial-gradient(circle at 35% 30%,#ff8fc0,#d63a7a);box-shadow:0 3px 6px rgba(0,0,0,.4)}
 .mail-nav{position:absolute;top:calc(50% - 20px);width:52px;height:52px;border-radius:50%;font:400 30px/1 var(--font-display);color:var(--gold);background:rgba(11,6,19,.72);border:1px solid var(--gold);cursor:pointer;transition:opacity .3s,background .2s}
