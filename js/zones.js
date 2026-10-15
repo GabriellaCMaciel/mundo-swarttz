@@ -115,15 +115,7 @@ const props = {
     const scr = new THREE.Mesh(new THREE.PlaneGeometry(2.7, 3.7), new THREE.MeshBasicMaterial({ map: phoneTex() })); scr.position.set(0, 2.75, 0.21); g.add(scr);
     const g2 = glowSprite(0x37d0c0, 7, 0.4); g2.position.set(0, 2.8, 0.6); g.add(g2);
   },
-  cartas(g) { // mesinha com cartas de depoimentos
-    const table = new THREE.Mesh(new THREE.CylinderGeometry(1.8, 1.8, 0.15, 24), lam(0x3a2350)); table.position.y = 1.1; g.add(table);
-    const stem = new THREE.Mesh(new THREE.CylinderGeometry(0.15, 0.15, 1.1, 10), lam(0x3a2350)); stem.position.y = 0.55; g.add(stem);
-    [0xff5fa2, 0xf2b84b, 0x37d0c0, 0xf08a3c, 0xb79af5].forEach((c, i) => {
-      const e = box(1.6, 0.09, 1.05, c, (i - 2) * 0.12, 1.22 + i * 0.1, i % 2 ? 0.1 : -0.1, g);
-      e.rotation.y = (i - 2) * 0.28;
-    });
-    const sheet = box(1.3, 0.04, 0.9, 0xf6ecd9, 0.1, 1.82, 0, g); sheet.rotation.y = 0.2;
-  }
+  cartas(g) { buildMailbox(g); } // a casinha e a caixa de correio rosa (js/mailbox.js)
 };
 
 // Onde cada zona fica, a cor e o texto do cartão que aparece quando você chega perto
@@ -134,7 +126,7 @@ const zones = [
     text: 'Os livros que brilham são cursos, certificações e a graduação. Chegue perto de um e abra.' },
   { id: 'selos', name: 'Álbum de selos', color: 0xf2b84b, pos: [22, 0, -4], text: 'Cada projeto vira selos com prints dele rodando.' },
   { id: 'telefone', name: 'Telefone', color: 0x7b3fe4, pos: [14, 0, 18], text: 'Redes sociais e contatos, a um toque.' },
-  { id: 'cartas', name: 'Cartas', color: 0xf08a3c, pos: [-14, 0, 18], text: 'Depoimentos em cartas, organizados por categoria.' }
+  { id: 'cartas', name: 'Cartas', color: 0xff7eb6, pos: [-14, 0, 18], r: 6.5, labelY: 6.2, glow: 0, lightI: 0.22, lightD: 12, text: 'Cartas de depoimento que a Gabriella recebeu. Abra a caixinha de correio para ler.' }
 ];
 
 // Etiqueta flutuante: desenhada num canvas 2D e usada como "sprite" (imagem que sempre encara a câmera)
