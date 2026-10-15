@@ -75,9 +75,11 @@ function mailGo(i) {
 
 // ===================== A CARTA: conteúdo, folha de três painéis e linha do tempo =====================
 function letterInner(l) { // o miolo da carta (usado na folha que dobra e na versão final, que rola)
-  return (l.photo ? '<img class="paper-photo" src="' + esc(l.photo) + '" alt="">' : '') +
+  // .paper-flow = tudo menos a assinatura. A folha é uma coluna flex e a assinatura tem margin-top:auto,
+  // então ela sempre vai para o canto inferior direito da folha, não importa o tamanho do texto.
+  return '<div class="paper-flow">' + (l.photo ? '<img class="paper-photo" src="' + esc(l.photo) + '" alt="">' : '') +
     '<span class="p-tag">' + esc(l.cat) + '</span><p class="paper-greet">' + esc(l.greeting || 'Querida Gabriella,') + '</p>' +
-    '<div class="paper-text">' + esc(l.text).split(/\n+/).map(t => '<p>' + t + '</p>').join('') + '</div>' +
+    '<div class="paper-text">' + esc(l.text).split(/\n+/).map(t => '<p>' + t + '</p>').join('') + '</div></div>' +
     '<p class="paper-sign">com carinho,<b>' + esc(l.who) + '</b></p>';
 }
 
@@ -95,7 +97,7 @@ function prepLetter() { // mede onde a carta vai ficar lida e monta a folha de t
   const l = letters[mailUi.cur], big = mailUi.big, inner = letterInner(l);
   big.innerHTML = inner; big.style.height = ''; big.hidden = false; big.style.visibility = 'hidden';
   let r = big.getBoundingClientRect();
-  const h = Math.floor(r.height / 3), H = h * 3;
+  const h = Math.floor(r.height / 102) * 34, H = h * 3; // h múltiplo de 34 (a altura de uma linha da pauta)
   big.style.height = H + 'px'; r = big.getBoundingClientRect();
   big.hidden = true; big.style.visibility = ''; big.scrollTop = 0;
   const W = r.width;
