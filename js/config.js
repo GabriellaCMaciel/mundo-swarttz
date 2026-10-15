@@ -32,3 +32,33 @@ const letters = [
   { cat: 'Mentores', text: 'Texto de exemplo: curiosa, constante e com uma visão clara do próprio caminho.', who: 'Nome do(a) mentor(a)' },
   { cat: 'Clientes', text: 'Texto de exemplo: entendeu o que eu precisava e entregou o site antes do prazo.', who: 'Nome do(a) cliente' }
 ];
+
+// Os livros da biblioteca: cada um vira um livro brilhante nas estantes (a ordem é da esquerda para a direita).
+// short = nome curto na capa | kind = tipo | status, hours e cert = linhas do painel | topics = assuntos | color = cor da capa.
+// Tudo aqui é PROVISÓRIO: troque pelos dados reais (carga horária, link do certificado, etc.).
+const books = [
+  { id: 'efg', short: 'EFG', kind: 'Curso técnico', title: 'Técnico em Desenvolvimento Web e Mobile', org: 'Escola do Futuro de Goiás (EFG)',
+    status: 'Em andamento', hours: 'a preencher', cert: 'a preencher', color: 0x7b3fe4,
+    text: 'Formação técnica em desenvolvimento de sites e aplicativos, com projetos em equipe e simulações de mercado.',
+    topics: ['HTML', 'CSS', 'JavaScript', 'Git', 'Lógica de programação'] },
+  { id: 'react', short: 'REACT', kind: 'Trilha Alura', title: 'Front-End com React', org: 'Alura',
+    status: 'Em andamento', hours: 'a preencher', cert: 'a preencher', color: 0x37d0c0,
+    text: 'Trilha de front-end focada em construir interfaces modernas com React.',
+    topics: ['React', 'Componentes', 'Hooks', 'Interfaces'] },
+  { id: 'python', short: 'PYTHON', kind: 'Trilha Alura', title: 'Back-End com Python', org: 'Alura',
+    status: 'Em andamento', hours: 'a preencher', cert: 'a preencher', color: 0xf2b84b,
+    text: 'Trilha de back-end com Python: lógica do servidor, APIs e bancos de dados.',
+    topics: ['Python', 'APIs', 'Bancos de dados'] },
+  { id: 'ia', short: 'IA', kind: 'Trilha Alura', title: 'Engenharia de Agentes de IA', org: 'Alura',
+    status: 'Em andamento', hours: 'a preencher', cert: 'a preencher', color: 0xff5fa2,
+    text: 'Trilha sobre como criar agentes de inteligência artificial, meu objetivo de longo prazo.',
+    topics: ['Agentes de IA', 'Prompts', 'Automação'] },
+  { id: 'grad', short: 'GRAD', kind: 'Graduação', title: 'Engenharia de Software', org: 'Gran Faculdade',
+    status: 'a preencher', hours: 'a preencher', cert: 'a preencher', color: 0xf08a3c,
+    text: 'Graduação em Engenharia de Software. Texto provisório: conte aqui a sua trajetória e o que pretende estudar.',
+    topics: [] },
+  { id: 'cert', short: 'CERTIF.', kind: 'Certificados', title: 'Certificações', org: 'Em breve',
+    status: 'Em breve', hours: '-', cert: 'em breve', color: 0xb79af5,
+    text: 'Aqui vão aparecer os certificados de cursos e eventos, cada um com link para conferir.',
+    topics: [] }
+];

@@ -94,19 +94,7 @@ const props = {
       const ball = new THREE.Mesh(new THREE.SphereGeometry(r, 14, 10), lam(c)); ball.position.set(x, r, z); g.add(ball);
     });
   },
-  biblioteca(g) { // estante cheia de livros coloridos
-    box(5, 4.2, 1, 0x3a2350, 0, 2.1, 0, g);
-    [0, 1, 2].forEach(row => {
-      const baseY = 0.3 + row * 1.35;
-      box(4.8, 0.1, 0.9, 0x1a0f2e, 0, baseY - 0.05, 0.1, g);
-      for (let x = -2.2; x < 2.1;) {
-        const w = 0.2 + Math.random() * 0.2, h = 0.75 + Math.random() * 0.4;
-        box(w, h, 0.7, bookColors[(Math.random() * 6) | 0], x + w / 2, baseY + h / 2, 0.35, g);
-        x += w + 0.03;
-      }
-    });
-    box(1.4, 0.22, 1.0, 0xf2b84b, 3.4, 0.11, 1.6, g); box(1.2, 0.22, 0.9, 0xff5fa2, 3.4, 0.33, 1.6, g); box(1.0, 0.22, 0.8, 0x37d0c0, 3.4, 0.55, 1.6, g); // pilha no chão
-  },
+  biblioteca(g) { buildLibrary(g); }, // o cenário grande fica em js/library.js
   selos(g) { // selos flutuantes: cada um será um projeto (imagens provisórias)
     const pairs = [[0xff5fa2, 0x7b3fe4], [0x37d0c0, 0x7b3fe4], [0xf2b84b, 0xff5fa2], [0x7b3fe4, 0x37d0c0]];
     pairs.forEach(([c1, c2], i) => {
@@ -140,7 +128,8 @@ const props = {
 const zones = [
   { id: 'sobre', name: 'Sobre', color: 0xf2b84b, pos: [-7, 0, -9], text: 'Quem é a Gabriella Swarttz: foto, apresentação e descrição.' },
   { id: 'atelie', name: 'Ateliê', color: 0xff5fa2, pos: [-22, 0, -4], text: 'As soft skills viram obras: pintura, bordado e cores.' },
-  { id: 'biblioteca', name: 'Biblioteca', color: 0x37d0c0, pos: [0, 0, -28], text: 'Cursos, certificações e graduação, nas estantes.' },
+  { id: 'biblioteca', name: 'Biblioteca', color: 0x37d0c0, pos: [0, 0, -28], r: 9, ground: 0x1d3a35, labelY: 10, glow: 0.07, lightI: 0.5,
+    text: 'Os livros que brilham são cursos, certificações e a graduação. Chegue perto de um e abra.' },
   { id: 'selos', name: 'Álbum de selos', color: 0xf2b84b, pos: [22, 0, -4], text: 'Cada projeto vira selos com prints dele rodando.' },
   { id: 'telefone', name: 'Telefone', color: 0x7b3fe4, pos: [14, 0, 18], text: 'Redes sociais e contatos, a um toque.' },
   { id: 'cartas', name: 'Cartas', color: 0xf08a3c, pos: [-14, 0, 18], text: 'Depoimentos em cartas, organizados por categoria.' }
@@ -165,20 +154,21 @@ function makeLabel(text, color, scale = 1) {
 function buildZones() {
   zones.forEach(z => {
     const g = new THREE.Group(); g.position.set(z.pos[0], z.pos[1], z.pos[2]); world.add(g);
-    const plate = new THREE.Mesh(new THREE.CylinderGeometry(5.5, 5.8, 0.3, 48), lam(0x241538, { emissive: new THREE.Color(z.color), emissiveIntensity: 0.14 }));
+    const R = z.r || 5.5; // raio da zona (a biblioteca é maior que as outras)
+    const plate = new THREE.Mesh(new THREE.CylinderGeometry(R, R + 0.3, 0.3, 48), lam(z.ground || 0x241538, { emissive: new THREE.Color(z.color), emissiveIntensity: 0.14 }));
     plate.position.y = 0.1; plate.receiveShadow = true; g.add(plate);
-    const ring = new THREE.Mesh(new THREE.TorusGeometry(5.5, 0.09, 8, 64), new THREE.MeshBasicMaterial({ color: z.color }));
+    const ring = new THREE.Mesh(new THREE.TorusGeometry(R, 0.09, 8, 64), new THREE.MeshBasicMaterial({ color: z.color }));
     ring.rotation.x = Math.PI / 2; ring.position.y = 0.3; ring.userData.flat = true; g.add(ring);
-    const light = new THREE.PointLight(z.color, 0.9, 14); light.position.set(0, 5, 3); g.add(light);
-    const aura = glowSprite(z.color, 12, 0.3); aura.position.set(0, 2.6, 0.5); g.add(aura);
+    const light = new THREE.PointLight(z.color, z.lightI || 0.9, 14); light.position.set(0, 5, 3); g.add(light);
+    const aura = glowSprite(z.color, R * 2.2, z.glow || 0.3); aura.position.set(0, 2.6, 0.5); g.add(aura);
     props[z.id](g);
-    const label = makeLabel(z.name, z.color); label.position.set(0, 6.8, 0); g.add(label);
+    const label = makeLabel(z.name, z.color); label.position.set(0, z.labelY || 6.8, 0); g.add(label);
     enableShadows(g);
-    z.ring = ring; z.light = light; z.label = label;
+    z.ring = ring; z.light = light; z.label = label; z.r = R;
 
     // "Fio de bordado": trilha pontilhada colorida que leva do centro até a zona
     const d = Math.hypot(z.pos[0], z.pos[2]), ux = z.pos[0] / d, uz = z.pos[2] / d;
-    for (let t = 6.5; t < d - 6.6; t += 1.7) {
+    for (let t = 6.5; t < d - R - 1.1; t += 1.7) {
       const dash = new THREE.Mesh(new THREE.BoxGeometry(0.9, 0.06, 0.2), new THREE.MeshBasicMaterial({ color: z.color }));
       dash.position.set(ux * t, 0.06, uz * t); dash.rotation.y = -Math.atan2(uz, ux); dash.userData.flat = true; world.add(dash);
     }
@@ -194,27 +184,30 @@ Promise.race([
   new Promise(r => setTimeout(r, 2500))
 ]).then(buildZones);
 
-let activeZone = null;
+let activeZone = null, activeBook = null; // zona e livro (da biblioteca) mais perto da personagem
 const tmpV = new THREE.Vector3();
 function checkZones(now) {
   let found = null;
   for (const z of zones) {
     if (!z.ring) continue;
     const d = Math.hypot(player.position.x - z.pos[0], player.position.z - z.pos[2]);
-    const near = d < 6.2;
+    const near = d < z.r + 0.7;
     z.label.getWorldPosition(tmpV); // a etiqueta some quando está longe do personagem ou colada na câmera
     z.label.material.opacity = Math.max(0, Math.min(1, 1.7 - d / 18, (camera.position.distanceTo(tmpV) - 9) / 6));
     z.ring.scale.setScalar(near ? 1.04 + Math.sin(now * 5) * 0.02 : 1);
-    z.light.intensity = near ? 1.9 : 0.9;
+    z.light.intensity = (z.lightI || 0.9) * (near ? 2.1 : 1);
     if (near) found = z;
   }
   catLabels.forEach(([lab, cat]) => {
     const dc = Math.hypot(player.position.x - cat.position.x, player.position.z - cat.position.z);
     lab.material.opacity = Math.max(0, Math.min(1, 1.8 - dc / 10));
   });
-  if (found !== activeZone) {
-    activeZone = found;
-    if (found) { hud.cardTitle.textContent = found.name; hud.cardText.textContent = found.text; hud.card.hidden = false; }
+  // Na biblioteca, o cartão mostra o livro que está mais perto (se tiver algum)
+  const book = found && found.id === 'biblioteca' ? nearestBook() : null;
+  if (found !== activeZone || book !== activeBook) {
+    activeZone = found; activeBook = book;
+    if (book) { hud.cardTitle.textContent = book.data.title; hud.cardText.textContent = book.data.kind + ' · ' + book.data.org; hud.card.hidden = false; }
+    else if (found) { hud.cardTitle.textContent = found.name; hud.cardText.textContent = found.text; hud.card.hidden = false; }
     else hud.card.hidden = true;
   }
 }
