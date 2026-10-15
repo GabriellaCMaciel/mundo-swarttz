@@ -149,15 +149,8 @@ function updateWorld(dt, now) {
   }
   player.userData.body.position.y = moving ? Math.abs(Math.sin(now * 11)) * 0.14 : Math.sin(now * 2) * 0.03;
 
-  // 3) Kiara segue a Gabriella (pestinha carente)
-  const kx = player.position.x - kiara.position.x, kz = player.position.z - kiara.position.z, kd = Math.hypot(kx, kz);
-  const kMoving = kd > 3.2;
-  if (kMoving) {
-    kiara.position.x += kx / kd * SPEED * 0.9 * dt; kiara.position.z += kz / kd * SPEED * 0.9 * dt;
-  }
-  kiara.rotation.y = angLerp(kiara.rotation.y, Math.atan2(kx, kz), Math.min(1, dt * (kMoving ? 10 : 4)));
-  kiara.userData.body.position.y = kMoving ? Math.abs(Math.sin(now * 14)) * 0.16 : 0;
-  kiara.userData.tail.rotation.z = Math.sin(now * (kMoving ? 9 : 4)) * 0.4;
+  // 3) Kiara segue a Gabriella e, quando ela para, vem se esfregar pedindo carinho (js/kiara.js)
+  updateKiara(dt, now, moving);
 
   // 4) Maria Marta fica na biblioteca, se lambendo, e olha para quem chega perto
   const mx = player.position.x - maria.position.x, mz = player.position.z - maria.position.z;
