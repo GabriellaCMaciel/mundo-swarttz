@@ -41,15 +41,12 @@ const ground = new THREE.Mesh(new THREE.CircleGeometry(140, 80), new THREE.MeshL
 ground.rotation.x = -Math.PI / 2; ground.receiveShadow = true; world.add(ground);
 
 // Confete colorido espalhado pelo chão
-const confettiMats = [0xff5fa2, 0xf2b84b, 0x37d0c0, 0xb79af5, 0xf08a3c, 0xf6ecd9].map(c => lam(c));
-const confettiGeo = new THREE.BoxGeometry(0.5, 0.08, 0.16);
+const confettiCols = [0xff5fa2, 0xf2b84b, 0x37d0c0, 0xb79af5, 0xf08a3c, 0xf6ecd9], confetti = [];
 for (let i = 0; i < 160; i++) {
-  const m = new THREE.Mesh(confettiGeo, confettiMats[i % 6]);
   const a = Math.random() * Math.PI * 2, r = 4 + Math.random() * 55;
-  m.position.set(Math.cos(a) * r, 0.05, Math.sin(a) * r);
-  m.rotation.y = Math.random() * Math.PI; m.userData.flat = true;
-  world.add(m);
+  confetti.push({ x: Math.cos(a) * r, y: 0.05, z: Math.sin(a) * r, sx: 0.5, sy: 0.08, sz: 0.16, ry: Math.random() * Math.PI, c: confettiCols[i % 6] });
 }
+world.add(instanced(new THREE.BoxGeometry(1, 1, 1), lam(0xffffff), confetti)); // as 160 tirinhas viram UM objeto (veja garden.js)
 
 // Estrelas no céu e vaga-lumes dourados flutuando perto do chão
 const starPos = new Float32Array(300 * 3);

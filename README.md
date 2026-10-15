@@ -16,9 +16,11 @@ index.html        página e elementos da interface
 css/style.css     estilos (cores, painéis, joystick)
 js/config.js      conteúdo editável: imagens, link do GitHub, texto do terminal, livros da biblioteca, depoimentos
 js/intro.js       renderizador, câmera e a abertura do notebook
+js/garden.js      ajudantes de jardim: flores, arbustos, árvores, postes, luzinhas e borboletas (usados no mundo todo)
 js/world.js       chão, luzes, céu, personagem e gatas
-js/library.js     a biblioteca: caramanchão, estantes, sofás, flores, luzes e livros clicáveis
-js/zones.js       cenários e etiquetas das outras zonas
+js/library.js     a biblioteca: grande pavilhão aberto com jardim, lagoa, estantes, sofás, puffs e livros clicáveis
+js/zones.js       cenários e etiquetas das outras zonas (sem círculos: tudo faz parte do mesmo mundo)
+js/decor.js       decoração do mundo inteiro: flores, árvores floridas, postes e fios de luz ligando as zonas
 js/ui.js          painéis, controles e o loop principal
 assets/           logos e foto
 ```
@@ -32,7 +34,7 @@ Use um servidor local (por exemplo, a extensão **Live Server** do VS Code) ou p
 ## Como editar
 
 - Textos e links: `js/config.js` (terminal da abertura, GitHub, livros da biblioteca, depoimentos).
-- Livros da biblioteca: lista `books` em `js/config.js` (título, tipo, status, carga horária, certificado, cor da capa). São 6 livros, 2 por estante.
+- Livros da biblioteca: lista `books` em `js/config.js` (título, tipo, status, carga horária, certificado, cor da capa). São 6 livros, bem espaçados num arco no fundo da biblioteca.
 - Zonas (nome, cor, posição, texto do cartão): lista `zones` em `js/zones.js`.
 - Conteúdo dos painéis: objeto `panels` em `js/ui.js`.
 - Velocidade do personagem: `SPEED` em `js/ui.js`.

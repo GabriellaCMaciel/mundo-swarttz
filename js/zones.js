@@ -101,8 +101,10 @@ const props = {
       const s = new THREE.Group();
       box(1.5, 1.9, 0.06, 0xf6ecd9, 0, 0, 0, s);
       const shot = new THREE.Mesh(new THREE.PlaneGeometry(1.2, 1.55), new THREE.MeshBasicMaterial({ map: placeholderTex(c1, c2, 'projeto ' + (i + 1)) })); shot.position.z = 0.04; s.add(shot);
-      for (let k = 0; k < 7; k++) { const px = -0.65 + k * 0.2167; box(0.1, 0.1, 0.07, 0x1a0f2e, px, 0.95, 0, s); box(0.1, 0.1, 0.07, 0x1a0f2e, px, -0.95, 0, s); }
-      for (let k = 0; k < 8; k++) { const py = -0.8 + k * 0.2286; box(0.1, 0.1, 0.07, 0x1a0f2e, 0.75, py, 0, s); box(0.1, 0.1, 0.07, 0x1a0f2e, -0.75, py, 0, s); }
+      const perf = []; // os "furinhos" do selo: 30 quadradinhos escuros viram um único objeto
+      for (let k = 0; k < 7; k++) { const px = -0.65 + k * 0.2167; perf.push({ x: px, y: 0.95, z: 0, sx: 0.1, sy: 0.1, sz: 0.07, c: 0x1a0f2e }, { x: px, y: -0.95, z: 0, sx: 0.1, sy: 0.1, sz: 0.07, c: 0x1a0f2e }); }
+      for (let k = 0; k < 8; k++) { const py = -0.8 + k * 0.2286; perf.push({ x: 0.75, y: py, z: 0, sx: 0.1, sy: 0.1, sz: 0.07, c: 0x1a0f2e }, { x: -0.75, y: py, z: 0, sx: 0.1, sy: 0.1, sz: 0.07, c: 0x1a0f2e }); }
+      s.add(instanced(new THREE.BoxGeometry(1, 1, 1), lam(0xffffff), perf));
       s.position.set(-2.4 + i * 1.6, 2.4 + (i % 2) * 0.5, 0);
       s.userData = { y0: s.position.y, i };
       g.add(s); floaters.push(s);
@@ -128,7 +130,7 @@ const props = {
 const zones = [
   { id: 'sobre', name: 'Sobre', color: 0xf2b84b, pos: [-7, 0, -9], text: 'Quem é a Gabriella Swarttz: foto, apresentação e descrição.' },
   { id: 'atelie', name: 'Ateliê', color: 0xff5fa2, pos: [-22, 0, -4], text: 'As soft skills viram obras: pintura, bordado e cores.' },
-  { id: 'biblioteca', name: 'Biblioteca', color: 0x37d0c0, pos: [0, 0, -28], r: 9, ground: 0x1d3a35, labelY: 10, glow: 0.07, lightI: 0.5,
+  { id: 'biblioteca', name: 'Biblioteca', color: 0x37d0c0, pos: [0, 0, -34], r: 12.5, labelY: 13, glow: 0.05, lightI: 0.5, lightD: 20,
     text: 'Os livros que brilham são cursos, certificações e a graduação. Chegue perto de um e abra.' },
   { id: 'selos', name: 'Álbum de selos', color: 0xf2b84b, pos: [22, 0, -4], text: 'Cada projeto vira selos com prints dele rodando.' },
   { id: 'telefone', name: 'Telefone', color: 0x7b3fe4, pos: [14, 0, 18], text: 'Redes sociais e contatos, a um toque.' },
@@ -154,24 +156,19 @@ function makeLabel(text, color, scale = 1) {
 function buildZones() {
   zones.forEach(z => {
     const g = new THREE.Group(); g.position.set(z.pos[0], z.pos[1], z.pos[2]); world.add(g);
-    const R = z.r || 5.5; // raio da zona (a biblioteca é maior que as outras)
-    const plate = new THREE.Mesh(new THREE.CylinderGeometry(R, R + 0.3, 0.3, 48), lam(z.ground || 0x241538, { emissive: new THREE.Color(z.color), emissiveIntensity: 0.14 }));
-    plate.position.y = 0.1; plate.receiveShadow = true; g.add(plate);
-    const ring = new THREE.Mesh(new THREE.TorusGeometry(R, 0.09, 8, 64), new THREE.MeshBasicMaterial({ color: z.color }));
-    ring.rotation.x = Math.PI / 2; ring.position.y = 0.3; ring.userData.flat = true; g.add(ring);
-    const light = new THREE.PointLight(z.color, z.lightI || 0.9, 14); light.position.set(0, 5, 3); g.add(light);
-    const aura = glowSprite(z.color, R * 2.2, z.glow || 0.3); aura.position.set(0, 2.6, 0.5); g.add(aura);
+    const R = z.r || 5.5; // raio de "alcance" da zona (só conta para o cartão e a trilha: não existe mais nenhum círculo desenhado no chão)
+    const light = new THREE.PointLight(z.color, z.lightI || 0.9, z.lightD || 14); light.position.set(0, 5, 3); g.add(light);
+    const aura = glowSprite(z.color, R * 2.2, z.glow || 0.22); aura.position.set(0, 2.6, 0.5); g.add(aura);
     props[z.id](g);
     const label = makeLabel(z.name, z.color); label.position.set(0, z.labelY || 6.8, 0); g.add(label);
     enableShadows(g);
-    z.ring = ring; z.light = light; z.label = label; z.r = R;
+    z.built = true; z.light = light; z.label = label; z.r = R;
 
     // "Fio de bordado": trilha pontilhada colorida que leva do centro até a zona
     const d = Math.hypot(z.pos[0], z.pos[2]), ux = z.pos[0] / d, uz = z.pos[2] / d;
-    for (let t = 6.5; t < d - R - 1.1; t += 1.7) {
-      const dash = new THREE.Mesh(new THREE.BoxGeometry(0.9, 0.06, 0.2), new THREE.MeshBasicMaterial({ color: z.color }));
-      dash.position.set(ux * t, 0.06, uz * t); dash.rotation.y = -Math.atan2(uz, ux); dash.userData.flat = true; world.add(dash);
-    }
+    const dashes = []; // todos os tracinhos da trilha viram um único objeto
+    for (let t = 6.5; t < d - R - 1.1; t += 1.7) dashes.push({ x: ux * t, y: 0.06, z: uz * t, sx: 0.9, sy: 0.06, sz: 0.2, ry: -Math.atan2(uz, ux), c: z.color });
+    if (dashes.length) world.add(instanced(new THREE.BoxGeometry(1, 1, 1), new THREE.MeshBasicMaterial({ color: 0xffffff }), dashes));
   });
   const lk = makeLabel('Kiara', 0xf08a3c, 0.55); lk.position.y = 2.3; kiara.add(lk);
   const lm = makeLabel('Maria Marta', 0xf6ecd9, 0.6); lm.position.y = 2.3; maria.add(lm);
@@ -189,12 +186,11 @@ const tmpV = new THREE.Vector3();
 function checkZones(now) {
   let found = null;
   for (const z of zones) {
-    if (!z.ring) continue;
+    if (!z.built) continue;
     const d = Math.hypot(player.position.x - z.pos[0], player.position.z - z.pos[2]);
     const near = d < z.r + 0.7;
     z.label.getWorldPosition(tmpV); // a etiqueta some quando está longe do personagem ou colada na câmera
     z.label.material.opacity = Math.max(0, Math.min(1, 1.7 - d / 18, (camera.position.distanceTo(tmpV) - 9) / 6));
-    z.ring.scale.setScalar(near ? 1.04 + Math.sin(now * 5) * 0.02 : 1);
     z.light.intensity = (z.lightI || 0.9) * (near ? 2.1 : 1);
     if (near) found = z;
   }
