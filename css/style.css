@@ -89,10 +89,7 @@ body{margin:0;background:var(--ink);color:var(--paper);font-family:var(--font-di
 @keyframes bob{50%{transform:translateY(-8px)}}
 .env-bob>*{position:absolute}
 .env-back{inset:0;z-index:1;border-radius:6px;background:linear-gradient(#e6cdb8,#d6b8a0);box-shadow:0 20px 44px rgba(0,0,0,.55)}
-.env-paper{left:22px;top:26px;width:296px;height:196px;z-index:2;box-sizing:border-box;overflow:hidden;padding:14px 16px;color:#3a2a4a;background:#fffaf0 repeating-linear-gradient(transparent 0 19px,rgba(120,150,200,.3) 19px 20px);box-shadow:0 -2px 8px rgba(0,0,0,.25);transition:transform .85s cubic-bezier(.3,.8,.3,1) .5s,opacity .2s}
-.env-paper p{margin:2px 0 0;font:500 15px/20px Caveat,'Segoe Script',cursive}
 .p-tag{display:inline-block;margin:0 0 6px;font:700 9px var(--font-mono);letter-spacing:.14em;text-transform:uppercase;padding:.3em .7em;background:#2a1745;color:var(--gold)}
-.env.open .env-paper{transform:translateY(-150px)}
 .env-front{inset:0;z-index:3;border-radius:6px;overflow:hidden}
 .env-front svg{display:block;width:100%;height:100%}
 .env-from{left:0;right:0;bottom:22px;z-index:5;text-align:center;color:#5a3a4a;text-shadow:0 0 6px #f8ecde,0 0 3px #f8ecde;pointer-events:none}
@@ -100,8 +97,7 @@ body{margin:0;background:var(--ink);color:var(--paper);font-family:var(--font-di
 .env-from b{display:block;max-width:230px;margin:0 auto;font:700 25px/1.05 Caveat,'Segoe Script',cursive;overflow-wrap:anywhere}
 .env-stamp{right:24px;top:70px;width:50px;height:62px;z-index:5;box-sizing:border-box;padding:5px;background:#fff4dc;box-shadow:0 1px 3px rgba(0,0,0,.3);outline:2px dashed rgba(120,90,60,.45);outline-offset:-3px;transform:rotate(4deg)}
 .env-stamp i{display:block;width:100%;height:100%;background:linear-gradient(135deg,var(--gold),var(--pink))}
-.env-flap{left:0;top:0;width:340px;height:125px;z-index:4;transform-origin:50% 0;transform-style:preserve-3d;transform:perspective(800px) rotateX(0deg);transition:transform .75s cubic-bezier(.4,.1,.2,1),z-index 0s .38s}
-.env.open .env-flap{transform:perspective(800px) rotateX(180deg);z-index:1}
+.env-flap{left:0;top:0;width:340px;height:125px;z-index:4;transform-origin:50% 0;transform-style:preserve-3d;transform:perspective(800px) rotateX(0deg)} /* o ângulo e o z-index da aba são escritos pelo JS a cada quadro (js/mail.js) */
 .f-out,.f-in{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden}
 .f-in{transform:rotateX(180deg)}
 .f-out svg,.f-in svg{display:block;width:100%;height:100%}
@@ -117,17 +113,18 @@ body{margin:0;background:var(--ink);color:var(--paper);font-family:var(--font-di
 .mail-dots{display:flex;gap:10px}
 .mail-dots button{width:11px;height:11px;padding:0;border-radius:50%;border:1px solid var(--gold);background:transparent;cursor:pointer}
 .mail-dots button[aria-current="true"]{background:var(--gold)}
-.mail.reading .mail-nav,.mail.reading .mail-foot,.mail.reading .mail-head{opacity:0;pointer-events:none}
+.mail.opening .mail-nav,.mail.opening .mail-foot,.mail.opening .mail-head{opacity:0;pointer-events:none}
+.mail.opening .mail-close{display:none}
+.letter-back{display:none;left:max(12px,var(--sl));right:auto;top:var(--st);z-index:40}
+.mail.opening .letter-back{display:block}
 .mail.reading .env{opacity:.1!important;filter:blur(2px) brightness(.5)}
+.mail .env{transition:transform .7s cubic-bezier(.3,.7,.2,1),opacity .6s,filter .6s}
 .paper-wrap{position:absolute;inset:0;display:grid;place-items:center;pointer-events:none;box-sizing:border-box;padding:calc(var(--st) + 30px) 14px var(--sb)}
-.paper-big{pointer-events:auto;position:relative;width:min(580px,100%);max-height:min(80vh,720px);overflow:auto;box-sizing:border-box;padding:34px 30px 34px 62px;color:#3a2a4a;touch-action:pan-y;user-select:text;-webkit-user-select:text;
+.paper-big{pointer-events:auto;position:relative;width:min(580px,100%);height:min(80vh,720px);overflow:auto;box-sizing:border-box;padding:34px 30px 34px 62px;color:#3a2a4a;touch-action:pan-y;user-select:text;-webkit-user-select:text;
   background:linear-gradient(90deg,transparent 48px,rgba(255,95,162,.4) 48px 50px,transparent 50px),repeating-linear-gradient(transparent 0 33px,rgba(120,150,200,.3) 33px 34px),#fffaf0;
   box-shadow:0 30px 80px rgba(0,0,0,.65);border-radius:3px;font:500 24px/34px Caveat,'Segoe Script',cursive}
 .paper-big p{margin:0}
 .paper-big>.p-tag{display:block;width:max-content;height:22px;line-height:22px;margin:6px 0;padding:0 .7em}
-.paper-back{display:block;height:28px;margin:3px 0 3px -32px;padding:0 .9em;font:700 11px var(--font-mono);letter-spacing:.06em;color:#fff;background:#2a1745;border:0;cursor:pointer}
-.paper-back:hover{background:var(--violet)}
-.paper-back:focus-visible{outline:2px solid var(--violet);outline-offset:3px}
 .paper-greet{font-size:30px;color:#7b3fe4}
 .paper-text p+p{margin-top:34px}
 .paper-sign{margin-top:34px;text-align:right}
@@ -137,3 +134,16 @@ body{margin:0;background:var(--ink);color:var(--paper);font-family:var(--font-di
 @media (prefers-reduced-motion:reduce){.mail-petals i{animation:none;opacity:0}.env.cur .env-bob{animation:none}}
 @media (max-width:520px){.about{grid-template-columns:1fr}.about img{max-width:220px}}
 @media (prefers-reduced-motion:reduce){.hint{animation:none}}
+/* A carta de três painéis (js/mail.js): cada painel gira em volta da sua dobradiça (transform-origin), em 3D */
+.sheet3d{position:absolute;left:0;top:0;transform-origin:0 0;perspective:1800px;transform-style:preserve-3d;pointer-events:none}
+.sh-shadow{position:absolute;left:0;right:0;top:0;height:0;box-shadow:0 26px 70px rgba(0,0,0,.6);border-radius:3px}
+.sh-panel{position:absolute;left:0;width:100%;transform-style:preserve-3d}
+.sh-panel.p1{transform-origin:50% 100%}
+.sh-panel.p3{transform-origin:50% 0}
+.sh-face{position:absolute;inset:0;overflow:hidden;background:#fffaf0;backface-visibility:hidden;-webkit-backface-visibility:hidden}
+.sh-face.back{transform:rotateX(180deg);background:linear-gradient(135deg,#f6ecd9,#eadcc4)}
+.sh-face::before,.sh-face::after{content:'';position:absolute;left:0;right:0;height:10px;pointer-events:none;z-index:2;opacity:0}
+.sh-face.e-t::before{top:0;opacity:1;background:linear-gradient(rgba(60,30,60,.09),transparent)}
+.sh-face.e-b::after{bottom:0;opacity:1;background:linear-gradient(to top,rgba(60,30,60,.09),transparent)}
+.sh-shade{position:absolute;inset:0;background:#1a0f2e;opacity:0;pointer-events:none;z-index:3}
+.paper-big.paper-page{position:absolute;left:0;max-height:none;overflow:hidden;box-shadow:none;border-radius:0;pointer-events:none;margin:0}
