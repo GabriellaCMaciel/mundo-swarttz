@@ -101,7 +101,7 @@ function startWorld() {
   intro.visible = false;
   world.visible = true;
   scene.background = skyTex;
-  scene.fog = new THREE.Fog(WORLD_FOG, 45, 125);
+  scene.fog = new THREE.Fog(WORLD_FOG, 42, 104);
   hud.hint.hidden = true; hud.title.hidden = true; hud.skip.hidden = true; hud.brand.hidden = false;
   if (touch) hud.joy.hidden = false; else hud.keys.hidden = false;
   camera.position.set(player.position.x, CAM_Y, player.position.z + CAM_Z);
@@ -113,7 +113,7 @@ function startWorld() {
 }
 
 // ===== 8. O coração: o loop que roda ~60 vezes por segundo =====
-const SPEED = 9, LIMIT = 48;
+const SPEED = 11, LIMIT = 92; // LIMIT = até onde dá para andar (raio a partir do centro)
 const camWant = new THREE.Vector3(), lookWant = new THREE.Vector3();
 function angLerp(a, b, t) { // gira suave pelo caminho mais curto
   const d = ((b - a + Math.PI) % (Math.PI * 2) + Math.PI * 2) % (Math.PI * 2) - Math.PI;
@@ -159,7 +159,7 @@ function updateWorld(dt, now) {
   updateSparks(dt);
   checkZones(now);
   updateLibrary(now, dt); updatePondLife(now, dt);
-  updateGarden(now); updateSwing(now); updateMailbox(now);
+  updateGarden(now); updateSwing(now); updateMailbox(now, dt);
 
   // 6) o sol (e suas sombras) acompanha o personagem; a câmera também, com suavidade
   sun.position.set(player.position.x + 12, 26, player.position.z + 10);
@@ -177,7 +177,8 @@ function frame() {
   const dt = Math.min(clock.getDelta(), 0.05);
   const now = clock.elapsedTime;
   if (phase === 'world') updateWorld(dt, now); else updateIntro(now, dt);
-  renderer.render(scene, camera);
+  // Com a tela das cartas aberta o mundo 3D fica escondido atrás dela: não desenhar poupa a placa de vídeo e deixa a animação da carta fluida
+  if (!mailUi.isOpen) renderer.render(scene, camera);
   requestAnimationFrame(frame);
 }
 requestAnimationFrame(frame);

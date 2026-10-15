@@ -4,9 +4,9 @@
 'use strict';
 
 // A lagoa da biblioteca (coordenadas do MUNDO). Fica aqui para library.js, pond.js e decor.js concordarem sobre onde ela está.
-const POND = { x: -30, z: -26, r: 5.4 };
+const POND = { x: -40, z: -46, r: 5.4 };
 // O balanço na árvore, à direita da biblioteca (coordenadas do MUNDO), usado por swing.js e decor.js
-const SWING = { x: 29, z: -27 };
+const SWING = { x: 40, z: -47 };
 
 const DEG = Math.PI / 180;
 const polar = (ang, r) => [Math.sin(ang) * r, Math.cos(ang) * r]; // ângulo + distância -> [x, z]
@@ -86,6 +86,19 @@ function instanced(geo, material, items) {
   return mesh;
 }
 
+// Todos os "quadradinhos" de vegetação ficam nesta lista: os que estão muito longe da câmera (já escondidos pela névoa) não são desenhados.
+const vegChunks = [];
+const CULL_DIST = 100; // distância (em unidades do mundo) a partir da qual um lote de plantas deixa de ser desenhado
+const _cv = new THREE.Vector3();
+let _cullTick = 0;
+function cullFar() {
+  if (++_cullTick % 6) return; // basta conferir de vez em quando
+  vegChunks.forEach(c => {
+    _cv.copy(c.m.geometry.boundingSphere.center); c.parent.localToWorld(_cv);
+    c.m.visible = Math.hypot(_cv.x - camera.position.x, _cv.z - camera.position.z) < CULL_DIST + c.m.geometry.boundingSphere.radius;
+  });
+}
+
 const GREENS = [0x2f8f6b, 0x247a5a, 0x3aa17a, 0x1d6650, 0x4cb88a];
 const FLOWER_COLS = [0xff7eb6, 0xff5fa2, 0xfff1f5, 0xb79af5, 0xf2b84b, 0xf08a3c];
 
@@ -117,14 +130,14 @@ class VegBatch {
   // Divide tudo em "quadradinhos" de 18x18 unidades do mundo: só os quadradinhos que aparecem na tela são desenhados
   addTo(parent) {
     const mats = { b: lam(0xffffff), f: lam(0xffffff, { emissive: 0x2a1020 }), l: lam(0xffffff), t: lam(0xffffff) };
-    const geos = { b: new THREE.IcosahedronGeometry(1, 1), f: new THREE.IcosahedronGeometry(1, 0), l: new THREE.IcosahedronGeometry(1, 0), t: new THREE.CylinderGeometry(1, 1.2, 1, 6) };
+    const geos = { b: new THREE.IcosahedronGeometry(1, 1), f: new THREE.OctahedronGeometry(1, 0), l: new THREE.IcosahedronGeometry(1, 0), t: new THREE.CylinderGeometry(1, 1.2, 1, 6) };
     const cells = new Map();
     const put = (kind, items) => items.forEach(it => {
       const key = Math.floor(it.x / 18) + ',' + Math.floor(it.z / 18) + kind;
       let c = cells.get(key); if (!c) cells.set(key, c = { kind, items: [] }); c.items.push(it);
     });
     put('b', this.bushes); put('f', this.flowers); put('l', this.leaves); put('t', this.trunks);
-    cells.forEach(c => parent.add(instanced(geos[c.kind], mats[c.kind], c.items)));
+    cells.forEach(c => { const m = instanced(geos[c.kind], mats[c.kind], c.items); parent.add(m); vegChunks.push({ m, parent }); });
   }
 }
 
@@ -174,6 +187,7 @@ function addButterflies(parent, centers, n, rnd) {
 
 // Chamada todo quadro: luzinhas piscam e borboletas voam
 function updateGarden(now) {
+  cullFar();
   twinkle.forEach(t => { t.pts.material.opacity = 0.7 + 0.3 * Math.sin(now * 2.4 + t.phase * Math.PI); });
   butterflies.forEach(b => {
     const a = now * b.sp + b.ph;

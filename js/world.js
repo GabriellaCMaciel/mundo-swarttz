@@ -35,15 +35,15 @@ const patchTex = canvasTex(512, 512, (x, w, h) => {
   }
 });
 patchTex.wrapS = patchTex.wrapT = THREE.RepeatWrapping;
-patchTex.repeat.set(14, 14);
+patchTex.repeat.set(20, 20); // o chão cobre 400 unidades: 20 repetições = retalhos de 20x20, do mesmo tamanho de antes
 patchTex.anisotropy = renderer.capabilities.getMaxAnisotropy();
-const ground = new THREE.Mesh(new THREE.CircleGeometry(140, 80), new THREE.MeshLambertMaterial({ map: patchTex }));
+const ground = new THREE.Mesh(new THREE.CircleGeometry(200, 90), new THREE.MeshLambertMaterial({ map: patchTex }));
 ground.rotation.x = -Math.PI / 2; ground.receiveShadow = true; world.add(ground);
 
 // Confete colorido espalhado pelo chão
 const confettiCols = [0xff5fa2, 0xf2b84b, 0x37d0c0, 0xb79af5, 0xf08a3c, 0xf6ecd9], confetti = [];
-for (let i = 0; i < 160; i++) {
-  const a = Math.random() * Math.PI * 2, r = 4 + Math.random() * 55;
+for (let i = 0; i < 320; i++) {
+  const a = Math.random() * Math.PI * 2, r = 4 + Math.random() * 95;
   confetti.push({ x: Math.cos(a) * r, y: 0.05, z: Math.sin(a) * r, sx: 0.5, sy: 0.08, sz: 0.16, ry: Math.random() * Math.PI, c: confettiCols[i % 6] });
 }
 world.add(instanced(new THREE.BoxGeometry(1, 1, 1), lam(0xffffff), confetti)); // as 160 tirinhas viram UM objeto (veja garden.js)
@@ -57,9 +57,9 @@ for (let i = 0; i < 300; i++) {
 const starGeo = new THREE.BufferGeometry(); starGeo.setAttribute('position', new THREE.BufferAttribute(starPos, 3));
 world.add(new THREE.Points(starGeo, new THREE.PointsMaterial({ color: 0xf2d9a0, size: 2, sizeAttenuation: false, fog: false, transparent: true, opacity: 0.8 })));
 
-const MOTES = 200, moteBase = new Float32Array(MOTES * 3), motePos = new Float32Array(MOTES * 3);
+const MOTES = 300, moteBase = new Float32Array(MOTES * 3), motePos = new Float32Array(MOTES * 3);
 for (let i = 0; i < MOTES; i++) {
-  const a = Math.random() * Math.PI * 2, r = Math.sqrt(Math.random()) * 55;
+  const a = Math.random() * Math.PI * 2, r = Math.sqrt(Math.random()) * 90;
   moteBase.set([Math.cos(a) * r, 1.2 + Math.random() * 8, Math.sin(a) * r], i * 3);
 }
 motePos.set(moteBase);

@@ -2,7 +2,7 @@
 
 Portfólio 3D interativo de **Gabriella Swarttz**, feito com HTML, CSS, JavaScript e [Three.js](https://threejs.org/).
 
-Você abre o notebook, "hackeia" o perfil e entra num mundo com zonas para explorar: Sobre, Ateliê, Biblioteca, Álbum de selos, Telefone e Cartas. As gatas Kiara e Maria Marta moram por lá.
+Você abre o notebook, "hackeia" o perfil e entra num mundo com zonas para explorar: Sobre, Ateliê, Biblioteca, Álbum de selos, Telefone e Cartas. As gatas Kiara, Maria Marta, Zé Porempa, Mel e os três filhotes (Bangula, Ônix e Cat Noir) moram por lá.
 
 ## Como usar
 
@@ -22,8 +22,9 @@ js/library.js     a biblioteca: grande pavilhão aberto com jardim, lagoa, estan
 js/pond.js        a lagoa viva: peixes nadando e o gato Zé Porempa tentando pegá-los
 js/kiara.js       a Kiara: segue a Gabriella e, quando ela para, vem se esfregar nas pernas pedindo carinho
 js/swing.js       o balanço na árvore (cordas com flores e hera, livro, manta, cestos), à direita da biblioteca
-js/mailbox.js     a zona Cartas em 3D: casinha decorativa e caixa de correio rosa com rosas
-js/mail.js        a tela das cartas: carrossel de envelopes e a animação de abrir a carta
+js/mailbox.js     a zona Cartas em 3D: caixa de correio rosa, casinha inclinada e quintal com cerca completa e portão
+js/yardcats.js    a Mel (no telhado, rosna se outro gato chega perto) e os filhotes brincando de lutinha no quintal
+js/mail.js        a tela das cartas: carrossel de envelopes e a carta dobrada em três (animação por linha do tempo, reversível)
 js/zones.js       cenários e etiquetas das outras zonas (sem círculos: tudo faz parte do mesmo mundo)
 js/decor.js       decoração do mundo inteiro: flores, árvores floridas, postes e fios de luz ligando as zonas
 js/ui.js          painéis, controles e o loop principal
@@ -42,6 +43,7 @@ Use um servidor local (por exemplo, a extensão **Live Server** do VS Code) ou p
 - Livros da biblioteca: lista `books` em `js/config.js` (título, tipo, status, carga horária, certificado, cor da capa). São 6 livros, bem espaçados num arco no fundo da biblioteca.
 - Zonas (nome, cor, posição, texto do cartão): lista `zones` em `js/zones.js`.
 - Conteúdo dos painéis: objeto `panels` em `js/ui.js`.
-- Velocidade do personagem: `SPEED` em `js/ui.js`.
+- Velocidade do personagem e tamanho do mundo: `SPEED` e `LIMIT` em `js/ui.js`.
+- Tamanho de cada zona: campo `size` da lista `zones` (1 = tamanho original). A casa das cartas tem as medidas e o giro em `CARTAS`, `YARD` e `HOUSE`, no topo de `js/mailbox.js`.
 
 Os textos dos painéis, os depoimentos e as imagens dos selos ainda são provisórios.

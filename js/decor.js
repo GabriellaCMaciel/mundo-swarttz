@@ -7,24 +7,25 @@ function buildDecor() {
   const rnd = mulberry32(77), veg = new VegBatch(rnd), lights = new Lights(), lampPos = [];
 
   // Lugares onde NÃO se planta nada: em cima das zonas, no ponto de partida e em cima das trilhas
-  const spots = zones.map(z => ({ x: z.pos[0], z: z.pos[2], r: (z.r || 5.5) + (z.id === 'biblioteca' ? 11.5 : 3.5) }));
-  spots.push({ x: 0, z: 6, r: 6 }, { x: POND.x, z: POND.z, r: POND.r + 2.5 }, { x: SWING.x + 3, z: SWING.z, r: 10 }, { x: -14 + HOUSE.dx, z: 18 + HOUSE.dz, r: 7 }); // ponto de partida, lagoa, balanço e a casa das cartas
+  const zr = z => z.r || 5.5 * (z.size || 1); // raio da zona (as pequenas foram ampliadas: veja zones.js)
+  const spots = zones.map(z => ({ x: z.pos[0], z: z.pos[2], r: zr(z) + (z.id === 'biblioteca' ? 11.5 : 3.5) }));
+  spots.push({ x: 0, z: 6, r: 6 }, { x: POND.x, z: POND.z, r: POND.r + 2.5 }, { x: SWING.x + 3, z: SWING.z, r: 10 }, { x: YARD.cx, z: YARD.cz, r: YARD.r }); // ponto de partida, lagoa, balanço e o quintal da casa das cartas
   // Onde NÃO nascem árvores (só moitas baixas): no corredor entre o ponto de partida e a câmera, e na frente da lagoa
-  const noTree = (x, z) => (Math.abs(x) < 9 && z > -4) || (Math.abs(x - POND.x) < POND.r + 14 && z > POND.z + 2 && z < POND.z + 20);
-  const trails = zones.map(z => ({ len: Math.hypot(z.pos[0], z.pos[2]), x: z.pos[0], z: z.pos[2], r: z.r || 5.5 }));
+  const noTree = (x, z) => (Math.abs(x) < 9 && z > -4) || (Math.abs(x - POND.x) < POND.r + 14 && z > POND.z + 2 && z < POND.z + 20) || Math.hypot(x - YARD.cx, z - YARD.cz) < YARD.r + 6;
+  const trails = zones.map(z => ({ len: Math.hypot(z.pos[0], z.pos[2]), x: z.pos[0], z: z.pos[2], r: zr(z) }));
   const onTrail = (px, pz, w) => trails.some(t => { // distância do ponto até o segmento que vai do centro até a zona
     const k = Math.max(0, Math.min(1, (px * t.x + pz * t.z) / (t.len * t.len)));
     return Math.hypot(px - t.x * k, pz - t.z * k) < w;
   });
   const free = (x, z, w) => !spots.some(s => Math.hypot(x - s.x, z - s.z) < s.r) && !onTrail(x, z, w);
   // Quanto mais perto de uma zona, mais enfeitado (o jardim "nasce" em volta das construções)
-  const nearness = (x, z) => Math.min(...zones.map(zn => Math.hypot(x - zn.pos[0], z - zn.pos[2]) - (zn.r || 5.5)));
+  const nearness = (x, z) => Math.min(...zones.map(zn => Math.hypot(x - zn.pos[0], z - zn.pos[2]) - zr(zn)));
 
   const centers = [];
-  for (let i = 0, ok = 0; i < 2600 && ok < 560; i++) {
-    const a = rnd() * 6.283, r = Math.sqrt(rnd()) * 66, x = Math.sin(a) * r, z = Math.cos(a) * r;
+  for (let i = 0, ok = 0; i < 6000 && ok < 1000; i++) {
+    const a = rnd() * 6.283, r = Math.sqrt(rnd()) * 104, x = Math.sin(a) * r, z = Math.cos(a) * r;
     if (!free(x, z, 3.4)) continue;
-    if (rnd() > 0.2 + 0.8 * Math.exp(-Math.max(0, nearness(x, z)) / 14)) continue; // mais denso perto das zonas
+    if (rnd() > 0.12 + 0.88 * Math.exp(-Math.max(0, nearness(x, z)) / 14)) continue; // mais denso perto das zonas
     ok++;
     const roll = rnd(), dom = FLOWER_COLS[(rnd() * 6) | 0];
     if (roll < 0.34) { veg.groundBush(x, z, 0.6 + rnd() * 0.7, 9, dom); if (ok % 6 === 0) centers.push([x, z]); }
@@ -37,7 +38,7 @@ function buildDecor() {
 
   // Postes de luz dos dois lados de cada trilha, ligados por fios de luzinhas: assim as zonas ficam "interligadas"
   zones.forEach(z => {
-    const d = Math.hypot(z.pos[0], z.pos[2]), ux = z.pos[0] / d, uz = z.pos[2] / d, R = z.r || 5.5;
+    const d = Math.hypot(z.pos[0], z.pos[2]), ux = z.pos[0] / d, uz = z.pos[2] / d, R = zr(z);
     [-1, 1].forEach(side => {
       let prev = null;
       for (let t = 9; t < d - R - 2.5; t += 8.5) {
