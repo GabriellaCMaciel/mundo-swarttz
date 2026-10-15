@@ -24,14 +24,9 @@ function buildPondLife(P) { // P = { x, z, r } em coordenadas do mundo
   pondLife.P = P;
 
   // ----- O Zé Porempa: gato branco, olhos cor de mel e barriguinha de quem come bem -----
-  const ze = buildCat(0xfffaf2, null);
+  const ze = buildCat(0xfffaf2, null, { eye: 0xe8aa3a }); // olhos amarelo-mel (a pupila preta vem do buildCat)
   const { body, head, tail } = ze.userData;
   body.children[0].scale.set(1.18, 0.95, 1.45); // barriga redonda
-  [2, 4].forEach(i => { // olhos: grandes, amarelo-mel, com uma pupilinha
-    const eye = head.children[i]; eye.material.color.setHex(0xe8aa3a); eye.scale.setScalar(1.7);
-    const pupil = new THREE.Mesh(new THREE.SphereGeometry(0.03, 6, 5), new THREE.MeshBasicMaterial({ color: 0x120b1c }));
-    pupil.scale.set(0.55, 1.3, 0.5); pupil.position.set(eye.position.x, eye.position.y, eye.position.z + 0.05); head.add(pupil);
-  });
   const nose = new THREE.Mesh(new THREE.SphereGeometry(0.035, 6, 5), new THREE.MeshBasicMaterial({ color: 0xff8fb3 })); nose.position.set(0, -0.03, 0.33); head.add(nose);
   const tongue = new THREE.Mesh(new THREE.SphereGeometry(0.05, 8, 6), new THREE.MeshBasicMaterial({ color: 0xff6f9c })); // língua (ele é guloso)
   tongue.scale.set(1, 0.5, 1.4); tongue.position.set(0, -0.13, 0.3); tongue.visible = false; head.add(tongue);

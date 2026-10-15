@@ -95,7 +95,17 @@ function buildPlayer() {
 }
 
 // --- As gatas: um construtor de gato que muda cor e mancha ---
-function buildCat(baseColor, patchColor) {
+// Cada gato é montado por aqui. opts.eye = cor da íris (hex). Todo gato com olho colorido ganha também uma pupila
+// preta redonda e menor por cima da íris. Sem opts.eye, os olhos ficam escuros (só uma bolinha).
+function catEye(color) {
+  const g = new THREE.Group();
+  if (color === undefined || color === null) { g.add(new THREE.Mesh(new THREE.SphereGeometry(0.045, 8, 6), new THREE.MeshBasicMaterial({ color: 0x120b1c }))); return g; }
+  g.add(new THREE.Mesh(new THREE.SphereGeometry(0.068, 10, 8), new THREE.MeshBasicMaterial({ color })));                       // íris (a cor do olho)
+  const pupil = new THREE.Mesh(new THREE.SphereGeometry(0.036, 8, 6), new THREE.MeshBasicMaterial({ color: 0x070309 })); // pupila: preta, menor e mais à frente
+  pupil.position.z = 0.046; g.add(pupil);
+  return g;
+}
+function buildCat(baseColor, patchColor, opts = {}) {
   const g = new THREE.Group();
   const body = new THREE.Group(); g.add(body);
   const fur = lam(baseColor);
@@ -109,7 +119,7 @@ function buildCat(baseColor, patchColor) {
   head.add(new THREE.Mesh(new THREE.SphereGeometry(0.33, 14, 10), fur));
   [-1, 1].forEach(s => {
     const ear = new THREE.Mesh(new THREE.ConeGeometry(0.11, 0.24, 4), fur); ear.position.set(s * 0.19, 0.3, 0); head.add(ear);
-    const eye = new THREE.Mesh(new THREE.SphereGeometry(0.045, 8, 6), new THREE.MeshBasicMaterial({ color: 0x120b1c })); eye.position.set(s * 0.12, 0.05, 0.3); head.add(eye);
+    const eye = catEye(opts.eye); eye.position.set(s * 0.12, 0.05, 0.3); head.add(eye);
   });
   if (patchColor) {
     const patch = lam(patchColor);
