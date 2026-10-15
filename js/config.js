@@ -24,10 +24,12 @@ const terminalLines = [
   ['>>> ACESSO CONCEDIDO <<<', '#ff5fa2']
 ];
 
-// Depoimentos (provisórios). Troque pelos reais: cat = categoria, text = o que a pessoa disse, who = quem disse.
+// Depoimentos (provisórios): cada um vira uma carta na caixa de correio, com o nome do remetente no envelope.
+// who = nome de quem escreveu | cat = categoria (aparece no papel) | text = o depoimento (use \n para separar parágrafos)
+// Opcionais: greeting = saudação (padrão "Querida Gabriella,") | photo = foto de quem escreveu, ex.: 'assets/prof-ana.jpg'
 const letters = [
   { cat: 'Professores', text: 'Texto de exemplo: aprende rápido, ajuda a turma e entrega tudo com capricho.', who: 'Nome do(a) professor(a)' },
-  { cat: 'Professores', text: 'Texto de exemplo: explica conceitos difíceis de um jeito simples e paciente.', who: 'Nome do(a) professor(a)' },
+  { cat: 'Professores', text: 'Texto de exemplo: explica conceitos difíceis de um jeito simples e paciente.', who: 'Outro(a) professor(a)' },
   { cat: 'Colegas', text: 'Texto de exemplo: é a pessoa que não deixa o grupo travar e ainda deixa tudo bonito.', who: 'Nome do(a) colega' },
   { cat: 'Mentores', text: 'Texto de exemplo: curiosa, constante e com uma visão clara do próprio caminho.', who: 'Nome do(a) mentor(a)' },
   { cat: 'Clientes', text: 'Texto de exemplo: entendeu o que eu precisava e entregou o site antes do prazo.', who: 'Nome do(a) cliente' }

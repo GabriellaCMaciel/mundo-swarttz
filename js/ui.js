@@ -19,17 +19,8 @@ const panels = {
       .map((c, i) => '<div class="stamp"><div class="shot" style="background:linear-gradient(135deg,' + c[0] + ',' + c[1] + ')">print do projeto</div><b>Projeto ' + (i + 1) + '</b></div>').join('') + '</div>',
   telefone: z => heading(z, 'Mais links em breve.') +
     '<div class="links"><a class="link on" href="' + GITHUB + '" target="_blank" rel="noopener noreferrer"><span>GitHub</span><small>GabriellaCMaciel ↗</small></a>' +
-    ['LinkedIn', 'Instagram', 'E-mail', 'WhatsApp', 'YouTube'].map(n => '<div class="link off"><span>' + n + '</span><small>em breve</small></div>').join('') + '</div>',
-  cartas: z => heading(z, 'Depoimentos de exemplo. Escolha uma categoria para filtrar.') +
-    '<div class="chips"><button class="chip" type="button" data-cat="">Todas</button>' + ['Professores', 'Colegas', 'Mentores', 'Clientes'].map(c => '<button class="chip" type="button" data-cat="' + c + '">' + c + '</button>').join('') + '</div>' +
-    '<div class="letters" id="letters"></div>'
+    ['LinkedIn', 'Instagram', 'E-mail', 'WhatsApp', 'YouTube'].map(n => '<div class="link off"><span>' + n + '</span><small>em breve</small></div>').join('') + '</div>'
 };
-function renderLetters(cat) {
-  const list = letters.filter(l => !cat || l.cat === cat);
-  $('letters').innerHTML = list.map(l => '<div class="letter"><span class="tag">' + l.cat + ' · exemplo</span><p>' + l.text + '</p><cite>' + l.who + '</cite></div>').join('');
-  hud.sheet.querySelectorAll('.chip[data-cat]').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.cat === (cat || ''))));
-}
-
 // O painel de um livro da biblioteca: curso, certificação ou graduação
 function bookHtml(b) {
   return '<button class="back" type="button" data-back="1">← todos os livros</button>' +
@@ -49,22 +40,20 @@ function showSheet(html) { // coloca o conteúdo na folha do painel e leva o foc
 function openPanel(z) {
   if (panelOpen || !z) return;
   panelOpen = true;
+  if (z.id === 'cartas') return openMail(); // a caixa de correio tem tela própria (js/mail.js)
   // perto de um livro da biblioteca, abre direto o livro; senão, a lista de livros
   showSheet(z.id === 'biblioteca' && activeBook ? bookHtml(activeBook.data) : panels[z.id](z));
-  if (z.id === 'cartas') renderLetters('');
 }
 function openBook(b) { // chamado também pelo clique do mouse em um livro 3D (library.js)
   if (panelOpen) return;
   panelOpen = true; showSheet(bookHtml(b));
 }
-function closePanel() { panelOpen = false; hud.panel.hidden = true; }
+function closePanel() { panelOpen = false; hud.panel.hidden = true; if (mailUi.isOpen) closeMail(); }
 hud.sheet.addEventListener('click', e => {
   if (e.target.closest('.close')) return closePanel();
   const bk = e.target.closest('[data-book]');
   if (bk) return showSheet(bookHtml(books.find(b => b.id === bk.dataset.book)));
   if (e.target.closest('[data-back]')) return showSheet(panels.biblioteca(zones.find(z => z.id === 'biblioteca')));
-  const chip = e.target.closest('.chip[data-cat]');
-  if (chip) renderLetters(chip.dataset.cat);
 });
 hud.panel.addEventListener('click', e => { if (e.target === hud.panel) closePanel(); });
 hud.open.addEventListener('click', () => openPanel(activeZone));
@@ -74,6 +63,7 @@ const keys = {};
 window.addEventListener('keydown', e => {
   keys[e.code] = true;
   if (phase !== 'world') return;
+  if (mailKey(e)) return; // com a tela das cartas aberta, ela cuida das teclas
   if (e.code === 'Escape') closePanel();
   else if ((e.code === 'KeyE' || e.code === 'Enter') && !panelOpen && activeZone) openPanel(activeZone);
 });
@@ -169,7 +159,7 @@ function updateWorld(dt, now) {
   updateSparks(dt);
   checkZones(now);
   updateLibrary(now, dt); updatePondLife(now, dt);
-  updateGarden(now); updateSwing(now);
+  updateGarden(now); updateSwing(now); updateMailbox(now);
 
   // 6) o sol (e suas sombras) acompanha o personagem; a câmera também, com suavidade
   sun.position.set(player.position.x + 12, 26, player.position.z + 10);

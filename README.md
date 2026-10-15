@@ -22,6 +22,8 @@ js/library.js     a biblioteca: grande pavilhão aberto com jardim, lagoa, estan
 js/pond.js        a lagoa viva: peixes nadando e o gato Zé Porempa tentando pegá-los
 js/kiara.js       a Kiara: segue a Gabriella e, quando ela para, vem se esfregar nas pernas pedindo carinho
 js/swing.js       o balanço na árvore (cordas com flores e hera, livro, manta, cestos), à direita da biblioteca
+js/mailbox.js     a zona Cartas em 3D: casinha decorativa e caixa de correio rosa com rosas
+js/mail.js        a tela das cartas: carrossel de envelopes e a animação de abrir a carta
 js/zones.js       cenários e etiquetas das outras zonas (sem círculos: tudo faz parte do mesmo mundo)
 js/decor.js       decoração do mundo inteiro: flores, árvores floridas, postes e fios de luz ligando as zonas
 js/ui.js          painéis, controles e o loop principal
