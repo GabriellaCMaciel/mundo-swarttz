@@ -159,7 +159,7 @@ function updateWorld(dt, now) {
   updateSparks(dt);
   checkZones(now);
   updateLibrary(now, dt); updatePondLife(now, dt);
-  updateGarden(now); updateSwing(now); updateMailbox(now, dt);
+  updateGarden(now); updateSwing(now); updateMailbox(now, dt); updatePhone(now, dt);
 
   // 6) o sol (e suas sombras) acompanha o personagem; a câmera também, com suavidade
   sun.position.set(player.position.x + 12, 26, player.position.z + 10);

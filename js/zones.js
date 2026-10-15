@@ -32,20 +32,6 @@ function placeholderTex(c1, c2, label) {
     x.fillText(label, w / 2, h - 44); x.font = '400 13px "JetBrains Mono", monospace'; x.fillText('print do projeto', w / 2, h - 22);
   });
 }
-// Tela do telefone gigante: uma grade de "apps" (só o GitHub está ligado por enquanto)
-function phoneTex() {
-  return canvasTex(512, 700, (x, w, h) => {
-    x.fillStyle = '#0b0613'; x.fillRect(0, 0, w, h);
-    x.fillStyle = '#f2b84b'; x.font = '800 38px Syne, sans-serif'; x.textAlign = 'center'; x.fillText('contatos', w / 2, 90);
-    const tiles = ['GitHub', 'LinkedIn', 'Instagram', 'E-mail', 'WhatsApp', 'YouTube', 'TikTok', 'Figma', 'Currículo'];
-    tiles.forEach((t, i) => {
-      const cx = 30 + (i % 3) * 156, cy = 150 + Math.floor(i / 3) * 140;
-      x.fillStyle = i === 0 ? '#f2b84b' : '#2a1745'; x.fillRect(cx, cy, 140, 120);
-      x.fillStyle = i === 0 ? '#0b0613' : '#b79af5'; x.font = '700 22px Syne, sans-serif'; x.fillText(t, cx + 70, cy + 70);
-    });
-  });
-}
-
 // Cada função abaixo monta o "cenário" de uma zona. Mexa nas cores e tamanhos à vontade.
 const props = {
   sobre(g) { // quadro com a foto colada com fita e um bilhete com a logo
@@ -110,11 +96,7 @@ const props = {
       g.add(s); floaters.push(s);
     });
   },
-  telefone(g) { // telefone grandão: cada "app" será uma rede social
-    box(3, 5, 0.4, 0x120b1c, 0, 2.7, 0, g);
-    const scr = new THREE.Mesh(new THREE.PlaneGeometry(2.7, 3.7), new THREE.MeshBasicMaterial({ map: phoneTex() })); scr.position.set(0, 2.75, 0.21); g.add(scr);
-    const g2 = glowSprite(0x37d0c0, 7, 0.4); g2.position.set(0, 2.8, 0.6); g.add(g2);
-  },
+  telefone(g) { buildPhone(g); }, // o celular gigante flutuante, com ícones e cartões de vidro (js/phone.js)
   cartas(g) { buildMailbox(g); } // a casinha e a caixa de correio rosa (js/mailbox.js)
 };
 
@@ -126,7 +108,7 @@ const zones = [
   { id: 'biblioteca', name: 'Biblioteca', color: 0x37d0c0, pos: [0, 0, -54], r: 12.5, labelY: 13, glow: 0.05, lightI: 0.5, lightD: 20,
     text: 'Os livros que brilham são cursos, certificações e a graduação. Chegue perto de um e abra.' },
   { id: 'selos', name: 'Álbum de selos', color: 0xf2b84b, pos: [33, 0, -20], size: 1.35, text: 'Cada projeto vira selos com prints dele rodando.' },
-  { id: 'telefone', name: 'Telefone', color: 0x7b3fe4, pos: [27, 0, 31], size: 1.35, text: 'Redes sociais e contatos, a um toque.' },
+  { id: 'telefone', name: 'Telefone', color: 0x7b3fe4, pos: [27, 0, 31], size: 1.35, labelY: 0.5, labelZ: 2.0, text: 'Redes sociais e contatos, a um toque.' },
   // Cartas: a posição é a da caixa de correio. A casa e o quintal ficam atrás dela, girados (rot) para não encararem a câmera (veja mailbox.js)
   { id: 'cartas', name: 'Cartas', color: 0xff7eb6, pos: [CARTAS.x, 0, CARTAS.z], rot: CARTAS.rot, r: 7, labelY: 5.4, glow: 0, lightI: 0.22, lightD: 12, text: 'Cartas de depoimento que a Gabriella recebeu. Abra a caixinha de correio para ler.' }
 ];
@@ -161,7 +143,7 @@ function buildZones() {
     const stage = S === 1 ? g : new THREE.Group();
     if (S !== 1) { stage.scale.setScalar(S); g.add(stage); }
     props[z.id](stage);
-    const label = makeLabel(z.name, z.color); label.position.set(0, z.labelY || 6.8 * S, 0); g.add(label);
+    const label = makeLabel(z.name, z.color); label.position.set(0, z.labelY || 6.8 * S, z.labelZ || 0); // labelZ: puxa a etiqueta para a frente (o celular fica alto demais para ela ficar em cima) g.add(label);
     enableShadows(g);
     z.built = true; z.light = light; z.label = label; z.r = R;
 
