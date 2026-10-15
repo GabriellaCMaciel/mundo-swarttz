@@ -139,17 +139,20 @@ const zones = [
 
 // Etiqueta flutuante: desenhada num canvas 2D e usada como "sprite" (imagem que sempre encara a câmera)
 function makeLabel(text, color, scale = 1) {
-  const c = document.createElement('canvas'); c.width = 512; c.height = 128;
-  const x = c.getContext('2d');
+  // A largura da caixa se ajusta ao texto (medido no canvas): nomes longos como "Álbum de selos" não são mais cortados
+  const c = document.createElement('canvas'), x = c.getContext('2d'), font = '800 54px Syne, system-ui, sans-serif';
+  x.font = font;
+  const W = Math.max(512, Math.ceil(x.measureText(text).width) + 120); // 60px de folga de cada lado
+  c.width = W; c.height = 128;
   x.fillStyle = 'rgba(11,6,19,0.85)';
   x.beginPath();
-  if (x.roundRect) x.roundRect(6, 6, 500, 116, 28); else x.rect(6, 6, 500, 116);
+  if (x.roundRect) x.roundRect(6, 6, W - 12, 116, 28); else x.rect(6, 6, W - 12, 116);
   x.fill();
   x.lineWidth = 5; x.strokeStyle = hex(color); x.stroke();
-  x.fillStyle = '#f6ecd9'; x.font = '800 54px Syne, system-ui, sans-serif';
-  x.textAlign = 'center'; x.textBaseline = 'middle'; x.fillText(text, 256, 68);
+  x.fillStyle = '#f6ecd9'; x.font = font; // mudar o tamanho do canvas apaga a fonte, então definimos de novo
+  x.textAlign = 'center'; x.textBaseline = 'middle'; x.fillText(text, W / 2, 68);
   const s = new THREE.Sprite(new THREE.SpriteMaterial({ map: new THREE.CanvasTexture(c), transparent: true, depthTest: false }));
-  s.scale.set(4 * scale, 1 * scale, 1); s.renderOrder = 10;
+  s.scale.set(4 * scale * (W / 512), 1 * scale, 1); s.renderOrder = 10;
   return s;
 }
 
