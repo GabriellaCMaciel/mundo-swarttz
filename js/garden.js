@@ -4,7 +4,9 @@
 'use strict';
 
 // A lagoa da biblioteca (coordenadas do MUNDO). Fica aqui para library.js, pond.js e decor.js concordarem sobre onde ela está.
-const POND = { x: -19.5, z: -23, r: 5.4 };
+const POND = { x: -30, z: -26, r: 5.4 };
+// O balanço na árvore, à direita da biblioteca (coordenadas do MUNDO), usado por swing.js e decor.js
+const SWING = { x: 29, z: -27 };
 
 const DEG = Math.PI / 180;
 const polar = (ang, r) => [Math.sin(ang) * r, Math.cos(ang) * r]; // ângulo + distância -> [x, z]

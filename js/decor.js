@@ -8,7 +8,7 @@ function buildDecor() {
 
   // Lugares onde NÃO se planta nada: em cima das zonas, no ponto de partida e em cima das trilhas
   const spots = zones.map(z => ({ x: z.pos[0], z: z.pos[2], r: (z.r || 5.5) + (z.id === 'biblioteca' ? 11.5 : 3.5) }));
-  spots.push({ x: 0, z: 6, r: 6 }, { x: POND.x, z: POND.z, r: POND.r + 2.5 }); // ponto de partida e lagoa
+  spots.push({ x: 0, z: 6, r: 6 }, { x: POND.x, z: POND.z, r: POND.r + 2.5 }, { x: SWING.x + 3, z: SWING.z, r: 10 }); // ponto de partida, lagoa e balanço
   // Onde NÃO nascem árvores (só moitas baixas): no corredor entre o ponto de partida e a câmera, e na frente da lagoa
   const noTree = (x, z) => (Math.abs(x) < 9 && z > -4) || (Math.abs(x - POND.x) < POND.r + 14 && z > POND.z + 2 && z < POND.z + 20);
   const trails = zones.map(z => ({ len: Math.hypot(z.pos[0], z.pos[2]), x: z.pos[0], z: z.pos[2], r: z.r || 5.5 }));
