@@ -204,6 +204,8 @@ function buildMailbox(g) {
   veg.addTo(g); lights.addTo(g, 6); lampGlows(g, lampPos, 3.2);
   addButterflies(g, [[-2, 1.5], [3, 2.5], [-8, -8], [-14, -14], [0, -10]], 6, rnd);
 
+  // Mel (no telhado) e os três filhotes (no quintal): js/yardcats.js
+  buildYardCats(g, H, rise, half);
   mergeStatic(g); // as caixas das paredes, da cerca etc. viram poucas malhas (muito mais leve para a placa de vídeo)
 }
 
@@ -217,4 +219,5 @@ function updateMailbox(now, dt) {
     p.s.position.y = b[1] + t * 3.4; p.s.position.x = b[0] + Math.sin(t * 4 + p.ph * 6) * 0.4;
     p.s.material.opacity = 0.32 * Math.sin(t * Math.PI); const k = 1.3 + t * 2.4; p.s.scale.set(k, k, 1);
   });
+  updateYardCats(now, dt);
 }
