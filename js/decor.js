@@ -8,7 +8,9 @@ function buildDecor() {
 
   // Lugares onde NÃO se planta nada: em cima das zonas, no ponto de partida e em cima das trilhas
   const spots = zones.map(z => ({ x: z.pos[0], z: z.pos[2], r: (z.r || 5.5) + (z.id === 'biblioteca' ? 11.5 : 3.5) }));
-  spots.push({ x: 0, z: 6, r: 5 });
+  spots.push({ x: 0, z: 6, r: 6 }, { x: POND.x, z: POND.z, r: POND.r + 2.5 }); // ponto de partida e lagoa
+  // Onde NÃO nascem árvores (só moitas baixas): no corredor entre o ponto de partida e a câmera, e na frente da lagoa
+  const noTree = (x, z) => (Math.abs(x) < 9 && z > -4) || (Math.abs(x - POND.x) < POND.r + 14 && z > POND.z + 2 && z < POND.z + 20);
   const trails = zones.map(z => ({ len: Math.hypot(z.pos[0], z.pos[2]), x: z.pos[0], z: z.pos[2], r: z.r || 5.5 }));
   const onTrail = (px, pz, w) => trails.some(t => { // distância do ponto até o segmento que vai do centro até a zona
     const k = Math.max(0, Math.min(1, (px * t.x + pz * t.z) / (t.len * t.len)));
@@ -27,7 +29,7 @@ function buildDecor() {
     const roll = rnd(), dom = FLOWER_COLS[(rnd() * 6) | 0];
     if (roll < 0.34) { veg.groundBush(x, z, 0.6 + rnd() * 0.7, 9, dom); if (ok % 6 === 0) centers.push([x, z]); }
     else if (roll < 0.7) { for (let k = 0; k < 4; k++) veg.groundBush(x + (rnd() - 0.5) * 2, z + (rnd() - 0.5) * 2, 0.2 + rnd() * 0.14, 4, FLOWER_COLS[(rnd() * 6) | 0]); }
-    else if (roll < 0.86 && nearness(x, z) > 7) { // árvores só um pouco mais longe das construções
+    else if (roll < 0.86 && nearness(x, z) > 7 && !noTree(x, z)) { // árvores só um pouco mais longe das construções
       const h = 4.6 + rnd() * 2.6, cr = veg.tree(x, z, h, rnd() < 0.5);
       if (rnd() < 0.7) for (let k = 0; k < 12; k++) { const u = rnd() * 6.283, v = rnd() * 3.14; lights.add(x + Math.cos(u) * Math.sin(v) * cr * 1.05, h * 0.72 + Math.cos(v) * cr * 0.8, z + Math.sin(u) * Math.sin(v) * cr * 1.05); }
     } else veg.groundBush(x, z, 0.5 + rnd() * 0.5, 6, dom);

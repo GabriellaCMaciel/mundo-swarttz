@@ -380,7 +380,7 @@ function buildLibrary(g) {
   }
 
   // ===================== O JARDIM EM VOLTA (sem bordas: vai se misturando ao mundo) =====================
-  const pond = { x: -17, z: 10, r: 3.8 };
+  const pond = { x: POND.x - g.position.x, z: POND.z - g.position.z, r: POND.r }; // a lagoa (posição global em garden.js: o gato e os peixes dela vivem em pond.js)
   const blocked = (x, z, pad = 0) => (z > 8.5 && Math.abs(x) < 3.2 + pad) || Math.hypot(x - pond.x, z - pond.z) < pond.r + 1.4 + pad; // caminho da entrada e lagoa
   // Três fileiras de canteiros floridos, cada trecho com uma cor dominante (os canteiros mudam de cor ao redor)
   [[14.3, 3.0, 0.9, 1.4, 11], [15.9, 3.2, 0.7, 1.1, 9], [17.6, 3.6, 0.9, 1.5, 5]].forEach(([rad, stp, r0, r1, nf], ri) => {
@@ -401,6 +401,7 @@ function buildLibrary(g) {
   for (let a = 38; a < 330; a += 21) {
     const [x, z] = polar((a + rnd() * 8) * DEG, 21 + rnd() * 4.5);
     if (blocked(x, z, 2)) continue;
+    if (z > pond.z + 2 && Math.abs(x - pond.x) < pond.r + 8) continue; // nenhuma árvore na frente da lagoa (a câmera olha de baixo para cima)
     const h = 5.2 + rnd() * 2, cr = veg.tree(x, z, h, (a / 21 | 0) % 2 === 0);
     for (let i = 0; i < 16; i++) { const u = rnd() * 6.283, v = rnd() * 3.14; lights.add(x + Math.cos(u) * Math.sin(v) * cr * 1.05, h * 0.72 + Math.cos(v) * cr * 0.8, z + Math.sin(u) * Math.sin(v) * cr * 1.05); }
   }
@@ -422,20 +423,20 @@ function buildLibrary(g) {
     [-1, 1].forEach(s => bx(0.14, 0.6, 0.8, 0x4b2e3f, s * 1.2, 0.3, 0, b));
     veg.post(x + Math.cos(face) * 1.9, z - Math.sin(face) * 1.9, 2.0); lampPos.push(x + Math.cos(face) * 1.9, 2.2, z - Math.sin(face) * 1.9);
   };
-  bench(...polar(68 * DEG, 19.5), 68 * DEG + Math.PI);
-  bench(pond.x + 5.4, pond.z + 1.5, -Math.PI / 2);
+  bench(pond.x + pond.r + 1.7, pond.z - 3.8, -Math.PI / 2); // o único banco: de frente para a lagoa
   // Lagoa com pedras na borda, vitórias-régias e flores de lótus
   const water = flat(new THREE.Mesh(new THREE.CircleGeometry(pond.r, 40), new THREE.MeshBasicMaterial({ map: pondTex() })));
   water.rotation.x = -Math.PI / 2; water.position.set(pond.x, 0.06, pond.z); g.add(water);
   const rim = [], pads = [];
-  for (let i = 0; i < 26; i++) { const a = i / 26 * 6.283, s = 0.3 + rnd() * 0.25; rim.push({ x: pond.x + Math.cos(a) * (pond.r + 0.1), y: 0.12, z: pond.z + Math.sin(a) * (pond.r + 0.1), sx: s, sy: s * 0.7, sz: s, ry: rnd() * 3, c: [0x8a7f9a, 0x6f6283, 0xa093b3][i % 3] }); }
-  for (let i = 0; i < 9; i++) {
-    const a = rnd() * 6.283, d = rnd() * (pond.r - 0.7), x = pond.x + Math.cos(a) * d, z = pond.z + Math.sin(a) * d;
+  for (let i = 0; i < 38; i++) { const a = i / 38 * 6.283, s = 0.3 + rnd() * 0.25; rim.push({ x: pond.x + Math.cos(a) * (pond.r + 0.1), y: 0.12, z: pond.z + Math.sin(a) * (pond.r + 0.1), sx: s, sy: s * 0.7, sz: s, ry: rnd() * 3, c: [0x8a7f9a, 0x6f6283, 0xa093b3][i % 3] }); }
+  for (let i = 0; i < 12; i++) {
+    const a = rnd() * 6.283, d = rnd() * (pond.r - 0.9), x = pond.x + Math.cos(a) * d, z = pond.z + Math.sin(a) * d;
     pads.push({ x, y: 0.1, z, sx: 0.4 + rnd() * 0.25, sy: 0.04, sz: 0.4 + rnd() * 0.25, c: GREENS[i % 5] });
     if (i % 2 === 0) veg.bush(x, 0.18, z, 0.2, 5, i % 4 === 0 ? 0xff7eb6 : 0xfff1f5, 0x3aa17a);
   }
   g.add(instanced(new THREE.IcosahedronGeometry(1, 0), lam(0xffffff), rim));
   g.add(instanced(new THREE.CylinderGeometry(1, 1, 1, 9), lam(0xffffff), pads));
+  buildPondLife(POND); // peixinhos nadando e o Zé Porempa na beira (pond.js)
   // Borboletas voando pelo jardim
   addButterflies(g, [[-9, 15], [9, 15], [-13, -14], [13, -14], [0, 20], [-20, 0], [20, 2], [-5, 24]], 8, rnd);
 

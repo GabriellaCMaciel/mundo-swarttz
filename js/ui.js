@@ -175,7 +175,7 @@ function updateWorld(dt, now) {
   }
   updateSparks(dt);
   checkZones(now);
-  updateLibrary(now, dt);
+  updateLibrary(now, dt); updatePondLife(now, dt);
   updateGarden(now);
 
   // 6) o sol (e suas sombras) acompanha o personagem; a câmera também, com suavidade
