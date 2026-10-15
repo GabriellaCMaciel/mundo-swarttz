@@ -6,8 +6,8 @@ Você abre o notebook, "hackeia" o perfil e entra num mundo com zonas para explo
 
 ## Como usar
 
-- Computador: `WASD` ou setas para andar, `E` para abrir uma zona, `Esc` para fechar.
-- Celular: joystick na tela e botão "abrir".
+- Computador: `WASD` ou setas para andar, `E` (ou clicar na coisa) para abrir uma zona, `Esc` para fechar.
+- Celular: joystick na tela; toque na coisa (ou no cartão/botão "abrir") para abrir.
 
 ## Estrutura
 
@@ -25,6 +25,7 @@ js/swing.js       o balanço na árvore (cordas com flores e hera, livro, manta,
 js/mailbox.js     a zona Cartas em 3D: caixa de correio rosa, casinha inclinada e quintal com cerca completa e portão
 js/yardcats.js    a Mel (no telhado, rosna se outro gato chega perto) e os filhotes brincando de lutinha no quintal
 js/phone.js       o celular gigante da zona Telefone: flutua, gira devagar para os lados seguindo a pessoa, com ícones de redes e cartões de vidro
+js/pick.js        toque/clique nas coisas do mundo: ícones do celular abrem os perfis, zonas abrem o painel
 js/mail.js        a tela das cartas: carrossel de envelopes e a carta dobrada em três (animação por linha do tempo, reversível)
 js/zones.js       cenários e etiquetas das outras zonas (sem círculos: tudo faz parte do mesmo mundo)
 js/decor.js       decoração do mundo inteiro: flores, árvores floridas, postes e fios de luz ligando as zonas
@@ -45,7 +46,8 @@ Use um servidor local (por exemplo, a extensão **Live Server** do VS Code) ou p
 - Zonas (nome, cor, posição, texto do cartão): lista `zones` em `js/zones.js`.
 - Conteúdo dos painéis: objeto `panels` em `js/ui.js`.
 - Velocidade do personagem e tamanho do mundo: `SPEED` e `LIMIT` em `js/ui.js`.
-- Celular gigante: medidas em `PHONE`, posição dos ícones em `PH_SPOTS` e textos da tela/cartões em `js/phone.js`. O giro máximo é ±0,9 rad (`want` em `updatePhone`).
+- Links das redes sociais: lista `SOCIALS` em `js/config.js` (cole o link do seu perfil em `url`; vazio = "em breve").
+- Celular gigante: medidas em `PHONE`, posição dos ícones em `PH_SPOTS` e textos da tela/cartões em `js/phone.js`. O giro (só acompanha a pessoa) é limitado a ±0,38 rad (`want` em `updatePhone`).
 - Tamanho de cada zona: campo `size` da lista `zones` (1 = tamanho original). A casa das cartas tem as medidas e o giro em `CARTAS`, `YARD` e `HOUSE`, no topo de `js/mailbox.js`.
 
 Os textos dos painéis, os depoimentos e as imagens dos selos ainda são provisórios.

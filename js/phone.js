@@ -1,17 +1,18 @@
-// O celular gigante da zona Telefone: flutua, vira devagar para a esquerda e para a direita (nunca mostra as costas),
-// acompanha por onde a pessoa anda e tem ícones de redes sociais e cartões de vidro flutuando em volta.
+// O celular gigante da zona Telefone: flutua e vira só um pouquinho, acompanhando por onde a pessoa anda (nunca mostra as costas),
+// e tem ícones de redes sociais (clicáveis: levam ao perfil em js/config.js > SOCIALS) e cartões de vidro flutuando em volta.
 //
 // CONCEITOS DESTE ARQUIVO
 //  - Hierarquia de grupos: rig (flutua) > yawG (gira para os lados) > tiltG (inclina um pouquinho) > corpo, tela, cartões e ícones.
 //    Tudo que é filho do yawG gira junto; cada ícone ainda tem a sua própria animação por cima (balanço, giro, deriva).
 //  - Textura desenhada no Canvas 2D: a tela, os cartões e os ícones são imagens desenhadas por código (js/intro.js: canvasTex).
 //    Todo texto passa por put()/fitFont(), que encolhe a letra até caber na largura disponível: assim nenhuma palavra é cortada.
-//  - Seguir sem virar de costas: o ângulo alvo = (onde a pessoa está em relação ao celular) + (um balanço lento de seno), e depois
-//    é limitado (clamp) a ±0,9 rad (~51°). A suavização (angLerp) faz o giro ser macio, sem tranco.
+//  - Seguir sem virar de costas: o ângulo alvo = (onde a pessoa está em relação ao celular) x uma fração pequena, limitado (clamp)
+//    a ±0,38 rad (~22°). Ele não gira sozinho: se a pessoa para, ele para. A suavização (angLerp) faz o giro ser macio, sem tranco.
+//  - Áreas de clique: cada ícone tem um plano invisível (hit) um pouco maior que ele. O raio do mouse/dedo (js/pick.js) testa esses planos.
 'use strict';
 
 const PHONE = { W: 3.0, H: 5.6, D: 0.34, cy: 3.55 }; // medidas do corpo (largura, altura, espessura) e altura do centro, em unidades do cenário
-const phoneRig = { built: false, rig: null, yawG: null, tiltG: null, icons: [], cards: [], mats: [], yaw: 0, wx: 0, wz: 0 };
+const phoneRig = { built: false, rig: null, yawG: null, tiltG: null, icons: [], cards: [], mats: [], hits: [], yaw: 0, wx: 0, wz: 0 };
 const PH_FONT = 'Syne, system-ui, sans-serif', PH_MONO = '"JetBrains Mono", ui-monospace, monospace';
 
 // ---------- ajudantes de desenho ----------
@@ -177,6 +178,9 @@ function buildPhone(g) {
       ic.draw(x); }) }))));
     face.scale.set(0.97, 0.97, 1); face.position.z = 0.168; face.renderOrder = 3; it.add(face);
     const lab = iconLabel(ic.n, it); lab.position.set(0, -0.76, 0.2);
+    // área de clique invisível (ícone + etiqueta), um pouco maior que o desenho: bom para o dedo no celular
+    const hit = new THREE.Mesh(new THREE.PlaneGeometry(1.35, 1.7), new THREE.MeshBasicMaterial({ visible: false, side: THREE.DoubleSide }));
+    hit.position.set(0, -0.22, 0.25); hit.userData.social = SOCIALS.find(o => o.name === ic.n) || { name: ic.n, url: '' }; it.add(hit); R.hits.push(hit);
     it.scale.setScalar(s); it.position.set(px, py, pz); T.add(it);
     R.icons.push({ g: it, x0: px, y0: py, z0: pz, s, ph: i * 1.7 });
   });
@@ -189,11 +193,10 @@ function updatePhone(now, dt) {
   const R = phoneRig; if (!R.built) return;
   const dx = player.position.x - R.wx, dz = player.position.z - R.wz;
   if (dx * dx + dz * dz > 95 * 95) return; // longe demais para ver: não gasta nada
-  // 1) para onde olhar: um pouco na direção da pessoa (usa a distância da câmera, que fica sempre à frente, então nunca vira de costas) + balanço lento
-  const follow = Math.max(-0.55, Math.min(0.55, Math.atan2(dx, Math.max(10, camera.position.z - R.wz)) * 1.1));
-  const sway = calm ? 0 : Math.sin(now * 0.32) * 0.32; // ~20 s para ir e voltar
-  const want = Math.max(-0.9, Math.min(0.9, follow + sway));
-  R.yaw = angLerp(R.yaw, want, Math.min(1, dt * 1.4)); R.yawG.rotation.y = R.yaw;
+  // 1) para onde olhar: um pouco na direção da pessoa (usa a distância da câmera, que fica sempre à frente, então nunca vira de costas)
+  const follow = Math.atan2(dx, Math.max(10, camera.position.z - R.wz)) * 0.6; // só uma fração do ângulo real: o giro é sutil
+  const want = Math.max(-0.38, Math.min(0.38, follow));
+  R.yaw = angLerp(R.yaw, want, Math.min(1, dt * 2.2)); R.yawG.rotation.y = R.yaw;
   // 1b) câmera colada no celular: ele vai ficando transparente para não tapar a tela inteira (e não ser atravessado)
   const cd = Math.hypot(camera.position.x - R.wx, camera.position.z - R.wz), fade = Math.max(0.1, Math.min(1, (cd - 3) / 5));
   if (fade !== R.fade) { R.fade = fade; R.mats.forEach(m => { m.transparent = fade < 1 || m.userData.keepT; m.opacity = fade; if (!m.userData.keepT) m.depthWrite = fade >= 1; }); }
@@ -203,7 +206,7 @@ function updatePhone(now, dt) {
   // 2) flutuar e inclinar de leve (a tela olha um pouco para cima, na direção da câmera)
   if (calm) { R.tiltG.rotation.set(-0.12, 0, -0.07); return; }
   R.rig.position.y = PHONE.cy + Math.sin(now * 0.9) * 0.14;
-  R.tiltG.rotation.set(-0.12 + Math.sin(now * 0.37) * 0.025, 0, -0.07 + Math.sin(now * 0.45) * 0.03);
+  R.tiltG.rotation.set(-0.12, 0, -0.07); // inclinação fixa (a tela olha um pouco para cima); o celular só flutua para cima e para baixo
   // 3) cada ícone tem o seu balanço, giro e deriva (fases diferentes para não andarem juntos)
   R.icons.forEach(ic => {
     const t = now + ic.ph;

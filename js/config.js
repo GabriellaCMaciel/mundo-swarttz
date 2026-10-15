@@ -12,6 +12,21 @@ const ASSETS = {
 // Link do GitHub mostrado no telefone
 const GITHUB = 'https://github.com/GabriellaCMaciel';
 
+// REDES SOCIAIS: os ícones flutuantes do celular gigante e a lista do painel "Telefone" usam esta lista.
+// url = o link do SEU PERFIL naquela rede. Enquanto estiver '' (vazio), o ícone mostra "em breve" ao ser tocado.
+// Exemplos: LinkedIn 'https://www.linkedin.com/in/seu-perfil' | E-mail 'mailto:voce@email.com' | WhatsApp 'https://wa.me/55DDDNUMERO'
+// handle = o texto pequeno que aparece na lista do painel (seu @ ou nome de usuário).
+const SOCIALS = [
+  { name: 'GitHub',    url: GITHUB, handle: 'GabriellaCMaciel' },
+  { name: 'LinkedIn',  url: '', handle: '' },
+  { name: 'Instagram', url: '', handle: '' },
+  { name: 'E-mail',    url: '', handle: '' },
+  { name: 'WhatsApp',  url: '', handle: '' },
+  { name: 'YouTube',   url: '', handle: '' },
+  { name: 'TikTok',    url: '', handle: '' },
+  { name: 'Currículo', url: '', handle: '' }
+];
+
 // O roteiro do "hack". Cada linha: [texto, cor]
 const terminalLines = [
   ['$ ssh visitante@swarttz.dev', '#b79af5'],

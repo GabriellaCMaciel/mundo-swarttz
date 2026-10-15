@@ -30,6 +30,7 @@ body{margin:0;background:var(--ink);color:var(--paper);font-family:var(--font-di
 .title b{display:block;font-weight:800;font-size:clamp(26px,6.4vw,56px);letter-spacing:.06em;text-transform:uppercase;color:var(--paper);text-shadow:0 0 24px rgba(123,63,228,.9)}
 .title span{font:400 12px var(--font-mono);letter-spacing:.42em;text-transform:uppercase;color:var(--gold)}
 .card{left:var(--sl);top:calc(var(--st) + 30px);width:min(380px,calc(100% - var(--sl) - var(--sr)));box-sizing:border-box;background:rgba(11,6,19,.84);border:1px solid var(--violet);padding:14px 16px;display:grid;gap:10px;justify-items:start}
+.card{cursor:pointer}
 .card h2{margin:0;font-size:20px;font-weight:800;color:var(--gold)}
 .card p{margin:0;font:400 13px/1.5 var(--font-mono);color:var(--paper)}
 .hint{left:50%;bottom:calc(var(--sb) + 18px);transform:translateX(-50%);width:max-content;max-width:calc(100% - var(--sl) - var(--sr));text-align:center;font:700 14px var(--font-mono);letter-spacing:.06em;color:var(--gold);animation:pulse 1.8s ease-in-out infinite}
@@ -148,3 +149,14 @@ body{margin:0;background:var(--ink);color:var(--paper);font-family:var(--font-di
 .sh-face.e-b::after{bottom:0;opacity:1;background:linear-gradient(to top,rgba(60,30,60,.09),transparent)}
 .sh-shade{position:absolute;inset:0;background:#1a0f2e;opacity:0;pointer-events:none;z-index:3}
 .paper-big.paper-page{position:absolute;left:0;max-height:none;overflow:hidden;box-shadow:none;border-radius:0;pointer-events:none;margin:0}
+
+/* Toque e telas pequenas: cartão de informações compacto (título e botão na mesma linha), alvos de toque maiores */
+.toast{position:fixed;left:50%;bottom:calc(var(--sb) + 150px);transform:translateX(-50%);max-width:calc(100% - 32px);box-sizing:border-box;padding:10px 16px;font:700 13px var(--font-mono);color:var(--ink);background:var(--gold);box-shadow:0 6px 24px rgba(0,0,0,.5);z-index:60;text-align:center;pointer-events:none}
+@media (max-width:640px),(pointer:coarse){
+  .card{width:min(270px,calc(100% - var(--sl) - var(--sr)));padding:8px 10px;gap:4px 8px;grid-template-columns:1fr auto;align-items:center;top:calc(var(--st) + 22px)}
+  .card h2{grid-column:1;font-size:15px;line-height:1.2}
+  .card p{grid-column:1 / -1;grid-row:2;font-size:11px;line-height:1.35}
+  .card .btn{grid-column:2;grid-row:1;min-height:34px;padding:.4em .9em;font-size:11px}
+  .close{width:44px;height:44px}
+  .btn{min-height:40px}
+}

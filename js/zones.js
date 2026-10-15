@@ -145,6 +145,7 @@ function buildZones() {
     props[z.id](stage);
     const label = makeLabel(z.name, z.color); label.position.set(0, z.labelY || 6.8 * S, z.labelZ || 0); // labelZ: puxa a etiqueta para a frente (o celular fica alto demais para ela ficar em cima) g.add(label);
     enableShadows(g);
+    g.userData.zoneId = z.id; z.group = g; // o clique (js/pick.js) descobre a zona subindo pelos pais até achar este id
     z.built = true; z.light = light; z.label = label; z.r = R;
 
     // "Fio de bordado": trilha pontilhada colorida que leva do centro até a zona

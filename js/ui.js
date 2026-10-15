@@ -17,9 +17,10 @@ const panels = {
   selos: z => heading(z, 'Imagens provisórias. Cada projeto terá vários selos, com prints dele rodando.') +
     '<div class="stamps">' + [['#ff5fa2', '#7b3fe4'], ['#37d0c0', '#7b3fe4'], ['#f2b84b', '#ff5fa2'], ['#7b3fe4', '#37d0c0'], ['#f08a3c', '#ff5fa2'], ['#b79af5', '#37d0c0']]
       .map((c, i) => '<div class="stamp"><div class="shot" style="background:linear-gradient(135deg,' + c[0] + ',' + c[1] + ')">print do projeto</div><b>Projeto ' + (i + 1) + '</b></div>').join('') + '</div>',
-  telefone: z => heading(z, 'Mais links em breve.') +
-    '<div class="links"><a class="link on" href="' + GITHUB + '" target="_blank" rel="noopener noreferrer"><span>GitHub</span><small>GabriellaCMaciel ↗</small></a>' +
-    ['LinkedIn', 'Instagram', 'E-mail', 'WhatsApp', 'YouTube'].map(n => '<div class="link off"><span>' + n + '</span><small>em breve</small></div>').join('') + '</div>'
+  telefone: z => heading(z, 'Toque numa rede (aqui ou no celular gigante) para abrir o meu perfil.') + // a lista SOCIALS fica em config.js
+    '<div class="links">' + SOCIALS.map(s => s.url
+      ? '<a class="link on" href="' + s.url + '"' + (/^mailto:/.test(s.url) ? '' : ' target="_blank" rel="noopener noreferrer"') + '><span>' + s.name + '</span><small>' + (s.handle || 'abrir') + ' ↗</small></a>'
+      : '<div class="link off"><span>' + s.name + '</span><small>em breve</small></div>').join('') + '</div>'
 };
 // O painel de um livro da biblioteca: curso, certificação ou graduação
 function bookHtml(b) {
@@ -57,6 +58,7 @@ hud.sheet.addEventListener('click', e => {
 });
 hud.panel.addEventListener('click', e => { if (e.target === hud.panel) closePanel(); });
 hud.open.addEventListener('click', () => openPanel(activeZone));
+hud.card.addEventListener('click', () => openPanel(activeZone)); // o cartão inteiro também é um botão (bom para o dedo)
 
 // ===== 6. Controles: teclado e joystick de toque =====
 const keys = {};
@@ -103,7 +105,7 @@ function startWorld() {
   scene.background = skyTex;
   scene.fog = new THREE.Fog(WORLD_FOG, 42, 104);
   hud.hint.hidden = true; hud.title.hidden = true; hud.skip.hidden = true; hud.brand.hidden = false;
-  if (touch) hud.joy.hidden = false; else hud.keys.hidden = false;
+  if (touch) { hud.joy.hidden = false; hud.open.textContent = 'abrir'; } else hud.keys.hidden = false; // no celular não existe a tecla E
   camera.position.set(player.position.x, CAM_Y, player.position.z + CAM_Z);
   lookNow.set(player.position.x, 1.5, player.position.z);
   hud.flash.style.transition = 'none'; hud.flash.style.opacity = '1';
