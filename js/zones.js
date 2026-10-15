@@ -103,7 +103,7 @@ const props = {
 // Onde cada zona fica, a cor e o texto do cartão que aparece quando você chega perto.
 // size = quanto o cenário da zona é ampliado (1 = tamanho original); r = raio de "alcance" da zona.
 const zones = [
-  { id: 'sobre', name: 'Sobre', color: 0xf2b84b, pos: [20, 0, 2], rot: -0.55, size: 1.35, text: 'Quem é a Gabriella Swarttz: foto, apresentação e descrição.' },
+  { id: 'sobre', name: 'Sobre', color: 0xf2b84b, pos: [8, 0, 1], rot: -0.55, size: 1.35, text: 'Quem é a Gabriella Swarttz: foto, apresentação e descrição.' },
   { id: 'atelie', name: 'Ateliê', color: 0xff5fa2, pos: [-33, 0, -20], size: 1.35, text: 'As soft skills viram obras: pintura, bordado e cores.' },
   { id: 'biblioteca', name: 'Biblioteca', color: 0x37d0c0, pos: [0, 0, -54], r: 12.5, labelY: 13, glow: 0.05, lightI: 0.5, lightD: 20,
     text: 'Os livros que brilham são cursos, certificações e a graduação. Chegue perto de um e abra.' },
