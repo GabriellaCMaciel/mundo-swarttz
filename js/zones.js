@@ -128,7 +128,7 @@ const props = {
 
 // Onde cada zona fica, a cor e o texto do cartão que aparece quando você chega perto
 const zones = [
-  { id: 'sobre', name: 'Sobre', color: 0xf2b84b, pos: [-7, 0, -9], text: 'Quem é a Gabriella Swarttz: foto, apresentação e descrição.' },
+  { id: 'sobre', name: 'Sobre', color: 0xf2b84b, pos: [12, 0, 1], rot: -0.55, text: 'Quem é a Gabriella Swarttz: foto, apresentação e descrição.' },
   { id: 'atelie', name: 'Ateliê', color: 0xff5fa2, pos: [-22, 0, -4], text: 'As soft skills viram obras: pintura, bordado e cores.' },
   { id: 'biblioteca', name: 'Biblioteca', color: 0x37d0c0, pos: [0, 0, -34], r: 12.5, labelY: 13, glow: 0.05, lightI: 0.5, lightD: 20,
     text: 'Os livros que brilham são cursos, certificações e a graduação. Chegue perto de um e abra.' },
@@ -155,7 +155,7 @@ function makeLabel(text, color, scale = 1) {
 
 function buildZones() {
   zones.forEach(z => {
-    const g = new THREE.Group(); g.position.set(z.pos[0], z.pos[1], z.pos[2]); world.add(g);
+    const g = new THREE.Group(); g.position.set(z.pos[0], z.pos[1], z.pos[2]); g.rotation.y = z.rot || 0; world.add(g); // rot: giro em radianos (negativo = vira a frente para a esquerda)
     const R = z.r || 5.5; // raio de "alcance" da zona (só conta para o cartão e a trilha: não existe mais nenhum círculo desenhado no chão)
     const light = new THREE.PointLight(z.color, z.lightI || 0.9, z.lightD || 14); light.position.set(0, 5, 3); g.add(light);
     const aura = glowSprite(z.color, R * 2.2, z.glow || 0.22); aura.position.set(0, 2.6, 0.5); g.add(aura);
