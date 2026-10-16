@@ -18,12 +18,12 @@ const GITHUB = 'https://github.com/GabriellaCMaciel';
 // handle = o texto pequeno que aparece na lista do painel (seu @ ou nome de usuário).
 const SOCIALS = [
   { name: 'GitHub',    url: GITHUB, handle: 'GabriellaCMaciel' },
-  { name: 'LinkedIn',  url: '', handle: '' },
-  { name: 'Instagram', url: '', handle: '' },
-  { name: 'E-mail',    url: '', handle: '' },
-  { name: 'WhatsApp',  url: '', handle: '' },
-  { name: 'YouTube',   url: '', handle: '' },
-  { name: 'TikTok',    url: '', handle: '' },
+  { name: 'LinkedIn',  url: 'https://www.linkedin.com/in/gabriellacmaciel/', handle: 'gabriellacmaciel' },
+  { name: 'Instagram', url: 'https://www.instagram.com/gabriellaswarttz/', handle: '@gabriellaswarttz' },
+  { name: 'E-mail',    url: 'mailto:gabriellacunhamaciel@gmail.com', handle: 'gabriellacunhamaciel@gmail.com' },
+  { name: 'WhatsApp',  url: 'https://wa.me/5561981024070', handle: 'chamar no WhatsApp' }, // wa.me/ + 55 (Brasil) + DDD + número, só dígitos
+  { name: 'YouTube',   url: 'https://www.youtube.com/channel/UCdCcbj2feCNZjauq3Kz1mZw', handle: 'meu canal' },
+  { name: 'TikTok',    url: 'https://www.tiktok.com/@gabriella.swarttz', handle: '@gabriella.swarttz' },
   { name: 'Currículo', url: '', handle: '' }
 ];
 

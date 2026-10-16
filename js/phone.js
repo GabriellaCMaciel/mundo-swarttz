@@ -93,7 +93,7 @@ const PH_ICONS = [
 ];
 // posição de cada ícone em volta do celular [x, y, z] (relativo ao centro dele), tamanho e fase da animação
 // (ficam todos abaixo de ~9 unidades de altura no mundo: a câmera enxerga um pouco mais que isso, o que passar do topo seria cortado)
-const PH_SPOTS = [[-3.1, 0.7, 0.5, 0.85], [-2.7, 2.2, 0.8, 0.8], [2.9, -1.7, 0.8, 0.95], [2.5, 2.4, 0.8, 0.9], [3.5, 1.45, 0.5, 0.8], [-2.9, -2.4, 0.6, 0.85], [-3.9, -0.3, 0.5, 0.7], [3.9, -0.35, 0.5, 0.65]];
+const PH_SPOTS = [[-3.1, 0.7, 0.5, 0.85], [-2.6, 1.8, 0.8, 0.8], [2.9, -1.7, 0.8, 0.95], [2.5, 2.4, 0.8, 0.9], [3.5, 1.45, 0.5, 0.8], [-2.9, -2.4, 0.6, 0.85], [-3.9, -0.3, 0.5, 0.7], [3.9, -0.35, 0.5, 0.65]];
 // ordem dos ícones em PH_ICONS: GitHub, LinkedIn, Instagram, E-mail, WhatsApp, YouTube, TikTok, Currículo
 
 function iconLabel(text, parent) { // etiqueta de vidro embaixo do ícone: a largura se ajusta ao texto, então nada é cortado
