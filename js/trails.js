@@ -1,6 +1,6 @@
-// As trilhas: caminhos de terra batida, tortos como os de verdade, que ligam o ponto de partida a cada lugar do mundo.
-// Antes eram tracinhos em linha reta; agora cada trilha é uma FITA curva desenhada no chão, com pedrinhas coloridas nas beiradas.
-// O mesmo traçado (TRAILS) é usado pelo mapa (js/worldmap.js), pela decoração (js/decor.js: não plantar em cima, postes ao lado).
+// As trilhas: linhas curvas, tortas como as de verdade, que ligam o ponto de partida a cada lugar do mundo.
+// ELAS NÃO SÃO MAIS DESENHADAS NO CHÃO (a faixa de areia não combinava com o chão bordado do Mundo Swarttz). O traçado (TRAILS) continua
+// existindo só como "guia invisível": a decoração (js/decor.js) usa para não plantar em cima e para alinhar os postes de luz ao lado do caminho.
 //
 // CONCEITOS DESTE ARQUIVO
 //  - CURVA POR SOMA DE SENOS: a trilha começa como uma reta do ponto A ao ponto B. Em cada ponto dela a gente empurra para o lado
@@ -9,8 +9,6 @@
 //    fazem a curva sair igual em toda visita.
 //  - DESVIO DE OBSTÁCULOS: pontos que caem dentro do quintal cercado são empurrados para fora do retângulo; depois um "alisamento"
 //    (média de vizinhos) tira as quinas. Assim a trilha contorna a cerca sem ficar dura.
-//  - FITA (ribbon): para cada ponto da trilha criamos dois vértices, um de cada lado (ponto ± normal·largura/2), e ligamos tudo em
-//    triângulos. A textura tem bordas transparentes e esfarrapadas, que dão o ar de caminho gasto pelo uso.
 'use strict';
 
 const TRAIL_START = { x: 0, z: 6 };        // o ponto de partida (onde a personagem nasce)
@@ -61,44 +59,3 @@ zones.forEach((z, i) => {
 });
 TRAILS.push(makeTrail({ x: -9, z: -43 }, { x: POND.x + 8.5, z: POND.z + 1 }, 301, 4, 2.3)); // biblioteca > lagoa e cerejeira
 TRAILS.push(makeTrail({ x: 9, z: -43 }, { x: SWING.x - 8.5, z: SWING.z + 1 }, 302, 4, 2.3)); // biblioteca > balanço
-
-// ----- desenho no chão -----
-(function buildTrails() {
-  const tex = canvasTex(128, 128, (x, w, h) => { // terra batida: miolo claro, beiradas esfarrapadas e transparentes, pontinhos de areia e de sombra
-    const g = x.createLinearGradient(0, 0, w, 0);
-    g.addColorStop(0, 'rgba(196,150,100,0)'); g.addColorStop(0.1, 'rgba(196,150,100,.9)'); g.addColorStop(0.28, 'rgba(236,206,158,1)'); g.addColorStop(0.72, 'rgba(236,206,158,1)'); g.addColorStop(0.9, 'rgba(196,150,100,.9)'); g.addColorStop(1, 'rgba(196,150,100,0)');
-    x.fillStyle = g; x.fillRect(0, 0, w, h);
-    const r = mulberry32(5);
-    for (let i = 0; i < 160; i++) { x.fillStyle = r() < 0.5 ? 'rgba(255,236,200,.55)' : 'rgba(150,104,70,.4)'; const px = w * (0.12 + r() * 0.76), py = r() * h, s = 1 + r() * 2.6; x.beginPath(); x.ellipse(px, py, s * 1.5, s, r() * 3, 0, 6.3); x.fill(); }
-    for (let i = 0; i < 70; i++) { const py = r() * h, side = r() < 0.5 ? 0.1 : 0.9; x.fillStyle = 'rgba(70,50,40,.25)'; x.beginPath(); x.ellipse(w * (side + (r() - 0.5) * 0.08), py, 3 + r() * 3, 2 + r() * 2, r() * 3, 0, 6.3); x.fill(); } // sombrinhas na beirada: a grama amassada
-  });
-  tex.wrapS = tex.wrapT = THREE.RepeatWrapping;
-  const mat = new THREE.MeshLambertMaterial({ map: tex, color: 0xb99c78, transparent: true, depthWrite: false, polygonOffset: true, polygonOffsetFactor: -2, polygonOffsetUnits: -2 });
-  const pos = [], uv = [], idx = [], stones = [];
-  const rnd = mulberry32(909);
-  TRAILS.forEach((tr, ti) => {
-    const P = tr.pts, base = pos.length / 3; // base = quantos vértices já existem (esta trilha começa depois deles)
-    P.forEach((p, i) => {
-      const a = P[Math.max(0, i - 1)], b = P[Math.min(P.length - 1, i + 1)], tx = b.x - a.x, tz = b.z - a.z, tl = Math.hypot(tx, tz) || 1, nx = -tz / tl, nz = tx / tl;
-      const hw = tr.width / 2 * (0.88 + 0.2 * Math.sin(p.s * 0.45 + ti)); // a largura varia um pouco ao longo do caminho
-      pos.push(p.x + nx * hw, 0.04, p.z + nz * hw, p.x - nx * hw, 0.04, p.z - nz * hw); uv.push(0, p.s / 5, 1, p.s / 5);
-      if (i) { const k = base + (i - 1) * 2; idx.push(k, k + 2, k + 1, k + 1, k + 2, k + 3); } // dois triângulos por trecho (a ordem dos vértices decide que o lado de cima aparece)
-    });
-    // pedrinhas nas beiradas: umas na cor da zona (para cada caminho ter a sua), outras cinza-areia
-    const col = tr.zone ? tr.zone.color : 0xcdb4f6, cols = [col, col, 0xd9cbb4, 0x8f7fa6, 0xf6ecd9];
-    for (let s = 1.5; s < tr.len - 1; s += 1.6 + rnd() * 2.6) {
-      const q = trailAt(tr, s), side = rnd() < 0.5 ? -1 : 1, off = tr.width / 2 + 0.15 + rnd() * 0.8, r = 0.13 + rnd() * 0.2;
-      stones.push({ x: q.x + q.nx * off * side, y: r * 0.3, z: q.z + q.nz * off * side, sx: r * 1.25, sy: r * 0.7, sz: r, ry: rnd() * 3, c: cols[(rnd() * cols.length) | 0] });
-    }
-  });
-  const geo = new THREE.BufferGeometry();
-  geo.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3)); geo.setAttribute('uv', new THREE.Float32BufferAttribute(uv, 2));
-  geo.setIndex(idx); geo.computeVertexNormals();
-  const ribbon = new THREE.Mesh(geo, mat); ribbon.renderOrder = 1; ribbon.receiveShadow = true; ribbon.userData.flat = true; world.add(ribbon);
-  // a clareira do ponto de partida: um círculo de terra batida de borda macia, onde as trilhas se encontram
-  const plaza = new THREE.Mesh(new THREE.CircleGeometry(5.2, 36), new THREE.MeshLambertMaterial({ color: 0xb99c78, transparent: true, depthWrite: false, polygonOffset: true, polygonOffsetFactor: -2, polygonOffsetUnits: -2, map: canvasTex(128, 128, (x, w, h) => {
-    const g = x.createRadialGradient(64, 64, 0, 64, 64, 64); g.addColorStop(0, 'rgba(236,206,158,1)'); g.addColorStop(0.7, 'rgba(226,190,140,.95)'); g.addColorStop(1, 'rgba(196,150,100,0)'); x.fillStyle = g; x.fillRect(0, 0, w, h);
-  }) }));
-  plaza.rotation.x = -Math.PI / 2; plaza.position.set(TRAIL_START.x, 0.042, TRAIL_START.z); plaza.renderOrder = 1; plaza.userData.flat = true; world.add(plaza);
-  const st = instanced(new THREE.IcosahedronGeometry(1, 0), lam(0xffffff), stones); world.add(st);
-})();
