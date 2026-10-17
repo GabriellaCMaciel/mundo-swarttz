@@ -38,6 +38,9 @@ body{margin:0;background:var(--ink);color:var(--paper);font-family:var(--font-di
 .a11y-btn{right:var(--sr);top:calc(var(--st) + 38px)}
 .keys{right:var(--sr);top:var(--st);text-align:right;font:400 12px var(--font-mono);color:var(--paper);background:rgba(11,6,19,.78);padding:.5em .8em}
 .joy{left:var(--sl);bottom:var(--sb);width:124px;height:124px;border-radius:50%;border:2px solid rgba(183,154,245,.55);background:rgba(123,63,228,.18);touch-action:none}
+.acts{right:var(--sr);bottom:var(--sb);display:flex;gap:10px}
+.act{min-width:88px;min-height:48px;font-size:13px}
+.act[aria-pressed="true"]{background:var(--gold);color:var(--ink)}
 .knob{position:absolute;left:50%;top:50%;width:52px;height:52px;border-radius:50%;background:var(--gold);transform:translate(-50%,-50%)}
 .flash{position:fixed;inset:0;pointer-events:none;opacity:0;background:radial-gradient(circle,#fff 0%,var(--lilac) 55%,var(--violet) 100%)}
 .fail{position:fixed;inset:0;display:grid;place-items:center;padding:24px;text-align:center;font:400 15px/1.5 var(--font-mono)}

@@ -31,7 +31,7 @@ function updateKiara(dt, now, moving) {
   if (!wantPet) { // seguir a Gabriella (pestinha carente)
     R.mode = 'follow';
     walking = kd > 3.2;
-    if (walking) { k.position.x += kx / kd * SPEED * 0.9 * dt; k.position.z += kz / kd * SPEED * 0.9 * dt; turn = 10; }
+    if (walking) { k.position.x += kx / kd * SPEED * 0.9 * RUN.mul * dt; k.position.z += kz / kd * SPEED * 0.9 * RUN.mul * dt; turn = 10; }
   } else if (R.mode !== 'rub') { // ir até o começo do arco, ao lado das pernas dela
     const tx = p.x + Math.sin(RUB_START) * RUB_R, tz = p.z + Math.cos(RUB_START) * RUB_R, dx = tx - k.position.x, dz = tz - k.position.z, d = Math.hypot(dx, dz);
     if (d > 0.2) {

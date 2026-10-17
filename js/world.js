@@ -7,6 +7,7 @@ world.visible = false;
 scene.add(world);
 const touch = window.matchMedia('(pointer: coarse)').matches;
 const WORLD_FOG = 0x2a1250;
+const RUN = { mul: 1 }; // quanto a personagem está mais rápida que o normal (1 = andando, ~1,8 = correndo); a Kiara usa isso para acompanhar (js/kiara.js)
 const skyTex = canvasTex(8, 256, (x, w, h) => {
   const g = x.createLinearGradient(0, 0, 0, h);
   g.addColorStop(0, '#12062a'); g.addColorStop(0.55, '#2a1250'); g.addColorStop(1, '#2a1250');
@@ -176,7 +177,7 @@ const sparkColors = [0xf2b84b, 0xff5fa2, 0x37d0c0, 0xb79af5];
 function emitSpark() {
   const o = sparks.find(p => p.life <= 0); if (!o) return;
   o.life = 0.9; o.s.visible = true; o.s.material.color.setHex(sparkColors[(Math.random() * 4) | 0]);
-  o.s.position.set(player.position.x + (Math.random() - 0.5) * 0.6, 0.35, player.position.z + (Math.random() - 0.5) * 0.6);
+  o.s.position.set(player.position.x + (Math.random() - 0.5) * 0.6, player.position.y + 0.35, player.position.z + (Math.random() - 0.5) * 0.6);
 }
 function updateSparks(dt) {
   sparks.forEach(o => {

@@ -8,7 +8,7 @@ const $ = id => document.getElementById(id);
 const hud = {
   hint: $('hint'), skip: $('skip'), brand: $('brand'), title: $('title'), card: $('card'),
   cardTitle: $('cardTitle'), cardText: $('cardText'), open: $('open'), joy: $('joy'),
-  knob: $('knob'), keys: $('keys'), flash: $('flash'), panel: $('panel'), sheet: $('sheet')
+  knob: $('knob'), acts: $('acts'), btnRun: $('btnRun'), btnJump: $('btnJump'), keys: $('keys'), flash: $('flash'), panel: $('panel'), sheet: $('sheet')
 };
 
 // Aviso para leitor de tela: escreve numa região "aria-live" invisível (#srLive); o leitor lê o texto novo em voz alta, sem tirar o foco de onde a pessoa está.

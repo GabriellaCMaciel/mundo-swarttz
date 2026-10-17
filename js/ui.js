@@ -40,9 +40,10 @@ function a11yHtml() {
     '<ul class="az-list">' + zones.map(z => '<li><span>' + z.name + '</span><span class="az-btns"><button class="btn" type="button" data-az="open:' + z.id + '">Abrir</button><button class="btn" type="button" data-az="walk:' + z.id + '">Ir até lá</button></span></li>').join('') + '</ul>' +
     '<h3 class="az-h">Preferências</h3>' +
     '<label class="az-check"><input type="checkbox" id="azCalm"' + (calm ? ' checked' : '') + '> Reduzir movimento (gatos, borboletas, pétalas e luzes ficam parados)</label>' +
+    '<label class="az-check"><input type="checkbox" id="azRun"' + (runLock ? ' checked' : '') + '> Correr sempre (sem precisar segurar Shift)</label>' +
     '<h3 class="az-h">Como se mover</h3>' +
-    '<ul class="az-keys"><li><b>Teclado:</b> WASD ou setas para andar, E ou Enter para abrir, Esc para fechar, H para esta ajuda.</li>' +
-    '<li><b>Mouse ou toque:</b> clique ou toque no chão para andar até lá sozinho; toque num lugar para abrir. No celular também há o joystick.</li>' +
+    '<ul class="az-keys"><li><b>Teclado:</b> WASD ou setas para andar, Shift para correr (R liga e desliga o "correr sempre"), Espaço para pular, E ou Enter para abrir, Esc para fechar, H para esta ajuda.</li>' +
+    '<li><b>Mouse ou toque:</b> clique ou toque no chão para andar até lá sozinho; toque num lugar para abrir. No celular há o joystick e os botões "correr" e "pular" (também aparecem no computador, para quem usa só o mouse).</li>' +
     '<li><b>Sem segurar nada:</b> use "Ir até lá" acima: a personagem anda sozinha.</li></ul>';
 }
 function openA11y() { if (panelOpen || phase !== 'world') return; panelOpen = true; showSheet(a11yHtml()); }
@@ -94,7 +95,8 @@ hud.sheet.addEventListener('click', e => {
   if (bk) return showSheet(bookHtml(books.find(b => b.id === bk.dataset.book)));
   if (e.target.closest('[data-back]')) return showSheet(panels.biblioteca(zones.find(z => z.id === 'biblioteca')));
 });
-hud.sheet.addEventListener('change', e => { // caixinha "Reduzir movimento"
+hud.sheet.addEventListener('change', e => { // caixinhas "Reduzir movimento" e "Correr sempre"
+  if (e.target.id === 'azRun') setRun(e.target.checked);
   if (e.target.id === 'azCalm') { calm = e.target.checked; try { localStorage.setItem(CALM_KEY, calm ? '1' : '0'); } catch (err) { /* sem armazenamento: vale só nesta visita */ } }
 });
 hud.panel.addEventListener('click', e => { if (e.target === hud.panel) closePanel(); });
@@ -107,10 +109,18 @@ hud.card.addEventListener('click', () => openPanel(activeZone)); // o cartão in
 // "preso" e a personagem anda sozinha. A solução é um "zerar tudo" (resetInput) chamado sempre que o foco muda ou algo abre por cima do mundo.
 const keys = {};
 const stick = { x: 0, y: 0 };
+const RUN_KEY = 'swarttz-corre';
+let runLock = (() => { try { return localStorage.getItem(RUN_KEY) === '1'; } catch (e) { return false; } })(); // "correr sempre" (para quem não consegue segurar Shift)
+const JUMP = { v: 7.6, g: 24, vy: 0, air: false, squash: 0 }; // v = impulso (altura ≈ v²/2g ≈ 1,2), g = gravidade
 let resetStick = () => { };
 function resetInput() { // esquece tudo que estava apertado
   for (const k in keys) keys[k] = false;
   stick.x = 0; stick.y = 0; resetStick();
+}
+function setRun(on) { runLock = on; hud.btnRun.setAttribute('aria-pressed', on ? 'true' : 'false'); try { localStorage.setItem(RUN_KEY, on ? '1' : '0'); } catch (e) { /* sem armazenamento: vale só nesta visita */ } }
+function jump() { // pulo: dá um impulso para cima; a gravidade (em updateWorld) traz de volta
+  if (phase !== 'world' || panelOpen || mailUi.isOpen || JUMP.air) return;
+  JUMP.vy = JUMP.v; JUMP.air = true; JUMP.squash = -1; // squash < 0 = "esticar" no começo do pulo
 }
 window.addEventListener('keydown', e => {
   if (e.metaKey || e.ctrlKey || e.altKey) { resetInput(); return; } // atalho do navegador/sistema: o keyup dessas combinações costuma se perder
@@ -121,11 +131,18 @@ window.addEventListener('keydown', e => {
   if (e.code === 'Escape') closePanel();
   else if ((e.code === 'KeyE' || e.code === 'Enter') && !panelOpen && activeZone && !onControl) openPanel(activeZone);
   else if (e.code === 'KeyH' && !panelOpen) openA11y();
+  else if (e.code === 'Space' && !onControl) { e.preventDefault(); jump(); }
+  else if (e.code === 'KeyR' && !e.repeat && !panelOpen) setRun(!runLock);
 });
 window.addEventListener('keyup', e => { keys[e.code] = false; if (e.key === 'Meta' || e.key === 'Control' || e.key === 'Alt') resetInput(); });
 window.addEventListener('blur', resetInput);                                  // a janela perdeu o foco
 document.addEventListener('visibilitychange', () => { if (document.hidden) resetInput(); }); // a aba foi para o segundo plano
 window.addEventListener('contextmenu', () => { if (!touch) resetInput(); });   // menu do botão direito: o navegador engole os keyup. (No toque, um segurar longo não pode soltar o joystick.)
+hud.btnRun.setAttribute('aria-pressed', runLock ? 'true' : 'false');
+hud.btnRun.addEventListener('click', () => setRun(!runLock));
+hud.btnJump.addEventListener('pointerdown', e => { e.preventDefault(); jump(); }); // pointerdown: o pulo sai no instante do toque, sem esperar o "click"
+hud.btnJump.addEventListener('click', e => { if (e.detail === 0) jump(); });       // detail 0 = veio do teclado (Enter/Espaço no botão em foco)
+
 (function setupJoystick() {
   const R = 44; // até onde o botão pode ir
   let id = null;
@@ -163,6 +180,7 @@ function startWorld() {
   hud.hint.hidden = true; hud.title.hidden = true; hud.skip.hidden = true; hud.brand.hidden = false;
   document.getElementById('a11yBtn').hidden = false;
   announce('Você entrou no mundo 3D. Aperte H para o menu de acessibilidade, onde dá para ir direto a cada lugar. A versão simples, em texto puro, está no menu e no início da página.');
+  hud.acts.hidden = false; // botões "correr" e "pular": para toque e também para quem usa só o mouse
   if (touch) { hud.joy.hidden = false; hud.open.textContent = 'abrir'; } else hud.keys.hidden = false; // no celular não existe a tecla E
   camera.position.set(player.position.x, CAM_Y, player.position.z + CAM_Z);
   lookNow.set(player.position.x, 1.5, player.position.z);
@@ -214,15 +232,26 @@ function updateWorld(dt, now) {
   const len = Math.hypot(ix, iz);
   if (len > 1) { ix /= len; iz /= len; }
   const moving = len > 0.08;
+  const running = moving && (keys.ShiftLeft || keys.ShiftRight || runLock);
+  RUN.mul += ((running ? 1.8 : 1) - RUN.mul) * Math.min(1, dt * 8); // acelera e freia suave
 
   // 2) mover e girar o personagem
   if (moving) {
-    player.position.x += ix * SPEED * dt; player.position.z += iz * SPEED * dt;
+    player.position.x += ix * SPEED * RUN.mul * dt; player.position.z += iz * SPEED * RUN.mul * dt;
     clampToWorld(player.position); // borda do mundo
     player.rotation.y = angLerp(player.rotation.y, Math.atan2(ix, iz), Math.min(1, dt * 12));
-    sparkTimer += dt; if (sparkTimer > 0.07) { emitSpark(); sparkTimer = 0; }
+    sparkTimer += dt; if (sparkTimer > (running ? 0.04 : 0.07) && !JUMP.air) { emitSpark(); sparkTimer = 0; }
   }
-  player.userData.body.position.y = moving ? Math.abs(Math.sin(now * 11)) * 0.14 : Math.sin(now * 2) * 0.03;
+  // pulo: física simples. Velocidade vertical (vy) diminui com a gravidade; a altura (y) soma a velocidade; chegou ao chão, pousa.
+  if (JUMP.air) {
+    JUMP.vy -= JUMP.g * dt; player.position.y += JUMP.vy * dt;
+    if (player.position.y <= 0) { player.position.y = 0; JUMP.vy = 0; JUMP.air = false; JUMP.squash = 1; for (let i = 0; i < 3; i++) emitSpark(); } // pousou: "achata" um pouquinho e solta faíscas
+  }
+  JUMP.squash *= 1 - Math.min(1, dt * 9);
+  const pb = player.userData.body;
+  pb.scale.set(1 + 0.07 * JUMP.squash, 1 - 0.09 * JUMP.squash, 1 + 0.07 * JUMP.squash); // esticar ao subir, achatar ao pousar
+  pb.rotation.x += ((running ? 0.16 : 0) - pb.rotation.x) * Math.min(1, dt * 10);       // correndo, inclina o corpo para a frente
+  pb.position.y = JUMP.air ? 0 : moving ? Math.abs(Math.sin(now * (running ? 17 : 11))) * (running ? 0.2 : 0.14) : Math.sin(now * 2) * 0.03;
 
   // 3) Kiara segue a Gabriella e, quando ela para, vem se esfregar pedindo carinho (js/kiara.js)
   updateKiara(dt, now, moving);
