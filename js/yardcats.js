@@ -61,9 +61,11 @@ function buildMel(H, rise, half) {
   const fangs = [];
   [-1, 1].forEach(s => { const f = new THREE.Mesh(new THREE.ConeGeometry(0.022, 0.07, 5), new THREE.MeshBasicMaterial({ color: 0xfffaf2 })); f.position.set(s * 0.05, -0.09, 0.33); f.rotation.x = Math.PI; f.visible = false; head.add(f); fangs.push(f); });
 
-  // Rabo enrolado em volta das patas (um pedaço de rosquinha deitado)
+  // Rabo curto, só um "C" que sai da garupa e se enrola de lado (antes era uma volta quase inteira, que parecia uma rosquinha-base).
+  // É um pedaço de rosquinha (TorusGeometry: o 5º número é QUANTO da volta existe, em radianos). Como o arco é aberto, tampamos as duas pontas com bolinhas.
   const tail = new THREE.Group(); tail.position.set(0, 0.1, -0.02); body.add(tail);
-  const arc = new THREE.Mesh(new THREE.TorusGeometry(0.5, 0.075, 8, 22, 3.9), fur); arc.rotation.x = Math.PI / 2; arc.rotation.z = 0.5; tail.add(arc);
+  const TAIL_R = 0.5, TAIL_LEN = 2.0, arc = new THREE.Mesh(new THREE.TorusGeometry(TAIL_R, 0.075, 8, 16, TAIL_LEN), fur); arc.rotation.x = Math.PI / 2; arc.rotation.z = 4.35; tail.add(arc);
+  [0, TAIL_LEN].forEach((a, i) => { const cap = new THREE.Mesh(new THREE.SphereGeometry(0.075 * (i ? 0.85 : 1), 8, 6), fur); cap.position.set(Math.cos(a) * TAIL_R, Math.sin(a) * TAIL_R, 0); arc.add(cap); });
 
   // "grrrr…": um balãozinho de texto que aparece quando ela rosna
   const gr = new THREE.Sprite(new THREE.SpriteMaterial({ map: canvasTex(256, 96, (x, w, h) => {
