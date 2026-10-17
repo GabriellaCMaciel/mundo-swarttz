@@ -57,6 +57,22 @@ function ghMark(x, cx, cy, size, color = '#fff') { // desenha a marca centraliza
   x.save(); x.translate(cx - size / 2, cy - size / 2); x.scale(size / 16, size / 16); x.fillStyle = color; x.fill(GH_MARK); x.restore();
 }
 
+// Marca do LinkedIn (o quadradinho com "in"): Path2D numa grade de 24x24. O "in" é um buraco no quadrado, por onde aparece a cor do fundo.
+const LI_MARK = typeof Path2D !== 'undefined' ? new Path2D('M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z') : null;
+function liMark(x, cx, cy, size, color = '#fff') {
+  if (!LI_MARK) return;
+  x.save(); x.translate(cx - size / 2, cy - size / 2); x.scale(size / 24, size / 24); x.fillStyle = color; x.fill(LI_MARK); x.restore();
+}
+// Marca do Instagram: câmera de contorno (quadrado arredondado + lente + pontinho do flash), desenhada com traços em vez de Path2D, então escala sem borrar.
+function igMark(x, cx, cy, size, color = '#fff') {
+  const u = size / 100; // 1 unidade = 1% do tamanho
+  x.save(); x.translate(cx, cy); x.strokeStyle = color; x.fillStyle = color; x.lineWidth = 9 * u; x.lineJoin = 'round';
+  rrPath(x, -42 * u, -42 * u, 84 * u, 84 * u, 24 * u); x.stroke();
+  x.beginPath(); x.arc(0, 0, 19 * u, 0, 6.3); x.stroke();
+  x.beginPath(); x.arc(28 * u, -28 * u, 5.5 * u, 0, 6.3); x.fill();
+  x.restore();
+}
+
 // ---------- a tela do celular (fica colada no corpo) ----------
 function phoneScreenTex() {
   return canvasTex(600, 1165, (x, w, h) => {
@@ -76,13 +92,13 @@ function phoneScreenTex() {
     put(x, 'GitHub', 161, 690, 220, 36, 800, PH_FONT, '#fff', 'center'); put(x, 'meus projetos', 161, 722, 220, 20, 400, PH_MONO, 'rgba(255,255,255,0.85)', 'center');
     const pk = x.createLinearGradient(308, 500, 570, 736); pk.addColorStop(0, '#c9327a'); pk.addColorStop(1, '#b02a68');
     rrPath(x, 308, 500, 262, 236, 34); x.fillStyle = pk; x.fill(); x.lineWidth = 2.5; x.strokeStyle = 'rgba(255,255,255,0.5)'; x.stroke();
-    x.fillStyle = '#fff'; x.font = '700 84px ' + PH_FONT; x.textAlign = 'center'; x.fillText('♥', 439, 630);
+    igMark(x, 439, 596, 104);
     put(x, 'Instagram', 439, 690, 220, 36, 800, PH_FONT, '#fff', 'center'); put(x, 'dia a dia', 439, 722, 220, 20, 400, PH_MONO, 'rgba(255,255,255,0.9)', 'center');
     // lista de redes
     darkGlassRR(x, 30, 770, 540, 290, 34);
     put(x, 'Redes', 64, 828, 300, 32, 800, PH_FONT, '#fff'); put(x, 'ver tudo', 536, 828, 140, 20, 400, PH_MONO, 'rgba(255,255,255,0.85)', 'right');
     [['GitHub', 'GabriellaCMaciel', '#2b1b4d'], ['LinkedIn', 'gabriellacmaciel', '#3d7bff'], ['Instagram', '@gabriellaswarttz', '#d6336c']].forEach(([n, s, c], i) => { // (o texto vem dos mesmos @ do SOCIALS em config.js)
-      const y = 860 + i * 72; rrPath(x, 62, y, 50, 50, 14); x.fillStyle = c; x.fill(); if (i === 0) ghMark(x, 87, y + 25, 32);
+      const y = 860 + i * 72; rrPath(x, 62, y, 50, 50, 14); x.fillStyle = c; x.fill(); if (i === 0) ghMark(x, 87, y + 25, 32); else if (i === 1) liMark(x, 87, y + 25, 30); else igMark(x, 87, y + 25, 32);
       put(x, n, 128, y + 34, 150, 28, 700, PH_FONT, '#fff'); put(x, s, 536, y + 33, 250, 20, 400, PH_MONO, 'rgba(255,255,255,0.9)', 'right');
     });
     rrPath(x, 220, 1128, 160, 8, 4); x.fillStyle = 'rgba(255,255,255,0.85)'; x.fill();
@@ -93,8 +109,8 @@ function phoneScreenTex() {
 // cada ícone: nome, cor do corpo, texto da etiqueta, desenho (o fundo gradiente + o símbolo, em 256x256)
 const PH_ICONS = [
   { n: 'GitHub',    c: 0x35246b, g: ['#4b3a8f', '#251648'], draw: x => ghMark(x, 128, 128, 150) },
-  { n: 'LinkedIn',  c: 0x3d7bff, g: ['#5f9bff', '#2f62e8'], draw: x => { x.fillStyle = '#fff'; x.font = '800 132px ' + PH_FONT; x.textAlign = 'center'; x.fillText('in', 128, 170); } },
-  { n: 'Instagram', c: 0xff6fa5, g: ['#ff5fa2', '#ff9a4a'], draw: x => { x.strokeStyle = '#fff'; x.lineWidth = 14; rrPath(x, 56, 56, 144, 144, 40); x.stroke(); x.beginPath(); x.arc(128, 128, 32, 0, 6.3); x.stroke(); x.fillStyle = '#fff'; x.beginPath(); x.arc(168, 88, 8, 0, 6.3); x.fill(); } },
+  { n: 'LinkedIn',  c: 0x3d7bff, g: ['#5f9bff', '#2f62e8'], draw: x => liMark(x, 128, 128, 140) },
+  { n: 'Instagram', c: 0xff6fa5, g: ['#ff5fa2', '#ff9a4a'], draw: x => igMark(x, 128, 128, 150) },
   { n: 'E-mail',    c: 0x8b4cf0, g: ['#a870ff', '#6a35d8'], draw: x => { x.strokeStyle = '#fff'; x.lineWidth = 13; x.lineJoin = 'round'; rrPath(x, 52, 78, 152, 100, 14); x.stroke(); x.beginPath(); x.moveTo(60, 90); x.lineTo(128, 142); x.lineTo(196, 90); x.stroke(); } },
   { n: 'WhatsApp',  c: 0x2fd075, g: ['#4fe390', '#1fb35c'], draw: x => { x.fillStyle = '#fff'; x.beginPath(); x.arc(128, 122, 68, 0, 6.3); x.fill(); x.beginPath(); x.moveTo(78, 168); x.lineTo(62, 212); x.lineTo(108, 190); x.closePath(); x.fill(); x.fillStyle = '#1fb35c'; [100, 128, 156].forEach(a => { x.beginPath(); x.arc(a, 122, 10, 0, 6.3); x.fill(); }); } },
   { n: 'YouTube',   c: 0xff4455, g: ['#ff6677', '#e12a3c'], draw: x => { x.fillStyle = '#fff'; rrPath(x, 48, 80, 160, 96, 28); x.fill(); x.fillStyle = '#e12a3c'; x.beginPath(); x.moveTo(110, 104); x.lineTo(110, 152); x.lineTo(154, 128); x.closePath(); x.fill(); } },
