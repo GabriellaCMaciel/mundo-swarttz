@@ -64,6 +64,7 @@ const props = {
     note.position.set(1.55, 3.0, 0.12); note.rotation.z = -0.05; g.add(note);
     const nt = new THREE.Mesh(new THREE.PlaneGeometry(0.8, 0.28), new THREE.MeshBasicMaterial({ color: 0xf2b84b, transparent: true, opacity: 0.85, side: THREE.DoubleSide }));
     nt.position.set(1.55, 4.28, 0.14); nt.rotation.z = 0.1; g.add(nt);
+    buildWorldMap(g); // segunda tábua, ao lado: o mapa do mundo com o X de onde você está (js/worldmap.js)
   },
   atelie(g) { // cavalete com pintura, bastidor de bordado e novelos de lã
     box(2.8, 3.4, 0.14, 0xf6ecd9, 0, 2.7, 0, g);

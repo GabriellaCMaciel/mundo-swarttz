@@ -30,6 +30,7 @@ js/phone.js       o celular gigante da zona Telefone: flutua, gira devagar para 
 js/pick.js        toque/clique nas coisas do mundo: ícones do celular abrem os perfis, zonas abrem o painel
 js/mail.js        a tela das cartas: carrossel de envelopes e a carta dobrada em três (animação por linha do tempo, reversível)
 js/zones.js       cenários e etiquetas das outras zonas (sem círculos: tudo faz parte do mesmo mundo)
+js/worldmap.js    o mapa do mundo numa tábua ao lado da placa "Sobre", com um X vermelho no lugar onde a pessoa está agora
 js/decor.js       decoração do mundo inteiro: flores, árvores floridas, postes e fios de luz ligando as zonas
 js/ui.js          painéis, controles e o loop principal
 assets/           logos (SVG, versões para fundo escuro e claro) e foto
