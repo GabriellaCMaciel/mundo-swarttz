@@ -36,6 +36,7 @@ let panelOpen = false;
 function showSheet(html) { // coloca o conteúdo na folha do painel e leva o foco para o botão de fechar
   hud.sheet.innerHTML = '<button class="close" type="button" aria-label="Fechar">✕</button>' + html;
   hud.panel.hidden = false;
+  document.getElementById('panelHint').textContent = touch ? 'toque fora do painel ou no ✕ para fechar' : 'clique fora do painel, ✕ ou Esc para fechar'; // instrução de "algo aberto": canto inferior direito
   hud.sheet.querySelector('.close').focus();
 }
 function openPanel(z) {

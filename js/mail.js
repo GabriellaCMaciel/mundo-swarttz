@@ -184,11 +184,20 @@ function finishClose() { // a carta voltou para dentro do envelope e a aba fecho
   if (env) { env.querySelector('.env-bob').style.animationPlayState = ''; env.querySelector('.env-flap').style.cssText = ''; }
   mailUi.root.classList.remove('opening', 'reading');
   mailUi.state = 'closed'; mailUi.reading = false; mailUi.lock = false;
+  setMailHint(false);
   mailUi.root.focus({ preventScroll: true });
 }
 
+// Instrução de controles da tela das cartas (canto inferior direito): uma para escolher a carta e outra para a carta aberta
+function setMailHint(reading) {
+  const t = typeof touch !== 'undefined' && touch;
+  document.getElementById('mailKeys').textContent = reading
+    ? (t ? 'toque fora da carta ou no ✕ para voltar' : 'clique fora da carta, ✕ ou Esc para voltar')
+    : (t ? 'arraste para trocar · toque na carta para abrir' : 'setas, arrastar ou rodinha para trocar · clique ou Enter para abrir · Esc volta');
+}
 function openEnvelope() { // clicou no envelope do meio
   if (mailUi.state !== 'closed' || !letters.length) return;
+  setMailHint(true);
   mailUi.envs[mailUi.cur].querySelector('.env-bob').style.animationPlayState = 'paused'; // o balanço do envelope para (a carta não "sai" de algo que balança)
   prepLetter(); anim.ts = 0; renderLetter(0);
   mailUi.state = 'opening'; mailUi.reading = true; mailUi.lock = true; mailUi.root.classList.add('opening');
@@ -207,7 +216,7 @@ function openMail() {
   mailUi.isOpen = true; mailUi.cur = Math.min(mailUi.cur, letters.length - 1);
   abortLetter(); mailUi.root.hidden = false; fit(); layout();
   mailUi.root.focus({ preventScroll: true }); // o foco fica na tela (não em um botão), para Enter abrir a carta
-  document.getElementById('mailKeys').textContent = typeof touch !== 'undefined' && touch ? 'arraste para trocar · toque na carta para abrir' : 'setas, arrastar ou rodinha para trocar · clique ou Enter para abrir · Esc volta';
+  setMailHint(false);
 }
 function abortLetter() { // para qualquer animação e deixa tudo no estado "fechado" (usado ao abrir e ao fechar a tela)
   cancelAnimationFrame(anim.raf); anim.dir = 0; anim.ts = 0;

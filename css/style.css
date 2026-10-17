@@ -33,9 +33,9 @@ body{margin:0;background:var(--ink);color:var(--paper);font-family:var(--font-di
 .card{cursor:pointer}
 .card h2{margin:0;font-size:20px;font-weight:800;color:var(--gold)}
 .card p{margin:0;font:400 13px/1.5 var(--font-mono);color:var(--paper)}
-.hint{left:50%;bottom:calc(var(--sb) + 18px);transform:translateX(-50%);width:max-content;max-width:calc(100% - var(--sl) - var(--sr));text-align:center;font:700 14px var(--font-mono);letter-spacing:.06em;color:var(--gold);background:rgba(11,6,19,.78);padding:.55em 1em;animation:pulse 1.8s ease-in-out infinite}
+.hint{right:var(--sr);top:calc(var(--st) + 124px);width:max-content;max-width:min(340px,calc(100% - var(--sl) - var(--sr)));text-align:right;font:700 14px var(--font-mono);letter-spacing:.06em;color:var(--gold);background:rgba(11,6,19,.78);padding:.55em 1em;animation:pulse 1.8s ease-in-out infinite}
 @keyframes pulse{50%{opacity:.8}} /* a pulsação antiga ia até .35 e o texto perdia contraste: agora fica sempre legível */
-.keys{left:var(--sl);bottom:var(--sb);font:400 12px var(--font-mono);color:var(--paper);background:rgba(11,6,19,.78);padding:.5em .8em}
+.keys{right:var(--sr);top:var(--st);text-align:right;font:400 12px var(--font-mono);color:var(--paper);background:rgba(11,6,19,.78);padding:.5em .8em}
 .joy{left:var(--sl);bottom:var(--sb);width:124px;height:124px;border-radius:50%;border:2px solid rgba(183,154,245,.55);background:rgba(123,63,228,.18);touch-action:none}
 .knob{position:absolute;left:50%;top:50%;width:52px;height:52px;border-radius:50%;background:var(--gold);transform:translate(-50%,-50%)}
 .flash{position:fixed;inset:0;pointer-events:none;opacity:0;background:radial-gradient(circle,#fff 0%,var(--lilac) 55%,var(--violet) 100%)}
@@ -109,15 +109,17 @@ body{margin:0;background:var(--ink);color:var(--paper);font-family:var(--font-di
 .mail-nav:hover:not(:disabled){background:var(--gold);color:var(--ink)}
 .mail-nav:disabled{opacity:.2;cursor:default}
 .mail-nav:focus-visible,.mail-dots button:focus-visible{outline:2px solid var(--lilac);outline-offset:3px}
-/* orientações de controle: parte inferior ESQUERDA (no celular e em telas estreitas sobem um pouco para não encostar nos pontinhos e no botão do meio) */
-.mail-keys{position:absolute;left:var(--sl);bottom:var(--sb);z-index:2;margin:0;max-width:min(380px,calc(100% - var(--sl) - var(--sr)));box-sizing:border-box;padding:.5em .8em;font:400 12px/1.5 var(--font-mono);color:var(--paper);background:rgba(11,6,19,.78);transition:opacity .4s}
-@media (max-width:900px){.mail-keys{bottom:calc(var(--sb) + 92px)}}
+/* orientações de controle: ficam sempre no canto SUPERIOR direito (.keys e .hint). Só quando algo se abre na tela (tela das cartas, carta, painéis) vão para o canto INFERIOR direito, discretas mas legíveis. Em telas estreitas a da tela das cartas sobe um pouco para não encostar nos pontinhos */
+.mail-keys,.panel-hint{position:absolute;right:var(--sr);bottom:var(--sb);z-index:2;margin:0;max-width:min(340px,calc(100% - var(--sl) - var(--sr)));box-sizing:border-box;padding:.45em .75em;text-align:right;font:400 11.5px/1.5 var(--font-mono);color:#d8cdf0;background:rgba(11,6,19,.6);transition:opacity .4s}
+.panel-hint{position:fixed;pointer-events:none}
+@media (max-width:900px){.mail-keys{bottom:calc(var(--sb) + 92px)}.mail.opening .mail-keys{bottom:var(--sb)}}
 .mail-foot{position:absolute;left:0;right:0;bottom:var(--sb);display:grid;justify-items:center;gap:8px;transition:opacity .4s}
 .mail-foot p{margin:0;font:400 12px var(--font-mono);color:var(--lilac)}
 .mail-dots{display:flex;gap:10px}
 .mail-dots button{width:11px;height:11px;padding:0;border-radius:50%;border:1px solid var(--gold);background:transparent;cursor:pointer}
 .mail-dots button[aria-current="true"]{background:var(--gold)}
-.mail.opening .mail-nav,.mail.opening .mail-foot,.mail.opening .mail-head,.mail.opening .mail-keys{opacity:0;pointer-events:none}
+.mail.opening .mail-nav,.mail.opening .mail-foot,.mail.opening .mail-head{opacity:0;pointer-events:none}
+.mail.opening .mail-keys{bottom:var(--sb)}
 .mail.opening .mail-close{display:none}
 .letter-back{display:none;right:max(12px,var(--sr));left:auto;top:var(--st);z-index:40} /* o ✕ da carta aberta fica no canto superior direito, fora do papel */
 .mail.opening .letter-back{display:block}
@@ -163,3 +165,5 @@ body{margin:0;background:var(--ink);color:var(--paper);font-family:var(--font-di
   .close{width:44px;height:44px}
   .btn{min-height:40px}
 }
+/* telas estreitas: o título desce um pouco para não ficar por baixo do botão "pular intro" (canto superior direito) */
+@media (max-width:520px){.title{top:calc(var(--st) + 58px)}.hint{top:calc(var(--st) + 160px)}}
