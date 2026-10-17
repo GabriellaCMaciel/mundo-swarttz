@@ -14,7 +14,7 @@
 'use strict';
 
 const mailUi = {
-  root: document.getElementById('mail'), track: null, dots: document.getElementById('mailDots'), count: document.getElementById('mailCount'),
+  root: document.getElementById('mail'), track: null, dots: document.getElementById('mailDots'), count: document.getElementById('mailCount'), cat: document.getElementById('mailCat'),
   big: document.getElementById('paperBig'), openBtn: document.getElementById('mailOpenBtn'), back: document.getElementById('letterBack'),
   envs: [], cur: 0, isOpen: false, scale: 1,
   state: 'closed',            // 'closed' | 'opening' | 'open' | 'closing'
@@ -63,8 +63,9 @@ function layout() { // posição de cada envelope: o do meio de frente, os outro
     el.classList.toggle('cur', o === 0);
   });
   mailUi.count.textContent = (mailUi.cur + 1) + ' de ' + letters.length;
+  mailUi.cat.textContent = letters[mailUi.cur].cat || ''; // legenda embaixo, no centro: quem é a pessoa do envelope selecionado (não vai escrita dentro da carta)
   mailUi.dots.querySelectorAll('button').forEach((b, i) => b.setAttribute('aria-current', String(i === mailUi.cur)));
-  if (mailUi.isOpen && mailUi.said !== mailUi.cur) announce('Carta ' + (mailUi.cur + 1) + ' de ' + letters.length + ', de ' + letters[mailUi.cur].who + '. Aperte Enter para abrir.');
+  if (mailUi.isOpen && mailUi.said !== mailUi.cur) announce('Carta ' + (mailUi.cur + 1) + ' de ' + letters.length + ', de ' + letters[mailUi.cur].who + (letters[mailUi.cur].cat ? ' (' + letters[mailUi.cur].cat + ')' : '') + '. Aperte Enter para abrir.');
   mailUi.said = mailUi.cur; // só avisa quando a carta muda (e não a cada redimensionamento da janela)
   mailUi.root.querySelector('.prev').disabled = mailUi.cur === 0;
   mailUi.root.querySelector('.next').disabled = mailUi.cur === letters.length - 1;
@@ -79,8 +80,8 @@ function mailGo(i) {
 function letterInner(l) { // o miolo da carta (usado na folha que dobra e na versão final, que rola)
   // .paper-flow = tudo menos a assinatura. A folha é uma coluna flex e a assinatura tem margin-top:auto,
   // então ela sempre vai para o canto inferior direito da folha, não importa o tamanho do texto.
-  return '<div class="paper-flow">' + (l.photo ? '<img class="paper-photo" src="' + esc(l.photo) + '" alt="">' : '') +
-    '<span class="p-tag">' + esc(l.cat) + '</span><p class="paper-greet">' + esc(l.greeting || 'Querida Gabriella,') + '</p>' +
+  return '<div class="paper-flow">' + (l.photo ? '<img class="paper-photo' + (l.logo ? ' paper-logo' : '') + '" src="' + esc(l.photo) + '" alt="' + esc(l.photoAlt || '') + '">' : '') +
+    '<p class="paper-greet">' + esc(l.greeting || 'Querida Gabriella,') + '</p>' +
     '<div class="paper-text">' + esc(l.text).split(/\n+/).map(t => '<p>' + t + '</p>').join('') + '</div></div>' +
     '<p class="paper-sign">com carinho,<b>' + esc(l.who) + '</b></p>';
 }

@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Syne:wght@600;800&family=JetBrains+Mono:wght@400;700&family=Caveat:wght@500;700&family=Nunito:wght@600;700;800&display=swap">
-  <link rel="stylesheet" href="css/style.css?v=20261017d">
+  <link rel="stylesheet" href="css/style.css?v=20261017e">
 </head>
 <body>
 <a class="skip-link" id="toSimple" href="?simples">Abrir a versão simples (sem 3D, para leitor de tela e teclado)</a>
@@ -38,7 +38,7 @@
   <div class="mail-stage" id="mailStage"></div>
   <button class="mail-nav prev" type="button" aria-label="Carta anterior">‹</button>
   <button class="mail-nav next" type="button" aria-label="Próxima carta">›</button>
-  <footer class="mail-foot"><div class="mail-dots" id="mailDots"></div><p id="mailCount"></p><button class="btn" id="mailOpenBtn" type="button">abrir carta</button></footer>
+  <footer class="mail-foot"><p class="mail-cat" id="mailCat"></p><div class="mail-dots" id="mailDots"></div><p id="mailCount"></p><button class="btn" id="mailOpenBtn" type="button">abrir carta</button></footer>
   <div class="paper-wrap"><article class="paper-big" id="paperBig" hidden></article></div>
 </div>
 
@@ -46,6 +46,6 @@
   <!-- O "?v=..." força o navegador a baixar a versão nova (cache). Troque o valor a cada atualização: aqui, no CSS e no boot.js (ele repassa o mesmo valor aos outros arquivos). -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
   <!-- boot.js decide entre o mundo 3D e a versão simples (texto puro) e carrega os demais arquivos, em ordem: veja js/boot.js. -->
-  <script src="js/boot.js?v=20261017d"></script>
+  <script src="js/boot.js?v=20261017e"></script>
 </body>
 </html>

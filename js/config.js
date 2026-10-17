@@ -55,11 +55,11 @@ const terminalLines = [
 // who = nome de quem escreveu | cat = quem é a pessoa (aparece no papel) | text = o depoimento (use \n para separar parágrafos)
 // Opcionais: greeting = saudação (padrão "Querida Gabriella,") | photo = foto de quem escreveu, ex.: 'assets/prof-ana.jpg'
 const letters = [
-  { cat: 'Cliente e parceiro de projeto no EFG', greeting: 'Bom dia!', who: 'Júlio Cézar',
+  { cat: 'Cliente e parceiro de projeto no EFG', greeting: 'Bom dia!', who: 'Júlio Cézar', photo: 'assets/depo-jc-resolve.png', logo: true, photoAlt: 'Logo da JC Resolve',
     text: 'Eu gostei muito, mas muito mesmo, do site.\nFoi exatamente o que eu pensei, porém o quiz ficou melhor do que eu imaginava.' },
-  { cat: 'Colega de trabalho no programa START', greeting: 'Gab,', who: 'Juliana Barbosa',
+  { cat: 'Amiga e colega de trabalho no projeto START', greeting: 'Gaby,', who: 'Juliana Barbosa', photo: 'assets/depo-juliana.jpg', photoAlt: 'Foto de Juliana Barbosa',
     text: 'Seus projetos estão tops! Ficaram bem finalizados e organizados. Parabéns pela dedicação. Só se valorizar mais, sério. Você é uma menina dedicada, deu um baita duro por cada projeto.' },
-  { cat: 'Amigo e colega de curso técnico no EFG', greeting: 'Gab, mulher, boa noite 🌙', who: 'Gabriel Carneiro',
+  { cat: 'Amigo e colega de curso técnico no EFG', greeting: 'Gab, mulher, boa noite 🌙', who: 'Gabriel Carneiro', photo: 'assets/depo-gabriel.jpg', photoAlt: 'Foto de Gabriel Carneiro',
     text: 'Muito obrigado, Gab, por me ajudar e sempre me auxiliar quando eu preciso. Sou muito grato por vc.\nVc arrasou nessa apresentação, e é isso que importa. Vc foi incrível e estamos muito felizes com isso.' }
 ];
 

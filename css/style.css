@@ -121,7 +121,7 @@ body{margin:0;background:var(--ink);color:var(--paper);font-family:var(--font-di
 /* orientações de controle: ficam sempre no canto SUPERIOR direito (.keys e .hint). Só quando algo se abre na tela (tela das cartas, carta, painéis) vão para o canto INFERIOR direito, discretas mas legíveis. Em telas estreitas a da tela das cartas sobe um pouco para não encostar nos pontinhos */
 .mail-keys,.panel-hint{position:absolute;right:var(--sr);bottom:var(--sb);z-index:2;margin:0;max-width:min(340px,calc(100% - var(--sl) - var(--sr)));box-sizing:border-box;padding:.45em .75em;text-align:right;font:400 11.5px/1.5 var(--font-mono);color:#d8cdf0;background:rgba(11,6,19,.6);transition:opacity .4s}
 .panel-hint{position:fixed;pointer-events:none}
-@media (max-width:900px){.mail-keys{bottom:calc(var(--sb) + 92px)}.mail.opening .mail-keys{bottom:var(--sb)}}
+@media (max-width:900px){.mail-keys{bottom:calc(var(--sb) + 132px)}.mail.opening .mail-keys{bottom:var(--sb)}}
 .mail-foot{position:absolute;left:0;right:0;bottom:var(--sb);display:grid;justify-items:center;gap:8px;transition:opacity .4s}
 .mail-foot p{margin:0;font:400 12px var(--font-mono);color:var(--lilac)}
 .mail-dots{display:flex;gap:10px}
@@ -142,11 +142,14 @@ body{margin:0;background:var(--ink);color:var(--paper);font-family:var(--font-di
 .paper-big p{margin:0}
 .paper-big .p-tag{display:block;width:max-content;height:22px;line-height:22px;margin:6px 0;padding:0 .7em}
 .paper-greet{font-size:30px;color:#7b3fe4}
-.paper-text p+p{margin-top:34px}
+.paper-text p+p{margin-top:0} /* parágrafos colados, sem pular linha na folha pautada */
 .paper-flow{flex:0 0 auto}
 .paper-big .paper-sign{flex:0 0 auto;margin:auto 0 0;padding-top:34px;text-align:right}
 .paper-big .paper-sign b{display:block;font-size:32px;line-height:34px;color:#d63a7a}
-.paper-photo{float:right;width:140px;margin:0 0 12px 16px;border:8px solid #fff;border-bottom-width:26px;box-shadow:0 6px 16px rgba(0,0,0,.35);transform:rotate(4deg)}
+.mail-cat{min-height:1.5em;text-align:center;max-width:min(92vw,520px);text-transform:none;letter-spacing:.02em}
+.mail-foot p.mail-cat{font:700 13px/1.4 var(--font-mono);color:var(--gold)}
+.paper-photo.paper-logo{width:96px;border:0;border-radius:18px;box-shadow:0 4px 12px rgba(0,0,0,.3);transform:rotate(3deg);margin:0 0 12px 16px;background:#0f2a2e}
+.paper-photo{float:right;width:118px;margin:0 0 12px 16px;border:8px solid #fff;border-bottom-width:26px;box-shadow:0 6px 16px rgba(0,0,0,.35);transform:rotate(4deg)}
 @media (max-width:520px){.paper-big{padding:34px 18px 34px 46px;font-size:21px}.paper-big{background-position:0 0}.paper-back{margin-left:-24px}.paper-greet{font-size:26px}.mail-nav{width:44px;height:44px;font-size:26px}}
 @media (prefers-reduced-motion:reduce){.mail-petals i{animation:none;opacity:0}.env.cur .env-bob{animation:none}}
 @media (max-width:520px){.about{grid-template-columns:1fr}.about img{max-width:220px}}
