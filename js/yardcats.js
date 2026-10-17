@@ -62,11 +62,14 @@ function buildMel(H, rise, half) {
   const fangs = [];
   [-1, 1].forEach(s => { const f = new THREE.Mesh(new THREE.ConeGeometry(0.022, 0.07, 5), new THREE.MeshBasicMaterial({ color: 0xfffaf2 })); f.position.set(s * 0.05, -0.09, 0.33); f.rotation.x = Math.PI; f.visible = false; head.add(f); fangs.push(f); });
 
-  // Rabo curto, só um "C" que sai da garupa e se enrola de lado (antes era uma volta quase inteira, que parecia uma rosquinha-base).
-  // É um pedaço de rosquinha (TorusGeometry: o 5º número é QUANTO da volta existe, em radianos). Como o arco é aberto, tampamos as duas pontas com bolinhas.
-  const tail = new THREE.Group(); tail.position.set(0, 0.1, -0.02); body.add(tail);
-  const TAIL_R = 0.5, TAIL_LEN = 2.0, arc = new THREE.Mesh(new THREE.TorusGeometry(TAIL_R, 0.075, 8, 16, TAIL_LEN), fur); arc.rotation.x = Math.PI / 2; arc.rotation.z = 4.35; tail.add(arc);
-  [0, TAIL_LEN].forEach((a, i) => { const cap = new THREE.Mesh(new THREE.SphereGeometry(0.075 * (i ? 0.85 : 1), 8, 6), fur); cap.position.set(Math.cos(a) * TAIL_R, Math.sin(a) * TAIL_R, 0); arc.add(cap); });
+  // Rabo: sai da GARUPA (a parte de trás e de baixo do corpo, entre as ancas), vai para trás, contorna o corpo pelo lado e termina enrolado em direção às patas,
+  // como um gato sentado de verdade. Antes ele nascia no meio da barriga (por isso parecia colado no lugar errado).
+  // É um tubo liso que acompanha uma curva e vai afinando (cherryTube, de cherry.js). O grupo "tail" fica EXATAMENTE na garupa, então o balançar do rabo
+  // (rotação em y, em updateYardCats) gira em torno da base dele e não em torno de um ponto qualquer.
+  const tail = new THREE.Group(); tail.position.set(0, 0.3, -0.4); body.add(tail); // ponto onde o rabo nasce: parte de trás das ancas (elas vão de z = -0,47 a +0,3)
+  const V3 = (x, y, z) => new THREE.Vector3(x, y, z);
+  cherryTube(tail, [V3(0, 0, 0.12), V3(0, -0.06, -0.14), V3(0.22, -0.16, -0.3), V3(0.56, -0.2, -0.12), V3(0.66, -0.21, 0.24)], t => 0.1 - 0.05 * t, fur, 22);
+  const tip = new THREE.Mesh(new THREE.SphereGeometry(0.05, 8, 6), fur); tip.position.set(0.66, -0.21, 0.24); tail.add(tip); // ponta arredondada
 
   // "grrrr…": um balãozinho de texto que aparece quando ela rosna
   const gr = new THREE.Sprite(new THREE.SpriteMaterial({ map: canvasTex(256, 96, (x, w, h) => {
