@@ -27,14 +27,18 @@ const SOCIALS = [
   { name: 'Currículo', url: '', handle: '' }
 ];
 
-// O roteiro do "hack". Cada linha: [texto, cor]
+// O roteiro do "hack" da abertura (o notebook invadindo a conta da Gabriella). Cada linha: [texto, cor]. Mantenha cada linha com até ~36 letras (a logo aparece à direita no final).
+// Linhas que começam com "ALERTA" deixam a barra do terminal vermelha e piscando devagar (1 vez por segundo).
 const terminalLines = [
-  ['$ ssh visitante@swarttz.dev', '#b79af5'],
-  ['conectando .............. ok', '#f6ecd9'],
-  ['driblando o firewall .... ok', '#f6ecd9'],
-  ['lendo perfil: Gabriella Swarttz', '#f2b84b'],
-  ['projetos ok | habilidades ok', '#f6ecd9'],
-  ['selos ok | gatas ok (miau)', '#f6ecd9'],
+  ['$ ssh invasor@swarttz.dev', '#b79af5'],
+  ['conectando ............ ok', '#f6ecd9'],
+  ['driblando o firewall .. ok', '#f6ecd9'],
+  ['quebrando a senha: ********', '#f2b84b'],
+  ['ALERTA: INVASAO DETECTADA!', '#ff7a93'],
+  ['alvo: conta de Gabriella Swarttz', '#ff7a93'],
+  ['copiando projetos e habilidades', '#f6ecd9'],
+  ['copiando selos, cartas e gatas', '#f6ecd9'],
+  ['progresso [##########] 100%', '#37d0c0'],
   ['', '#f6ecd9'],
   ['>>> ACESSO CONCEDIDO <<<', '#ff5fa2']
 ];

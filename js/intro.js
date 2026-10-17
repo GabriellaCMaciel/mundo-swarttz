@@ -135,18 +135,25 @@ const coffee = new THREE.Mesh(new THREE.CircleGeometry(0.26, 20), lam(0x3a1f12))
 });
 
 // O roteiro do "hack" (terminalLines) fica em js/config.js
-const CPS = 20, PAUSE = 10; // letras por segundo e pausa entre linhas (em "letras")
+const CPS = 30, PAUSE = 8;
+const glowRed = new THREE.Color(0xff2d55), glowViolet = new THREE.Color(0x7b3fe4); // letras por segundo e pausa entre linhas (em "letras")
 const totalChars = terminalLines.reduce((n, l) => n + l[0].length + PAUSE, 0);
 let logoImg = null;
 loadImg(ASSETS.logoDark, im => { logoImg = im; });
 
 function drawTerminal(typed, now) {
+  // Barra de cima: roxa no começo; depois que a linha "ALERTA" aparece, fica vermelha e pisca devagar (1x por segundo, seguro para quem é sensível a luzes piscando)
+  let alert = false, acc = 0;
+  for (const [text] of terminalLines) { if (text.startsWith('ALERTA') && typed > acc) alert = true; acc += text.length + PAUSE; }
+  const granted = typed > totalChars - 30; // chegou no "acesso concedido": a barra volta a ser roxa
+  const red = alert && !granted, on = !red || calm || Math.floor(now) % 2 === 0;
   tctx.fillStyle = '#0b0613'; tctx.fillRect(0, 0, 610, 400);
-  tctx.fillStyle = '#7b3fe4'; tctx.fillRect(0, 0, 610, 34);
+  tctx.fillStyle = red ? (on ? '#c4143c' : '#7a0d26') : '#7b3fe4'; tctx.fillRect(0, 0, 610, 34);
   tctx.font = '700 18px "JetBrains Mono", monospace';
-  tctx.fillStyle = '#f6ecd9'; tctx.fillText('swarttz.dev | terminal', 14, 23);
-  tctx.font = '700 22px "JetBrains Mono", monospace';
-  let left = typed, y = 78, lastX = 18, lastY = 78;
+  tctx.fillStyle = '#ffffff'; tctx.fillText(red ? '!! INVASAO EM ANDAMENTO !!' : 'swarttz.dev | terminal', 14, 23);
+  if (red) { tctx.strokeStyle = '#ff3b66'; tctx.lineWidth = 4; tctx.strokeRect(2, 2, 606, 396); } // borda vermelha enquanto a invasão acontece
+  tctx.font = '700 19px "JetBrains Mono", monospace';
+  let left = typed, y = 66, lastX = 18, lastY = 66;
   for (const [text, color] of terminalLines) {
     if (left <= 0) break;
     const shown = text.slice(0, left);
@@ -154,17 +161,18 @@ function drawTerminal(typed, now) {
     tctx.fillText(shown, 18, y);
     lastX = 18 + tctx.measureText(shown).width; lastY = y;
     left -= text.length + PAUSE;
-    y += 40;
+    y += 29;
   }
-  if (typed > totalChars - 30 && logoImg) tctx.drawImage(logoImg, 458, 176, 134, 166); // a logo aparece no "acesso concedido"
-  if (Math.floor(now * 2) % 2 === 0) { tctx.fillStyle = '#f2b84b'; tctx.fillRect(lastX + 4, lastY - 19, 12, 24); } // cursor piscando
+  if (granted && logoImg) tctx.drawImage(logoImg, 458, 188, 134, 166); // a logo aparece no "acesso concedido"
+  if (Math.floor(now * 2) % 2 === 0) { tctx.fillStyle = '#f2b84b'; tctx.fillRect(lastX + 4, lastY - 16, 11, 21); } // cursor piscando
   termTex.needsUpdate = true;
+  return red; // quem chamou usa isto para tingir a luz da cena de vermelho
 }
 drawTerminal(0, 0);
 
 // Posições da câmera em cada momento da abertura
 const camClosed = new THREE.Vector3(0, 3.4, 6.6), lookClosed = new THREE.Vector3(0, 0.5, 0);
-const camOpen = new THREE.Vector3(0, 1.9, 5.2), lookOpen = new THREE.Vector3(0, 1.0, -0.6);
+const camOpen = new THREE.Vector3(0, 1.85, 4.2), lookOpen = new THREE.Vector3(0, 1.0, -0.6);
 const camDive = new THREE.Vector3(0, 1.59, -0.24), lookDive = new THREE.Vector3(0, 1.11, -1.45); // quase dentro da tela
 const LID_OPEN = -1.95; // ângulo (radianos) da tampa aberta
 const T_OPEN = 2.4, T_DIVE = 2.6; // duração (s) de abrir a tampa e de mergulhar na tela
@@ -200,7 +208,8 @@ function updateIntro(now, dt) {
     if (e >= T_OPEN) go('typing');
   } else if (phase === 'typing') {
     const n = Math.floor(e * CPS);
-    drawTerminal(n, now);
+    const red = drawTerminal(n, now);
+    glow.color.lerp(red ? glowRed : glowViolet, Math.min(1, dt * 6)); // a luz do notebook fica vermelha durante a invasão e volta ao roxo no fim
     if (n > totalChars + 45) go('diving');                   // segura ~2 s no "acesso concedido"
   } else if (phase === 'diving') {
     const k = ease(Math.min(e / T_DIVE, 1));
