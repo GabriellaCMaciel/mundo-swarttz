@@ -56,11 +56,11 @@ const terminalLines = [
 // Opcionais: greeting = saudação (padrão "Querida Gabriella,") | photo = foto de quem escreveu, ex.: 'assets/prof-ana.jpg'
 const letters = [
   { cat: 'Cliente e parceiro de projeto no EFG', greeting: 'Bom dia!', who: 'Júlio Cézar',
-    text: 'Eu gostei muito, mas muito mesmo, do site.\nFoi exatamente o que eu pensei, porém ficou melhor do que eu imaginava.' },
+    text: 'Eu gostei muito, mas muito mesmo, do site.\nFoi exatamente o que eu pensei, porém o quiz ficou melhor do que eu imaginava.' },
   { cat: 'Colega de trabalho no programa START', greeting: 'Gab,', who: 'Juliana Barbosa',
-    text: 'Seus projetos estão tops! Ficaram bem finalizados e organizados. Parabéns pela dedicação.\nVocê precisa se valorizar mais, sério. Você é uma menina dedicada, deu um baita duro por cada projeto.' },
+    text: 'Seus projetos estão tops! Ficaram bem finalizados e organizados. Parabéns pela dedicação. Só se valorizar mais, sério. Você é uma menina dedicada, deu um baita duro por cada projeto.' },
   { cat: 'Amigo e colega de curso técnico no EFG', greeting: 'Gab, mulher, boa noite 🌙', who: 'Gabriel Carneiro',
-    text: 'Muito obrigado, Gab, uai, por me ajudar e sempre me auxiliar quando eu preciso. Por isso eu sou muito grato por vc.\nEu te agradeço muito, muito, pelo que vc fez por mim. Eu que agradeço por vc ser assim, mulher.\nVc arrasou nessa apresentação, e é isso que importa. Vc foi incrível e estamos muito felizes com isso.' }
+    text: 'Muito obrigado, Gab, por me ajudar e sempre me auxiliar quando eu preciso. Sou muito grato por vc.\nVc arrasou nessa apresentação, e é isso que importa. Vc foi incrível e estamos muito felizes com isso.' }
 ];
 
 // Os livros da biblioteca: cada um vira um livro brilhante nas estantes (a ordem é da esquerda para a direita).
