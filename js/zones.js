@@ -52,11 +52,12 @@ const props = {
     const nx = noteTex.image.getContext('2d');
     const drawNote = logo => {
       nx.fillStyle = '#f6ecd9'; nx.fillRect(0, 0, 420, 520);
-      if (logo) nx.drawImage(logo, 130, 24, 160, 198);
+      if (logo) nx.drawImage(logo, 136, 20, 148, 183);
       nx.fillStyle = '#2a1745'; nx.textAlign = 'center';
-      nx.font = '800 38px Syne, sans-serif'; nx.fillText('Gabriella', 210, 288); nx.fillText('Swarttz', 210, 332);
-      nx.font = '700 20px "JetBrains Mono", monospace'; nx.fillText('dev em formação', 210, 378);
-      nx.font = '400 15px "JetBrains Mono", monospace'; nx.fillStyle = '#7b3fe4'; nx.fillText('(texto provisório)', 210, 420);
+      nx.font = '800 60px Syne, sans-serif'; nx.fillText('Gabriella', 210, 280); nx.fillText('Swarttz', 210, 342);
+      // textos do bilhete: nada pequeno demais para ler de longe (antes 20 px e 15 px; agora 34 px e 30 px)
+      nx.font = '800 34px "JetBrains Mono", monospace'; nx.fillText('dev em formação', 210, 400);
+      nx.font = '800 30px "JetBrains Mono", monospace'; nx.fillStyle = '#7b3fe4'; nx.fillText('Web & Mobile', 210, 452);
       noteTex.needsUpdate = true;
     };
     drawNote(null); loadImg(ASSETS.logoLight, drawNote);

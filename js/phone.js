@@ -179,8 +179,7 @@ function buildPhone(g) {
   const chat = card(2.2, 1.1, 230, (x, w, h) => {
     const cg = x.createLinearGradient(0, 0, w, h); cg.addColorStop(0, '#d63a55'); cg.addColorStop(1, '#b82a68');
     rrPath(x, 4, 4, w - 8, h - 8, 38); x.fillStyle = cg; x.fill(); x.lineWidth = 2.5; x.strokeStyle = 'rgba(255,255,255,0.6)'; x.stroke();
-    put(x, 'Vamos conversar?', 36, 92, w - 72, 40, 800, PH_FONT, '#fff'); put(x, 'me chama nas redes', 36, 134, w - 72, 28, 700, PH_MONO, 'rgba(255,255,255,0.92)');
-    rrPath(x, 36, 160, 120, 46, 23); x.fillStyle = 'rgba(255,255,255,0.95)'; x.fill(); put(x, 'abrir (E)', 96, 193, 112, 26, 800, PH_FONT, '#b82a68', 'center');
+    put(x, 'Vamos conversar?', 36, 118, w - 60, 56, 800, PH_FONT, '#fff'); put(x, 'me chama nas redes', 36, 184, w - 60, 38, 700, PH_MONO, 'rgba(255,255,255,0.95)'); // sem botão "abrir (E)": o cartão é só para ler
   }, 0.8, T); chat.position.set(-2.25, -1.0, 0.8);
 
   const nav = card(3.2, 0.66, 230, (x, w, h) => {
