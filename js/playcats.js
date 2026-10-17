@@ -13,8 +13,10 @@
 const PCATS = { ready: false, J: null, M: null, B: null, camD: 0 };
 const TRUNK = { x: 5.2, z: -0.3 }; // o mesmo TX / TZ de swing.js
 const trunkR = y => 0.9 - 0.35 * (y / 6.4); // raio do tronco na altura y (cone: 0,9 embaixo, 0,55 em cima)
-const OBST = [[-3.2, 1.0, 0.6], [-2.35, 1.7, 0.6], [-2.5, 2.6, 0.95], [TRUNK.x, TRUNK.z, 1.1]]; // cestos, pilha de livros e tronco: o chão que os gatos desviam
-const AREA = { x0: -6.2, x1: 3.9, z0: -2, z1: 5.4 }; // onde passeiam
+// OBSTÁCULOS: "cápsulas" no chão = um segmento [x1,z1]-[x2,z2] com um raio (um círculo é uma cápsula de pontos iguais). Os gatos contornam todas.
+// (coordenadas do balanço) cestos e a pilha de livros (já com os livros caídos em volta), postes, o tronco (com a base alargada) e o balanço (tábua + cordas).
+const OBST = [[-3.2, 1.0, -3.2, 1.0, 0.62], [-2.35, 1.7, -2.35, 1.7, 0.62], [-2.5, 2.6, -2.5, 2.6, 1.25], [-5, 2.5, -5, 2.5, 0.35], [3.2, 3.6, 3.2, 3.6, 0.35], [TRUNK.x, TRUNK.z, TRUNK.x, TRUNK.z, 1.3], [-1.25, -0.3, 1.25, -0.3, 0.85]];
+const AREA = { x0: -6.2, x1: 4.2, z0: -2.4, z1: 5.6 }; // onde passeiam
 const lerpA = (a, b, t) => { const d = Math.atan2(Math.sin(b - a), Math.cos(b - a)); return a + d * t; }; // gira pelo lado mais curto
 const rr = (a, b) => a + Math.random() * (b - a);
 const easeSmooth = t => t * t * (3 - 2 * t);
@@ -65,32 +67,57 @@ function buildPlayCats() {
 }
 
 // ---------- ajudantes de movimento ----------
-function avoid(C) { // empurra o gato para fora de cestos, livros e do tronco (círculos em xz)
+function capD(o, x, z) { // distância de um ponto até a cápsula (até o segmento dela) e o ponto mais próximo do eixo
+  const dx = o[2] - o[0], dz = o[3] - o[1], L2 = dx * dx + dz * dz, t = L2 < 1e-6 ? 0 : Math.max(0, Math.min(1, ((x - o[0]) * dx + (z - o[1]) * dz) / L2)), cx = o[0] + dx * t, cz = o[1] + dz * t;
+  return [Math.hypot(x - cx, z - cz), cx, cz];
+}
+function avoid(C) { // empurra o gato para fora de qualquer obstáculo (ele nunca entra em cesto, livro, poste, tronco ou balanço)
   const p = C.g.position;
-  OBST.forEach(([ox, oz, r]) => { const dx = p.x - ox, dz = p.z - oz, d = Math.hypot(dx, dz); if (d < r + 0.25 && d > 0.001) { p.x = ox + dx / d * (r + 0.25); p.z = oz + dz / d * (r + 0.25); } });
+  OBST.forEach(o => { const [d, cx, cz] = capD(o, p.x, p.z), R = o[4] + 0.25; if (d < R) { const nx = d > 0.001 ? (p.x - cx) / d : 1, nz = d > 0.001 ? (p.z - cz) / d : 0; p.x = cx + nx * R; p.z = cz + nz * R; } });
   p.x = Math.max(AREA.x0, Math.min(AREA.x1, p.x)); p.z = Math.max(AREA.z0, Math.min(AREA.z1, p.z));
 }
-// DESVIO: se a linha reta até o alvo bate num cesto, na pilha de livros ou no tronco, o gato mira num ponto ao lado do obstáculo (um "waypoint").
-// Sem isso ele empurrava o cesto para sempre, preso num canto. Recalculado todo quadro, então ele contorna sozinho.
+// Um alvo que cai DENTRO de um obstáculo é empurrado para a beirada dele. Era a causa da "travação": o gato tentava ir para dentro do cesto, o avoid()
+// o empurrava para fora, e ele ficava ali, com as patinhas andando, até o tempo do estado acabar.
+function outside(tx, tz) {
+  for (let k = 0; k < 2; k++) OBST.forEach(o => { const [d, cx, cz] = capD(o, tx, tz), R = o[4] + 0.5; if (d < R) { const nx = d > 0.001 ? (tx - cx) / d : 1, nz = d > 0.001 ? (tz - cz) / d : 0; tx = cx + nx * R; tz = cz + nz * R; } });
+  return [Math.max(AREA.x0 + 0.2, Math.min(AREA.x1 - 0.2, tx)), Math.max(AREA.z0 + 0.2, Math.min(AREA.z1 - 0.2, tz))];
+}
+function landOk(C) { const [x, z] = outside(C.to.x, C.to.z); C.to.x = x; C.to.z = z; } // o ponto de aterrissagem de um salto também não pode cair em cima de um obstáculo
+function freeSpot() { // um ponto aleatório da área que não cai em cima de nada
+  for (let i = 0; i < 24; i++) { const x = rr(AREA.x0 + 0.8, AREA.x1 - 0.8), z = rr(AREA.z0 + 0.8, AREA.z1 - 0.8); if (OBST.every(o => capD(o, x, z)[0] > o[4] + 0.9)) return [x, z]; }
+  return [-1, 4];
+}
+// DESVIO: se a linha reta até o alvo bate num obstáculo, o gato mira num ponto ao lado dele (um "waypoint"). Para um círculo, o ponto fica de lado;
+// para o balanço (comprido), o ponto fica depois de uma das PONTAS (a que dá o menor desvio). Recalculado todo quadro, então ele contorna sozinho.
 function route(p, tx, tz) {
-  for (const [ox, oz, r] of OBST) {
-    const R = r + 0.55, sx = tx - p.x, sz = tz - p.z, L2 = sx * sx + sz * sz; if (L2 < 1e-4) continue;
-    if (Math.hypot(tx - ox, tz - oz) < R) continue; // o alvo está dentro do obstáculo (ex.: poleiro em cima do cesto): não tem como desviar
-    const t = Math.max(0, Math.min(1, ((ox - p.x) * sx + (oz - p.z) * sz) / L2)), cx = p.x + sx * t, cz = p.z + sz * t; // ponto da reta mais perto do obstáculo
-    if (Math.hypot(cx - ox, cz - oz) < R) {
-      let nx = cx - ox, nz = cz - oz; const nl = Math.hypot(nx, nz); if (nl < 0.05) { nx = -sz; nz = sx; } // reta passa bem no meio: escolhe um lado
-      const k = (R + 0.2) / (Math.hypot(nx, nz) || 1); return [ox + nx * k, oz + nz * k];
+  for (const o of OBST) {
+    const R = o[4] + 0.55; if (capD(o, tx, tz)[0] < R) continue; // alvo dentro do obstáculo: outside() já cuidou disso
+    let hit = null, best = 1e9;
+    for (let i = 1; i <= 10; i++) { const k = i / 10, x = p.x + (tx - p.x) * k, z = p.z + (tz - p.z) * k, r = capD(o, x, z); if (r[0] < R && r[0] < best) { best = r[0]; hit = [x, z, r[1], r[2]]; } }
+    if (!hit) continue;
+    const ax = o[2] - o[0], az = o[3] - o[1], L = Math.hypot(ax, az);
+    if (L < 0.01) { // círculo
+      let nx = hit[0] - hit[2], nz = hit[1] - hit[3]; const nl = Math.hypot(nx, nz); if (nl < 0.05) { nx = -(tz - p.z); nz = tx - p.x; }
+      const k = (R + 0.2) / (Math.hypot(nx, nz) || 1); return [hit[2] + nx * k, hit[3] + nz * k];
     }
+    let bw = null, bc = 1e9; // cápsula: testa as duas pontas
+    [[o[0], o[1], -ax / L, -az / L], [o[2], o[3], ax / L, az / L]].forEach(([ex, ez, dx, dz]) => { const wx = ex + dx * (R + 0.3), wz = ez + dz * (R + 0.3), c = Math.hypot(wx - p.x, wz - p.z) + Math.hypot(tx - wx, tz - wz); if (c < bc) { bc = c; bw = [wx, wz]; } });
+    return bw;
   }
   return [tx, tz];
 }
 // anda em direção a (tx, tz): vira devagar e avança na direção em que está virado (é o que dá a sensação de bichinho de verdade)
+// C.blocked = há quanto tempo ele "anda" sem sair do lugar (usado por updatePlayCats para destravar)
 function steer(C, tx, tz, speed, dt, turn = 9) {
-  const p = C.g.position, d = Math.hypot(tx - p.x, tz - p.z), [wx, wz] = route(p, tx, tz); // d = distância até o alvo de verdade; o gato vira para o waypoint
-  if (d > 0.05) { C.yaw = lerpA(C.yaw, Math.atan2(wx - p.x, wz - p.z), Math.min(1, turn * dt)); const sp = Math.min(speed, Math.max(0.8, d * 4)); // desacelera ao chegar: sem isso ele ficava dando voltas em torno do alvo (o giro é suave demais para um alvo tão perto)
+  const p = C.g.position; [tx, tz] = outside(tx, tz);
+  const d = Math.hypot(tx - p.x, tz - p.z), [wx, wz] = route(p, tx, tz), x0 = p.x, z0 = p.z; // d = distância até o alvo de verdade; o gato vira para o waypoint
+  if (d > 0.05) { C.yaw = lerpA(C.yaw, Math.atan2(wx - p.x, wz - p.z), Math.min(1, turn * dt)); const sp = Math.min(speed, Math.max(0.8, d * 4)); // desacelera ao chegar: sem isso ele ficava dando voltas em torno do alvo
     const st = sp * dt; p.x += Math.sin(C.yaw) * st; p.z += Math.cos(C.yaw) * st; C.speed = sp; }
   else C.speed = 0;
-  avoid(C); return d;
+  avoid(C);
+  const want = C.speed * dt, moved = Math.hypot(p.x - x0, p.z - z0);
+  C.blocked = (want > 0.002 && moved < want * 0.3 && d > 0.5) ? C.blocked + dt : Math.max(0, C.blocked - dt * 2);
+  return d;
 }
 // o "passo": patas em diagonal, o corpo quica um pouco e o rabo balança. amp = 0 (parada) a 1 (trotando); rate = velocidade das patas
 function gait(C, amp, rate, dt, now, tailUp = -0.5, dropY = 0) { // dropY = quanto o corpo desce (agachar)
@@ -197,7 +224,7 @@ function updateMocca(C, J, B, dt, now) {
     crouch = 1; amp = 0; tailUp = -0.02; headX = -0.45; C.yaw = lerpA(C.yaw, Math.atan2(bp.x - p.x, bp.z - p.z), Math.min(1, 12 * dt));
     C.g.position.x += Math.sin(now * 38) * 0.0025; C.g.position.z += Math.cos(now * 31) * 0.0015;
     if (C.t > 0.95) { // PULA na direção do passarinho
-      C.state = 'pounceB'; C.t = 0; C.from = p.clone(); { const dx = bp.x - p.x, dz = bp.z - p.z, dl = Math.hypot(dx, dz) || 1, hop = Math.max(0.6, dl - 0.9); C.to = new THREE.Vector3(p.x + dx / dl * hop, 0, p.z + dz / dl * hop); C.H = Math.max(0.6, Math.min(1.5, bp.y * 0.9)); }
+      C.state = 'pounceB'; C.t = 0; C.from = p.clone(); { const dx = bp.x - p.x, dz = bp.z - p.z, dl = Math.hypot(dx, dz) || 1, hop = Math.max(0.6, dl - 0.9); C.to = new THREE.Vector3(p.x + dx / dl * hop, 0, p.z + dz / dl * hop); C.H = Math.max(0.6, Math.min(1.5, bp.y * 0.9)); landOk(C); }
     }
   } else if (C.state === 'pounceB') {
     const u = Math.min(1, C.t / 0.8); jumpArc(C, C.from, C.to, C.H, u); pitch = -0.9 * Math.sin(Math.PI * Math.min(1, u * 1.15)) + (u > 0.6 ? (u - 0.6) * 1.2 : 0); amp = 0; headX = -0.4;
@@ -288,10 +315,14 @@ function updatePlayCats(now, dt) {
   dt = Math.min(dt, 0.05);
   if (calm) { return; } // "reduzir movimento": os bichinhos ficam onde estão
   const { J, M, B } = PCATS;
-  if (!J.init) { J.init = true; J.wait = 0.5; J.tx = J.g.position.x; J.tz = J.g.position.z; M.init = true; M.state = 'follow'; M.tx = M.g.position.x; M.tz = M.g.position.z; }
+  if (!J.init) { J.init = true; J.wait = 0.5; J.tx = J.g.position.x; J.tz = J.g.position.z; J.blocked = 0; M.init = true; M.state = 'follow'; M.tx = M.g.position.x; M.tz = M.g.position.z; M.blocked = 0; }
   updateJulietta(J, M, dt, now); updateMocca(M, J, B, dt, now); updateBird(B, M, dt, now);
+  // DESTRAVAR: se um deles "anda" há mais de 1 s sem sair do lugar (preso numa quina), esquece o que estava fazendo e escolhe outra coisa
+  if (!['roam', 'stalk', 'chase', 'zoom'].includes(J.state)) J.blocked = 0; if (!['follow', 'stalk', 'toTree'].includes(M.state)) M.blocked = 0; // só conta quando ele estava mesmo andando
+  if (J.blocked > 1) { J.blocked = 0; J.state = 'roam'; J.t = 0; J.wait = 0.3; [J.tx, J.tz] = freeSpot(); J.legs[0].rotation.x = J.legs[1].rotation.x = 0; }
+  if (M.blocked > 1) { M.blocked = 0; M.t = 0; if (M.state === 'toTree' || M.state === 'stalk') M.state = 'follow'; B.threat = false; }
   // se os dois ficarem colados, um empurra o outro de leve (nada de gato dentro de gato)
-  if (M.state === 'follow' || M.state === 'stalk') { const dx = M.g.position.x - J.g.position.x, dz = M.g.position.z - J.g.position.z, d = Math.hypot(dx, dz); if (d < 0.6 && d > 0.001) { M.g.position.x += dx / d * (0.6 - d) * 0.5; M.g.position.z += dz / d * (0.6 - d) * 0.5; J.g.position.x -= dx / d * (0.6 - d) * 0.5; J.g.position.z -= dz / d * (0.6 - d) * 0.5; } }
+  if (M.g.position.y < 0.3 && J.g.position.y < 0.3) { const dx = M.g.position.x - J.g.position.x, dz = M.g.position.z - J.g.position.z, d = Math.hypot(dx, dz); if (d < 0.8 && d > 0.001) { const k = (0.8 - d) * 0.5; M.g.position.x += dx / d * k; M.g.position.z += dz / d * k; J.g.position.x -= dx / d * k; J.g.position.z -= dz / d * k; avoid(M); avoid(J); } }
   swing.bf.forEach(b => { if (b.up > 0) b.up = Math.max(0, b.up - dt * 0.9); });
 }
 buildPlayCats();
