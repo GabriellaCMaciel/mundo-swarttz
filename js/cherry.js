@@ -15,32 +15,34 @@ const BENCH_SPOT = { x: POND.x - POND.r - 1.9, z: POND.z + 1.4 };
 const PETAL_PINKS = [0xffc2da, 0xffb0cf, 0xffd0e2, 0xffe3ee, 0xf7a1c7]; // tons de rosa (sem branco puro, para a copa não estourar de luz)
 const cherryState = { fall: null, items: [], wind: 1, ready: false, tmp: new THREE.Object3D() };
 
-// Um galho: cilindro afinando de uma ponta (a) até a outra (b). O cilindro nasce em pé (eixo Y), então giramos até apontar de a para b.
-function cherryLimb(parent, a, b, r0, r1, material) {
-  const dir = new THREE.Vector3().subVectors(b, a), len = dir.length();
-  const m = new THREE.Mesh(new THREE.CylinderGeometry(r1, r0, len, 7), material);
-  m.position.copy(a).addScaledVector(dir, 0.5);
-  m.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), dir.normalize());
-  parent.add(m); return m;
+// Galho/tronco como um TUBO liso que acompanha uma curva (CatmullRomCurve3) e vai afinando.
+// Antes era uma fila de cilindros retos: nas curvas sobravam "cunhas" vazias entre eles. No tubo não existe emenda.
+// Truque: o TubeGeometry nasce com raio 1; cada anel de vértices é então encolhido em direção ao centro da curva (rFn = raio em cada ponto, de t=0 a t=1).
+function cherryTube(parent, points, rFn, material, segs = 24) {
+  const curve = new THREE.CatmullRomCurve3(points), radial = 9, geo = new THREE.TubeGeometry(curve, segs, 1, radial, false), pos = geo.attributes.position;
+  for (let i = 0; i <= segs; i++) {
+    const c = curve.getPointAt(i / segs), r = rFn(i / segs);
+    for (let k = 0; k <= radial; k++) { const n = i * (radial + 1) + k; pos.setXYZ(n, c.x + (pos.getX(n) - c.x) * r, c.y + (pos.getY(n) - c.y) * r, c.z + (pos.getZ(n) - c.z) * r); }
+  }
+  geo.computeVertexNormals();
+  const m = new THREE.Mesh(geo, material); parent.add(m); return m;
 }
 
 // g = grupo da biblioteca (coordenadas locais = mundo - g.position); rnd = gerador de números "aleatórios" fixos; lights = pisca-pisca da biblioteca
 function buildCherry(g, rnd, lights, pond) {
   const gx = CHERRY.x - (POND.x - pond.x), gz = CHERRY.z - (POND.z - pond.z); // mundo -> local
-  const T = new THREE.Group(); T.position.set(gx, 0, gz); g.add(T);
+  const T = new THREE.Group(); T.position.set(gx, 0, gz); T.rotation.y = 0.6; T.scale.set(1.3, 1.12, 1.3); g.add(T); // maior que antes; o giro (+y) leva a frente da árvore um pouco para a direita
   const BARK = lam(0x5b3b46), V = (x, y, z) => new THREE.Vector3(x, y, z);
 
-  // ----- Tronco curvo e galhos que abrem em leque, cada um terminando num punhado de flores -----
-  const trunk = [V(0, 0, 0), V(0.25, 1.5, 0.1), V(-0.2, 2.9, 0.15), V(0.1, 3.7, 0)];
-  for (let i = 0; i < trunk.length - 1; i++) cherryLimb(T, trunk[i], trunk[i + 1], 0.46 - i * 0.1, 0.36 - i * 0.1, BARK);
+  // ----- Tronco GROSSO e curvo (tubo liso, com a base alargada em raízes) e galhos que abrem em leque, cada um terminando num punhado de flores -----
+  const top = V(0.15, 4.1, -0.05);
+  cherryTube(T, [V(0, -0.3, 0), V(0.3, 1.4, 0.1), V(-0.3, 2.8, 0.25), top], t => 0.5 + 0.55 * Math.pow(1 - t, 1.5) + 0.5 * Math.pow(Math.max(0, 1 - t * 5), 2), BARK, 28);
   const tips = [];
-  [[-2.6, 5.2, 0.8], [2.9, 5.5, -0.6], [0.3, 6.1, 2.6], [-0.4, 5.8, -2.7], [2.2, 5.0, 2.2], [-2.3, 5.0, -1.9], [0.2, 6.8, 0.2], [3.6, 4.4, 0.8]].forEach(([x, y, z], i) => {
-    const mid = V(x * 0.45 + 0.1, 3.9 + (y - 3.9) * 0.45, z * 0.45);
-    cherryLimb(T, trunk[3], mid, 0.24, 0.17, BARK); cherryLimb(T, mid, V(x, y, z), 0.17, 0.07, BARK); tips.push(V(x, y, z));
+  [[-2.7, 5.3, 0.8], [3.0, 5.6, -0.6], [0.3, 6.2, 2.7], [-0.4, 5.9, -2.8], [2.3, 5.1, 2.3], [-2.4, 5.1, -2.0], [0.2, 6.9, 0.2], [3.7, 4.5, 0.9]].forEach(([x, y, z]) => {
+    const mid = V(x * 0.5 + 0.1, 4.0 + (y - 4.0) * 0.4, z * 0.5);
+    cherryTube(T, [V(top.x, top.y - 0.4, top.z), mid, V(x, y, z)], t => 0.36 * (1 - t) + 0.09, BARK, 12); tips.push(V(x, y, z));
   });
-  // raízes aparecendo na base (pedacinhos de cone) para a árvore "pisar" no chão em vez de nascer de um cano
-  for (let i = 0; i < 5; i++) { const a = i / 5 * 6.283 + 0.4; cherryLimb(T, V(Math.cos(a) * 0.9, 0.05, Math.sin(a) * 0.9), V(Math.cos(a) * 0.2, 0.7, Math.sin(a) * 0.2), 0.12, 0.28, BARK); }
-
+  const knot = new THREE.Mesh(new THREE.SphereGeometry(0.62, 12, 10), BARK); knot.position.copy(top); T.add(knot); // nó onde os galhos nascem: esconde qualquer emenda
   // ----- Copa: muitas bolas macias de flor em tons de rosa; as de baixo "caem" como galhos de chorão -----
   const blobs = [];
   const add = (x, y, z, s) => blobs.push({ x, y, z, sx: s, sy: s * 0.8, sz: s, ry: rnd() * 3, c: PETAL_PINKS[(rnd() * 5) | 0] });
@@ -54,19 +56,20 @@ function buildCherry(g, rnd, lights, pond) {
   T.add(crown);
   // florzinhas mais claras salpicadas por cima da copa
   const specks = [];
-  for (let i = 0; i < 70; i++) { const b = blobs[(rnd() * blobs.length) | 0], u = rnd() * 6.283, v = rnd() * 3.14, r = b.sx * 0.97; specks.push({ x: b.x + Math.cos(u) * Math.sin(v) * r, y: b.y + Math.cos(v) * r * 0.8, z: b.z + Math.sin(u) * Math.sin(v) * r, sx: 0.13 + rnd() * 0.08, c: rnd() < 0.7 ? 0xffeef5 : 0xff8fbd }); }
-  T.add(instanced(new THREE.IcosahedronGeometry(1, 0), lam(0xffffff, { emissive: 0x33202a }), specks)); // icosaedro (redondinho): o octaedro virava pontinhas
-  for (let i = 0; i < 26; i++) { const b = blobs[(rnd() * blobs.length) | 0]; lights.add(gx + b.x + (rnd() - 0.5), b.y + (rnd() - 0.5), gz + b.z + (rnd() - 0.5)); } // luzinhas quentes dentro da copa
+  for (let i = 0; i < 70; i++) { const b = blobs[(rnd() * blobs.length) | 0], u = rnd() * 6.283, v = rnd() * 3.14, r = b.sx * 0.97; specks.push({ x: b.x + Math.cos(u) * Math.sin(v) * r, y: b.y + Math.cos(v) * r * 0.8, z: b.z + Math.sin(u) * Math.sin(v) * r, sx: 0.12 + rnd() * 0.07, c: rnd() < 0.7 ? 0xffdceb : 0xff8fbd }); }
+  T.add(instanced(new THREE.IcosahedronGeometry(1, 1), lam(0xffffff, { emissive: 0x33202a }), specks)); // icosaedro (redondinho): o octaedro virava pontinhas
+  T.updateMatrix(); const lp = new THREE.Vector3();
+  for (let i = 0; i < 26; i++) { const b = blobs[(rnd() * blobs.length) | 0]; lp.set(b.x + (rnd() - 0.5), b.y + (rnd() - 0.5), b.z + (rnd() - 0.5)).applyMatrix4(T.matrix); lights.add(lp.x, lp.y, lp.z); } // (applyMatrix4: leva o ponto para onde a árvore realmente está, já escalada e girada) // luzinhas quentes dentro da copa
 
   // ----- Tapete de pétalas: um brilho rosado suave no chão e centenas de pétalas espalhadas (algumas boiando na lagoa) -----
   // O brilho do chão é uma textura com degradê radial (centro rosado que some nas bordas): assim não aparece uma borda dura de círculo
   const carpetTex = canvasTex(256, 256, (x, w, h) => { const gr = x.createRadialGradient(w / 2, h / 2, 0, w / 2, h / 2, w / 2); gr.addColorStop(0, 'rgba(255,179,209,0.5)'); gr.addColorStop(0.6, 'rgba(255,179,209,0.22)'); gr.addColorStop(1, 'rgba(255,179,209,0)'); x.fillStyle = gr; x.fillRect(0, 0, w, h); });
-  const carpet = new THREE.Mesh(new THREE.PlaneGeometry(16, 13), new THREE.MeshBasicMaterial({ map: carpetTex, transparent: true, depthWrite: false }));
+  const carpet = new THREE.Mesh(new THREE.PlaneGeometry(20, 16), new THREE.MeshBasicMaterial({ map: carpetTex, transparent: true, depthWrite: false }));
   carpet.rotation.x = -Math.PI / 2; carpet.position.set(gx + 1.5, 0.035, gz); carpet.userData.flat = true; g.add(carpet);
   const flatPetal = new THREE.CircleGeometry(0.5, 6); flatPetal.rotateX(-Math.PI / 2); flatPetal.scale(1, 1, 1.5); // oval deitada
   const ground = [];
   for (let i = 0; i < 300; i++) {
-    const a = rnd() * 6.283, d = Math.pow(rnd(), 0.7) * 7.5, x = gx + 1.2 + Math.cos(a) * d * 1.15, z = gz + Math.sin(a) * d * 0.9; // oval, um pouco mais esticada para o lado da lagoa
+    const a = rnd() * 6.283, d = Math.pow(rnd(), 0.7) * 9, x = gx + 1.2 + Math.cos(a) * d * 1.15, z = gz + Math.sin(a) * d * 0.9; // oval, um pouco mais esticada para o lado da lagoa
     const onWater = Math.hypot(x - pond.x, z - pond.z) < pond.r - 0.3, inPond = Math.hypot(x - pond.x, z - pond.z) < pond.r + 0.3 && !onWater;
     if (inPond) continue; // a borda de pedras fica livre
     const s = 0.2 + rnd() * 0.14;
@@ -83,7 +86,7 @@ function buildCherry(g, rnd, lights, pond) {
   for (let i = 0; i < N; i++) {
     const u = rnd() * 6.283, v = Math.sqrt(rnd());
     items.push({
-      x0: gx + Math.cos(u) * v * 3.6, z0: gz + Math.sin(u) * v * 3.2, y0: 4.2 + rnd() * 2.6, // ponto de onde se solta, dentro da copa
+      x0: gx + Math.cos(u) * v * 4.8, z0: gz + Math.sin(u) * v * 4.2, y0: 4.6 + rnd() * 3.2, // ponto de onde se solta, dentro da copa
       dur: 7 + rnd() * 6, ph: rnd(), drift: 3 + rnd() * 5, sw: 0.5 + rnd() * 0.9, spin: 1.5 + rnd() * 3, s: 0.2 + rnd() * 0.12, zdrift: (rnd() - 0.5) * 2.5, c: PETAL_PINKS[(rnd() * 5) | 0], ground: 0.05,
     });
   }
