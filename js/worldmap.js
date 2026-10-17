@@ -1,5 +1,5 @@
-// O mapa do mundo, no canto superior direito da tela: uma ilustração "de livro infantil" (cores chapadas, construçõezinhas fofas, caminhos
-// tortos) com um X vermelho que se mexe junto com a personagem. Tocar nele (ou apertar M) amplia o mapa e mostra o nome de cada lugar.
+// O mapa do mundo, no canto superior direito da tela: um círculo com o MESMO chão bordado do mundo (retalhos roxos, fio dourado, pontos-cruz
+// rosa e confete), construçõezinhas fofas e um X vermelho que se mexe junto com a personagem. Tocar nele (ou apertar M) amplia o mapa e mostra o nome de cada lugar.
 //
 // CONCEITOS DESTE ARQUIVO
 //  - Mapa = escala + translação: um ponto do mundo (x, z) vira um pixel por  px = cx + x·k  e  py = cy + z·k, com k = (tamanho do mapa em pixels) ÷ (tamanho
@@ -7,12 +7,14 @@
 //  - Duas camadas: a ilustração (parada) é desenhada UMA vez num canvas "base"; a cada atualização só se copia a base e se desenha o X por cima.
 //    O mapa pequeno e o grande são duas bases (a grande só nasce quando alguém a abre), com o mesmo desenho em escalas diferentes (u = S ÷ 640).
 //  - Só atualiza quando mudou algo (a personagem andou ou o X pulsou), no máximo ~8 vezes por segundo, e nunca com um painel aberto (o loop está parado).
-//  - Ilustração "despojada": nada aqui é proporcional de verdade. Os prédios são grandes demais para o mapa, as árvores são enfeite sorteado
-//    (sementes fixas: mulberry32) e a ilha tem a borda ondulada. É de propósito, como nos mapas de livros ilustrados.
+//  - Ilustração "despojada": nada aqui é proporcional de verdade. Os prédios são grandes demais para o mapa e as árvores são enfeite sorteado
+//    (sementes fixas: mulberry32). É de propósito, como nos mapas de livros ilustrados.
+//  - CÍRCULO: o canvas é quadrado, mas tudo é desenhado dentro de um recorte circular (clip) e o CSS arredonda o botão (border-radius 50%).
+//  - O chão do mapa REUSA a textura do chão do mundo (patchTex, de world.js): um retalho dela = 20 unidades do mundo, então o desenho bate com o de verdade.
 'use strict';
 
 const WMAP = { open: false, base: {}, upd: 0, lx: 1e9, lz: 1e9, pl: -1, btn: null, cv: null, ctx: null, kind: 'small', S: 0, ready: false };
-const MAP_CX = 0.5, MAP_CY = 0.475, MAP_K = 0.39 / 84; // centro (em frações do lado) e escala (fração do lado por unidade do mundo; 84 = WORLD_LIMIT)
+const MAP_CX = 0.5, MAP_CY = 0.5, MAP_K = 0.45 / 84; // centro (em frações do lado) e escala (fração do lado por unidade do mundo; 84 = WORLD_LIMIT)
 const mapPt = (x, z, S) => [S * (MAP_CX + x * MAP_K), S * (MAP_CY + z * MAP_K)];
 
 // os lugares que aparecem no mapa: x, z no mundo; ic = qual desenho; lab = de que lado fica o nome (u = em cima, d = embaixo, l, r)
@@ -107,31 +109,27 @@ const MAP_ICONS = {
 
 function drawMapBase(S, labels) { // a ilustração inteira (parada), desenhada UMA vez
   const c = document.createElement('canvas'); c.width = c.height = S; const x = c.getContext('2d'), u = S / 640, rnd = mulberry32(31);
-  const cx = S * MAP_CX, cy = S * MAP_CY, R = S * 0.43, mp = (a, b) => mapPt(a, b, S);
-  x.fillStyle = '#b48fd8'; x.fillRect(0, 0, S, S);                                              // fundo roxo-lilás chapado
-  for (let i = 0; i < 26; i++) { x.fillStyle = 'rgba(255,255,255,.22)'; const a = rnd() * S, b = rnd() * S; x.fillRect(a, b, 2.5 * u, 2.5 * u); } // estrelinhas
-  blobPath(x, cx + 10 * u, cy + 26 * u, R); x.fillStyle = 'rgba(80,40,120,.35)'; x.fill();     // sombra no "mar"
-  x.fillStyle = '#8a5a57'; for (let d = 0; d <= 26 * u; d += 2) { blobPath(x, cx, cy + d, R); x.fill(); } // o barranco marrom (a ilha tem espessura)
-  x.fillStyle = '#6e4348'; for (let d = 14 * u; d <= 26 * u; d += 2) { blobPath(x, cx, cy + d, R * 0.997); x.fill(); }
-  blobPath(x, cx, cy, R); x.fillStyle = '#74c25e'; x.fill();                                    // a borda verde-escura
-  blobPath(x, cx, cy, R * 0.955); x.fillStyle = '#a6dc7c'; x.fill();                            // a grama clara
-  for (let i = 0; i < 70; i++) { const a = rnd() * 6.28, r = Math.sqrt(rnd()) * R * 0.9; x.fillStyle = '#c2ec96'; x.fillRect(cx + Math.cos(a) * r, cy + Math.sin(a) * r, 5 * u, 2 * u); } // tufinhos de grama
-  // trilhas: as mesmas do mundo (js/trails.js), em verde-limão clarinho, com pontas arredondadas
-  x.lineCap = x.lineJoin = 'round';
-  [[34 * u, '#cfe58f'], [24 * u, '#eef7c2']].forEach(([w, col]) => { x.lineWidth = w * (TRAILS[0].width / 2.9) * 0.7; x.strokeStyle = col; TRAILS.forEach(tr => {
-    x.beginPath(); tr.pts.forEach((p, i) => { const [a, b] = mp(p.x, p.z); i ? x.lineTo(a, b) : x.moveTo(a, b); }); x.stroke(); }); });
+  const cx = S * MAP_CX, cy = S * MAP_CY, R = S * 0.5, mp = (a, b) => mapPt(a, b, S);
+  x.save(); x.beginPath(); x.arc(cx, cy, R, 0, 6.2832); x.clip();                                // tudo abaixo fica DENTRO do círculo
+  const L = 20 * MAP_K * S;                                                                      // tamanho de um retalho (20 unidades do mundo) em pixels do mapa
+  for (let i = -Math.ceil(0.5 / (20 * MAP_K)); i <= Math.ceil(0.5 / (20 * MAP_K)); i++) for (let j = -Math.ceil(0.5 / (20 * MAP_K)); j <= Math.ceil(0.5 / (20 * MAP_K)); j++) x.drawImage(patchTex.image, cx + i * L, cy + j * L, L + 0.5, L + 0.5); // o mesmo chão bordado do mundo
+  x.fillStyle = 'rgba(183,154,245,.14)'; x.fillRect(0, 0, S, S);                                // um véu lilás clarinho para os desenhos aparecerem melhor
+  const cf = ['#ff5fa2', '#f2b84b', '#37d0c0', '#b79af5', '#f08a3c', '#f6ecd9'];
+  for (let i = 0; i < (labels ? 70 : 40); i++) { const a = rnd() * 6.28, r = Math.sqrt(rnd()) * R * 0.92; x.save(); x.translate(cx + Math.cos(a) * r, cy + Math.sin(a) * r); x.rotate(rnd() * 3); x.fillStyle = cf[i % 6]; x.fillRect(-4 * u, -1.4 * u, 8 * u, 2.8 * u); x.restore(); } // confete, como no chão do mundo
+  x.restore();
+  x.setLineDash([12 * u, 9 * u]); x.lineWidth = 3 * u; x.strokeStyle = 'rgba(242,184,75,.85)'; x.beginPath(); x.arc(cx, cy, R - 9 * u, 0, 6.2832); x.stroke(); x.setLineDash([]); // costura dourada em volta, como a do chão
   const pl = mapPlaces();
   // lagoa (mancha azul)
   const [lx, ly] = mp(POND.x, POND.z); x.beginPath(); x.ellipse(lx, ly, 46 * u, 33 * u, 0.15, 0, 6.3); x.fillStyle = '#5fb7e0'; x.fill(); x.beginPath(); x.ellipse(lx - 6 * u, ly - 5 * u, 34 * u, 22 * u, 0.15, 0, 6.3); x.fillStyle = '#7fcdee'; x.fill();
   // árvores de enfeite, sorteadas, longe dos lugares e das trilhas
   const near = (a, b, r) => pl.some(p => { const [q, w] = mp(p.x, p.z); return Math.hypot(a - q, b - w) < r; });
-  const tc = [['#4fa85a', '#7fd68c'], ['#5cb85c', '#8be0a0'], ['#6cc7a8', '#9be3c8'], ['#f29cc0', '#ffc2da']];
+  const tc = [['#2f8f6b', '#4cb88a'], ['#247a5a', '#3aa17a'], ['#3aa17a', '#6fd0a8'], ['#e58ab8', '#f4a6c9']]; // as cores das árvores do mundo (verde-azulado e rosa de cerejeira)
   for (let i = 0, n = 0; i < 900 && n < (labels ? 46 : 36); i++) {
-    const a = rnd() * 6.28, r = Math.sqrt(rnd()) * R * 0.88, px = cx + Math.cos(a) * r, py = cy + Math.sin(a) * r, wx = (px / S - MAP_CX) / MAP_K, wz = (py / S - MAP_CY) / MAP_K;
-    if (near(px, py, 58 * u) || distToTrails(wx, wz) < 6 || Math.hypot(px - lx, py - ly) < 62 * u) continue;
+    const a = rnd() * 6.28, r = Math.sqrt(rnd()) * R * 0.8, px = cx + Math.cos(a) * r, py = cy + Math.sin(a) * r, wx = (px / S - MAP_CX) / MAP_K, wz = (py / S - MAP_CY) / MAP_K;
+    if (near(px, py, 58 * u) || Math.hypot(px - lx, py - ly) < 62 * u) continue;
     const k = tc[(rnd() * tc.length) | 0]; tinyTree(x, px, py + 8 * u, (20 + rnd() * 12) * u, k[0], k[1]); n++;
   }
-  for (let i = 0; i < 40; i++) { const a = rnd() * 6.28, r = Math.sqrt(rnd()) * R * 0.9, px = cx + Math.cos(a) * r, py = cy + Math.sin(a) * r; if (near(px, py, 44 * u)) continue; dot(x, px, py, 3 * u, i % 3 ? '#fff' : '#ff6f8f'); } // florzinhas
+  for (let i = 0; i < 40; i++) { const a = rnd() * 6.28, r = Math.sqrt(rnd()) * R * 0.85, px = cx + Math.cos(a) * r, py = cy + Math.sin(a) * r; if (near(px, py, 44 * u)) continue; dot(x, px, py, 3 * u, i % 3 ? '#fff' : '#ff6f8f'); } // florzinhas
   // os lugares (desenhos maiores no mapa pequeno, onde não cabem nomes)
   const sc = labels ? 1 : 1.35;
   pl.forEach(p => { const [a, b] = mp(p.x, p.z); x.save(); x.translate(a, b); x.scale(u * sc, u * sc); x.shadowColor = 'rgba(60,30,40,.3)'; x.shadowBlur = 5; x.shadowOffsetY = 3; MAP_ICONS[p.ic](x); x.restore(); });
@@ -141,13 +139,12 @@ function drawMapBase(S, labels) { // a ilustração inteira (parada), desenhada 
     if (p.lab === 'u') bubble(x, p.name, a + ox, b - off - 14 * u, u, 'u'); else if (p.lab === 'd') bubble(x, p.name, a + ox, b + off + 12 * u, u, 'd');
     else if (p.lab === 'r') bubble(x, p.name, a + off2, b - 4 * u, u, 'r'); else bubble(x, p.name, a - off2, b - 4 * u, u, 'l');
   });
-  x.font = '700 ' + Math.round(30 * u) + 'px Caveat, "Segoe Script", cursive'; x.textAlign = 'left'; x.textBaseline = 'alphabetic'; x.fillStyle = '#fff'; // título à mão, no canto
-  if (labels) { x.fillText('Mundo Swarttz', 20 * u, 40 * u); x.font = '700 ' + Math.round(20 * u) + 'px Nunito, system-ui, sans-serif'; x.textAlign = 'right'; x.fillText('N ↑', S - 20 * u, 36 * u); }
+  if (labels) { x.font = '800 ' + Math.round(22 * u) + 'px Nunito, system-ui, sans-serif'; x.textAlign = 'center'; x.textBaseline = 'middle'; x.fillStyle = '#fff6e2'; x.fillText('N ↑', cx, 30 * u); } // só o norte (o título "Mundo Swarttz" saiu do mapa ampliado)
   return c;
 }
 
 // ---------- o mapa na tela ----------
-function mapSize() { return WMAP.open ? Math.min(innerWidth * 0.92, innerHeight * 0.66, 460) : (innerWidth <= 640 ? 124 : 172); } // tamanho em pixels da tela (CSS)
+function mapSize() { return WMAP.open ? Math.min(innerWidth * 0.92, innerHeight * 0.66, 460) : (innerWidth <= 640 ? 92 : 116); } // tamanho em pixels da tela (CSS)
 function mapPick() { // escolhe/recria a base certa e acerta o tamanho do canvas visível
   const css = Math.round(mapSize()), dpr = Math.min(window.devicePixelRatio || 1, 2), S = Math.round(css * dpr), kind = WMAP.open ? 'big' : 'small';
   const key = kind + S; if (!WMAP.base[key]) { WMAP.base = {}; WMAP.base[key] = drawMapBase(S, WMAP.open); } // só guarda a base em uso (a outra é refeita quando precisar)
@@ -163,6 +160,8 @@ function buildWorldMap() { // chamada ao entrar no mundo (ui.js > startWorld)
   WMAP.btn = document.getElementById('minimap'); WMAP.cv = document.getElementById('mmCanvas'); WMAP.ctx = WMAP.cv.getContext('2d');
   WMAP.btn.hidden = false; WMAP.ready = true; mapPick(); updateWorldMap(clock.elapsedTime, true);
   WMAP.btn.addEventListener('click', () => setMapOpen(!WMAP.open));
+  // com o mapa ampliado, clicar/tocar em QUALQUER lugar fora dele só fecha o mapa (a fase de captura chega antes do clique-para-andar, e o stopPropagation impede que a personagem ande por causa desse clique)
+  window.addEventListener('pointerdown', e => { if (WMAP.open && !WMAP.btn.contains(e.target)) { e.stopPropagation(); e.preventDefault(); setMapOpen(false); } }, true);
   window.addEventListener('resize', () => { if (WMAP.ready) { mapPick(); updateWorldMap(clock.elapsedTime, true); } });
 }
 
