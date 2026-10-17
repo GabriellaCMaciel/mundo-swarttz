@@ -35,6 +35,7 @@ body{margin:0;background:var(--ink);color:var(--paper);font-family:var(--font-di
 .card p{margin:0;font:400 13px/1.5 var(--font-mono);color:var(--paper)}
 .hint{right:var(--sr);top:calc(var(--st) + 124px);width:max-content;max-width:min(340px,calc(100% - var(--sl) - var(--sr)));text-align:right;font:700 14px var(--font-mono);letter-spacing:.06em;color:var(--gold);background:rgba(11,6,19,.78);padding:.55em 1em;animation:pulse 1.8s ease-in-out infinite}
 @keyframes pulse{50%{opacity:.8}} /* a pulsação antiga ia até .35 e o texto perdia contraste: agora fica sempre legível */
+.a11y-btn{right:var(--sr);top:calc(var(--st) + 38px)}
 .keys{right:var(--sr);top:var(--st);text-align:right;font:400 12px var(--font-mono);color:var(--paper);background:rgba(11,6,19,.78);padding:.5em .8em}
 .joy{left:var(--sl);bottom:var(--sb);width:124px;height:124px;border-radius:50%;border:2px solid rgba(183,154,245,.55);background:rgba(123,63,228,.18);touch-action:none}
 .knob{position:absolute;left:50%;top:50%;width:52px;height:52px;border-radius:50%;background:var(--gold);transform:translate(-50%,-50%)}
@@ -202,3 +203,13 @@ html.simple-mode,html.simple-mode body{height:auto;min-height:100%;overflow:auto
 .skip-link:focus{top:12px}
 @media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
 html.simple-mode{scroll-behavior:smooth}
+
+/* painel de acessibilidade */
+.az-h{margin:22px 0 8px;font:800 16px var(--font-display);color:var(--gold)}
+.az-list{list-style:none;margin:0;padding:0;display:grid;gap:8px}
+.az-list li{display:flex;flex-wrap:wrap;gap:8px 12px;align-items:center;justify-content:space-between;padding:8px 12px;border:1px solid var(--violet);font:700 14px var(--font-mono)}
+.az-btns{display:flex;gap:8px}
+.az-check{display:flex;gap:10px;align-items:flex-start;font:400 14px/1.5 var(--font-mono);cursor:pointer}
+.az-check input{width:22px;height:22px;margin:0;flex:none;accent-color:var(--gold)}
+.az-keys{margin:0;padding-left:1.2em;font:400 13px/1.7 var(--font-mono)}
+.az-keys li{margin-bottom:6px}

@@ -188,6 +188,7 @@ function addButterflies(parent, centers, n, rnd) {
 // Chamada todo quadro: luzinhas piscam e borboletas voam
 function updateGarden(now) {
   cullFar();
+  if (calm) return; // "reduzir movimento": luzinhas e borboletas ficam paradas
   twinkle.forEach(t => { t.pts.material.opacity = 0.7 + 0.3 * Math.sin(now * 2.4 + t.phase * Math.PI); });
   butterflies.forEach(b => {
     const a = now * b.sp + b.ph;

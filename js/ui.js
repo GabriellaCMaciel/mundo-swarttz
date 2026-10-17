@@ -31,6 +31,23 @@ function bookHtml(b) {
     '<p class="sub">(conteúdo provisório)</p>';
 }
 
+// ----- Painel "Acessibilidade e atalhos": ir direto a um lugar, andar sozinho até lá, reduzir movimento, versão simples -----
+function a11yHtml() {
+  return '<h2 id="sheetTitle" style="color:var(--gold)">Acessibilidade e atalhos</h2>' +
+    '<p class="sub">Tudo aqui funciona só com teclado, toque ou leitor de tela. Se preferir, a versão simples tem as mesmas informações em texto puro.</p>' +
+    '<p><a class="link on" href="?simples"><span>Abrir a versão simples (sem 3D)</span><small>texto puro ↗</small></a></p>' +
+    '<h3 class="az-h">Ir direto para um lugar</h3>' +
+    '<ul class="az-list">' + zones.map(z => '<li><span>' + z.name + '</span><span class="az-btns"><button class="btn" type="button" data-az="open:' + z.id + '">Abrir</button><button class="btn" type="button" data-az="walk:' + z.id + '">Ir até lá</button></span></li>').join('') + '</ul>' +
+    '<h3 class="az-h">Preferências</h3>' +
+    '<label class="az-check"><input type="checkbox" id="azCalm"' + (calm ? ' checked' : '') + '> Reduzir movimento (gatos, borboletas, pétalas e luzes ficam parados)</label>' +
+    '<h3 class="az-h">Como se mover</h3>' +
+    '<ul class="az-keys"><li><b>Teclado:</b> WASD ou setas para andar, E ou Enter para abrir, Esc para fechar, H para esta ajuda.</li>' +
+    '<li><b>Mouse ou toque:</b> clique ou toque no chão para andar até lá sozinho; toque num lugar para abrir. No celular também há o joystick.</li>' +
+    '<li><b>Sem segurar nada:</b> use "Ir até lá" acima: a personagem anda sozinha.</li></ul>';
+}
+function openA11y() { if (panelOpen || phase !== 'world') return; panelOpen = true; showSheet(a11yHtml()); }
+document.getElementById('a11yBtn').addEventListener('click', openA11y);
+
 let panelOpen = false;
 function showSheet(html) { // coloca o conteúdo na folha do painel e leva o foco para o botão de fechar
   hud.sheet.innerHTML = '<button class="close" type="button" aria-label="Fechar">✕</button>' + html;
@@ -52,9 +69,18 @@ function openBook(b) { // chamado também pelo clique do mouse em um livro 3D (l
 function closePanel() { panelOpen = false; hud.panel.hidden = true; if (mailUi.isOpen) closeMail(); syncLoop(); }
 hud.sheet.addEventListener('click', e => {
   if (e.target.closest('.close')) return closePanel();
+  const az = e.target.closest('[data-az]');
+  if (az) { // botões do painel de acessibilidade: "Abrir" mostra o conteúdo; "Ir até lá" faz a personagem andar sozinha
+    const [act, id] = az.dataset.az.split(':'), z = zones.find(o => o.id === id); closePanel();
+    if (act === 'open') openPanel(z); else walkToZone(z);
+    return;
+  }
   const bk = e.target.closest('[data-book]');
   if (bk) return showSheet(bookHtml(books.find(b => b.id === bk.dataset.book)));
   if (e.target.closest('[data-back]')) return showSheet(panels.biblioteca(zones.find(z => z.id === 'biblioteca')));
+});
+hud.sheet.addEventListener('change', e => { // caixinha "Reduzir movimento"
+  if (e.target.id === 'azCalm') { calm = e.target.checked; try { localStorage.setItem(CALM_KEY, calm ? '1' : '0'); } catch (err) { /* sem armazenamento: vale só nesta visita */ } }
 });
 hud.panel.addEventListener('click', e => { if (e.target === hud.panel) closePanel(); });
 hud.open.addEventListener('click', () => openPanel(activeZone));
@@ -68,6 +94,7 @@ window.addEventListener('keydown', e => {
   if (mailKey(e)) return; // com a tela das cartas aberta, ela cuida das teclas
   if (e.code === 'Escape') closePanel();
   else if ((e.code === 'KeyE' || e.code === 'Enter') && !panelOpen && activeZone) openPanel(activeZone);
+  else if (e.code === 'KeyH' && !panelOpen) openA11y();
 });
 window.addEventListener('keyup', e => { keys[e.code] = false; });
 const stick = { x: 0, y: 0 };
@@ -105,6 +132,7 @@ function startWorld() {
   scene.background = skyTex;
   scene.fog = new THREE.Fog(WORLD_FOG, 42, 104);
   hud.hint.hidden = true; hud.title.hidden = true; hud.skip.hidden = true; hud.brand.hidden = false;
+  document.getElementById('a11yBtn').hidden = false;
   if (touch) { hud.joy.hidden = false; hud.open.textContent = 'abrir'; } else hud.keys.hidden = false; // no celular não existe a tecla E
   camera.position.set(player.position.x, CAM_Y, player.position.z + CAM_Z);
   lookNow.set(player.position.x, 1.5, player.position.z);
@@ -125,6 +153,15 @@ function clampToWorld(p) {
     const cz = p.z + CAM_Z; r = Math.hypot(p.x, cz); if (r > WORLD_LIMIT) { const k = WORLD_LIMIT / r; p.x *= k; p.z = cz * k - CAM_Z; }
   }
 }
+// ----- Andar sozinho (para quem não consegue segurar teclas): clique/toque no chão ou "Ir até lá" no painel de acessibilidade -----
+// A personagem anda em linha reta até o ponto, como se alguém apertasse a tecla por ela. Qualquer tecla, o joystick ou abrir um painel cancelam.
+const auto = { on: false, x: 0, z: 0 };
+const marker = new THREE.Mesh(new THREE.RingGeometry(0.45, 0.65, 24), new THREE.MeshBasicMaterial({ color: 0xf2b84b, transparent: true, opacity: 0.85, depthWrite: false }));
+marker.rotation.x = -Math.PI / 2; marker.position.y = 0.09; marker.visible = false; world.add(marker);
+function walkTo(x, z) { const p = { x, z }; clampToWorld(p); auto.on = true; auto.x = p.x; auto.z = p.z; marker.position.x = p.x; marker.position.z = p.z; marker.visible = true; }
+function walkToZone(z) { // para um ponto dentro do alcance da zona, do lado de quem vem do ponto de partida (0, 6)
+  const dx = z.pos[0], dz = z.pos[2] - 6, d = Math.hypot(dx, dz) || 1, k = Math.max(0, d - z.r * 0.6) / d; walkTo(dx * k, 6 + dz * k);
+}
 const camWant = new THREE.Vector3(), lookWant = new THREE.Vector3();
 function angLerp(a, b, t) { // gira suave pelo caminho mais curto
   const d = ((b - a + Math.PI) % (Math.PI * 2) + Math.PI * 2) % (Math.PI * 2) - Math.PI;
@@ -135,7 +172,13 @@ function updateWorld(dt, now) {
   // 1) ler o que a pessoa apertou (parado enquanto um painel está aberto)
   let ix = (keys.KeyD || keys.ArrowRight ? 1 : 0) - (keys.KeyA || keys.ArrowLeft ? 1 : 0) + stick.x;
   let iz = (keys.KeyS || keys.ArrowDown ? 1 : 0) - (keys.KeyW || keys.ArrowUp ? 1 : 0) + stick.y;
-  if (panelOpen) { ix = 0; iz = 0; }
+  if (panelOpen) { ix = 0; iz = 0; auto.on = false; }
+  if (ix || iz) auto.on = false; // quem aperta uma tecla ou mexe no joystick assume o controle
+  if (auto.on) { // andar sozinho: vai na direção do ponto marcado e para quando chega
+    const ax = auto.x - player.position.x, az = auto.z - player.position.z, ad = Math.hypot(ax, az);
+    if (ad < 0.35) auto.on = false; else { ix = ax / ad; iz = az / ad; }
+  }
+  marker.visible = auto.on; if (auto.on) marker.scale.setScalar(calm ? 1 : 1 + Math.sin(now * 8) * 0.15);
   const len = Math.hypot(ix, iz);
   if (len > 1) { ix /= len; iz /= len; }
   const moving = len > 0.08;
@@ -168,8 +211,8 @@ function updateWorld(dt, now) {
   }
   updateSparks(dt);
   checkZones(now);
-  updateLibrary(now, dt); updatePondLife(now, dt);
-  updateGarden(now); updateCherry(now); updateSwing(now); updatePlayCats(now, dt); updateMailbox(now, dt); updatePhone(now, dt); updateWorldMap(now);
+  updateLibrary(now, dt); updateGarden(now); updateCherry(now); updatePhone(now, dt); updateWorldMap(now);
+  if (!calm) { updatePondLife(now, dt); updateSwing(now); updatePlayCats(now, dt); updateMailbox(now, dt); } // com "reduzir movimento" a lagoa, o balanço, os gatinhos e o quintal ficam parados
 
   // 6) o sol (e suas sombras) acompanha o personagem; a câmera também, com suavidade
   sun.position.set(player.position.x + 12, 26, player.position.z + 10);

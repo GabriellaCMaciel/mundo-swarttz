@@ -40,7 +40,9 @@ resize();
 // ----- Ajudantes que a gente usa o tempo todo -----
 const lam = (color, extra) => new THREE.MeshLambertMaterial(Object.assign({ color }, extra)); // material fosco e barato
 const ease = t => (t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2);                   // começa e termina suave
-const calm = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+// "Reduzir movimento": vem da configuração do aparelho (prefers-reduced-motion) OU do botão em Acessibilidade (guardado no navegador). É um "let" porque pode mudar durante o uso.
+const CALM_KEY = 'swarttz-calma';
+let calm = window.matchMedia('(prefers-reduced-motion: reduce)').matches || (() => { try { return localStorage.getItem(CALM_KEY) === '1'; } catch (e) { return false; } })();
 const clock = new THREE.Clock();
 const lookNow = new THREE.Vector3(); // para onde a câmera está olhando agora
 

@@ -6,6 +6,7 @@
 'use strict';
 
 const pickRay = new THREE.Raycaster(), pickNdc = new THREE.Vector2();
+const groundPlane = new THREE.Plane(new THREE.Vector3(0, 1, 0), 0), pickHit = new THREE.Vector3(); // o chão: plano horizontal na altura 0
 const toastEl = document.getElementById('toast');
 let toastTimer = 0;
 function showToast(msg) { // aviso rápido embaixo da tela (também é lido por leitores de tela: aria-live)
@@ -44,7 +45,9 @@ function openSocial(s) {
 renderer.domElement.addEventListener('click', e => {
   if (phase !== 'world' || panelOpen || mailUi.isOpen) return; // o clique em livros da biblioteca é tratado em library.js (vem antes e abre o painel)
   const s = pickIcon(e); if (s) return openSocial(s);
-  const z = pickZone(e); if (z) openPanel(z);
+  const z = pickZone(e); if (z) return openPanel(z);
+  // clicou no chão: a personagem anda até lá (ajuda quem não consegue segurar teclas). O raio atravessa a tela até encontrar o plano y = 0.
+  pickSetup(e); const hit = pickRay.ray.intersectPlane(groundPlane, pickHit); if (hit) walkTo(hit.x, hit.z);
 });
 let pickMoveT = 0;
 renderer.domElement.addEventListener('pointermove', e => { // mouse: cursor de "mãozinha" sobre o que é clicável (no máximo ~8 vezes por segundo)
