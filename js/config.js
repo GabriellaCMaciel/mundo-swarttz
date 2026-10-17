@@ -4,8 +4,8 @@
 
 // Imagens (ficam na pasta assets/)
 const ASSETS = {
-  logoDark: 'assets/logo-escuro.png',   // logo para fundos escuros (notebook, terminal)
-  logoLight: 'assets/logo-claro.png',   // logo para fundos claros (bilhete do quadro)
+  logoDark: 'assets/logo-escuro.svg',   // logo (SVG) para fundos escuros (notebook, terminal)
+  logoLight: 'assets/logo-claro.svg',   // logo (SVG) para fundos claros (bilhete do quadro, cartão do celular)
   photo: 'assets/foto.jpg'              // sua foto (quadro "Sobre")
 };
 

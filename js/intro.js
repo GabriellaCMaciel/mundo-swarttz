@@ -109,7 +109,7 @@ box(3.2, 0.08, 2.1, 0x2b2140, 0, 0, 1.05, lidPivot);
 
 // Logo (a gata de óculos) na capa da tampa
 const logoTex = new THREE.TextureLoader().load(ASSETS.logoDark);
-const lidLogo = new THREE.Mesh(new THREE.PlaneGeometry(1.14, 1.5), new THREE.MeshBasicMaterial({ map: logoTex, transparent: true }));
+const lidLogo = new THREE.Mesh(new THREE.PlaneGeometry(1.213, 1.5), new THREE.MeshBasicMaterial({ map: logoTex, transparent: true }));
 lidLogo.rotation.x = -Math.PI / 2; lidLogo.position.set(0, 0.045, 1.05); lidPivot.add(lidLogo);
 
 // Tela: um plano com uma textura desenhada num <canvas> 2D (é aqui que o texto "digita")
@@ -156,7 +156,7 @@ function drawTerminal(typed, now) {
     left -= text.length + PAUSE;
     y += 40;
   }
-  if (typed > totalChars - 30 && logoImg) tctx.drawImage(logoImg, 462, 176, 126, 166); // a logo aparece no "acesso concedido"
+  if (typed > totalChars - 30 && logoImg) tctx.drawImage(logoImg, 458, 176, 134, 166); // a logo aparece no "acesso concedido"
   if (Math.floor(now * 2) % 2 === 0) { tctx.fillStyle = '#f2b84b'; tctx.fillRect(lastX + 4, lastY - 19, 12, 24); } // cursor piscando
   termTex.needsUpdate = true;
 }

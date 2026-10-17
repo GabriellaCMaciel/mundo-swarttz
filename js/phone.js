@@ -120,16 +120,22 @@ function buildPhone(g) {
   const scr = flat(rrPlane(W - 0.25, H - 0.25, 0.38, new THREE.MeshBasicMaterial({ map: phoneScreenTex() }))); scr.position.z = D / 2 + 0.008; T.add(scr);
 
   // cartões de vidro que flutuam na frente da tela (cada um em uma profundidade, então se mexem de forma diferente quando o celular gira)
-  const prof = card(2.5, 1.1, 230, (x, w, h) => {
+  let phoneLogo = null; // a logo (SVG) chega depois que a página já começou: quando chegar, o cartão é redesenhado (veja loadImg logo abaixo)
+  const drawProf = (x, w, h) => {
     glassRR(x, 4, 4, w - 8, h - 8, 40, 0.74);
-    const ag = x.createLinearGradient(30, 40, 150, 200); ag.addColorStop(0, '#7b3fe4'); ag.addColorStop(1, '#ff5fa2');
+    const ag = x.createLinearGradient(30, 40, 150, 200); ag.addColorStop(0, '#3a2266'); ag.addColorStop(1, '#2a1745'); // fundo escuro: a versão "fundo escuro" da logo (contorno claro) aparece bem nele
     x.beginPath(); x.arc(92, h / 2, 62, 0, 6.3); x.fillStyle = ag; x.fill(); x.lineWidth = 6; x.strokeStyle = '#fff'; x.stroke();
-    x.fillStyle = '#fff'; x.font = '800 74px ' + PH_FONT; x.textAlign = 'center'; x.textBaseline = 'middle'; x.fillText('G', 92, h / 2 + 5);
+    if (phoneLogo) { const lh = 108, lw = lh * phoneLogo.width / phoneLogo.height; x.drawImage(phoneLogo, 92 - lw / 2, h / 2 - lh / 2 + 2, lw, lh); }
     put(x, 'Gabriella Swarttz', 178, 92, w - 200, 36, 800, PH_FONT, '#2a1745');
     put(x, 'Dev Web & Mobile', 178, 128, w - 200, 24, 400, PH_MONO, '#5a3a7a');
     put(x, 'Valparaíso de Goiás, BR', 178, 160, w - 200, 21, 400, PH_MONO, '#7a5a9a');
     rrPath(x, 178, 178, 172, 46, 23); x.fillStyle = '#7b3fe4'; x.fill(); put(x, 'Ver perfil', 264, 209, 150, 24, 700, PH_FONT, '#fff', 'center');
-  }, 0.55, T); prof.position.set(-0.28, 1.1, 0.55); // fica sobre o espaço vazio da tela (entre o título e as telhas), então não cobre nenhum texto
+  };
+  const prof = card(2.5, 1.1, 230, drawProf, 0.55, T);
+  loadImg(ASSETS.logoDark, im => { // chegou a logo: limpa o cartão, desenha de novo com ela e avisa o Three.js que a textura mudou (needsUpdate)
+    phoneLogo = im; const cv = prof.material.map.image, cx = cv.getContext('2d'); cx.clearRect(0, 0, cv.width, cv.height); drawProf(cx, cv.width, cv.height); prof.material.map.needsUpdate = true;
+  });
+  prof.position.set(-0.28, 1.1, 0.55); // fica sobre o espaço vazio da tela (entre o título e as telhas), então não cobre nenhum texto
 
   const stats = card(2.1, 1.3, 230, (x, w, h) => {
     rrPath(x, 4, 4, w - 8, h - 8, 36); x.fillStyle = 'rgba(52,38,110,0.82)'; x.fill(); x.lineWidth = 2.5; x.strokeStyle = 'rgba(255,255,255,0.4)'; x.stroke();

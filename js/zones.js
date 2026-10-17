@@ -51,7 +51,7 @@ const props = {
     const nx = noteTex.image.getContext('2d');
     const drawNote = logo => {
       nx.fillStyle = '#f6ecd9'; nx.fillRect(0, 0, 420, 520);
-      if (logo) nx.drawImage(logo, 135, 24, 150, 198);
+      if (logo) nx.drawImage(logo, 130, 24, 160, 198);
       nx.fillStyle = '#2a1745'; nx.textAlign = 'center';
       nx.font = '800 38px Syne, sans-serif'; nx.fillText('Gabriella', 210, 288); nx.fillText('Swarttz', 210, 332);
       nx.font = '700 20px "JetBrains Mono", monospace'; nx.fillText('dev em formação', 210, 378);
