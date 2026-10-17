@@ -102,18 +102,30 @@ hud.open.addEventListener('click', () => openPanel(activeZone));
 hud.card.addEventListener('click', () => openPanel(activeZone)); // o cartão inteiro também é um botão (bom para o dedo)
 
 // ===== 6. Controles: teclado e joystick de toque =====
+// POR QUE "ANDAR SEM PARAR" ACONTECIA: guardamos quais teclas estão apertadas (keys) e o joystick (stick). Elas só "soltam" quando o navegador avisa (keyup, pointerup).
+// Só que o aviso pode nunca chegar: trocar de aba/janela com a tecla apertada, abrir um menu do sistema, soltar o dedo fora da tela, tecla Cmd no Mac... Aí o estado fica
+// "preso" e a personagem anda sozinha. A solução é um "zerar tudo" (resetInput) chamado sempre que o foco muda ou algo abre por cima do mundo.
 const keys = {};
+const stick = { x: 0, y: 0 };
+let resetStick = () => { };
+function resetInput() { // esquece tudo que estava apertado
+  for (const k in keys) keys[k] = false;
+  stick.x = 0; stick.y = 0; resetStick();
+}
 window.addEventListener('keydown', e => {
+  if (e.metaKey || e.ctrlKey || e.altKey) { resetInput(); return; } // atalho do navegador/sistema: o keyup dessas combinações costuma se perder
   keys[e.code] = true;
   if (phase !== 'world') return;
   if (mailKey(e)) return; // com a tela das cartas aberta, ela cuida das teclas
+  const onControl = e.target && e.target.closest && e.target.closest('button, a, input, select, textarea'); // com um botão em foco, Espaço e Enter são dele
   if (e.code === 'Escape') closePanel();
-  else if ((e.code === 'KeyE' || e.code === 'Enter') && !panelOpen && activeZone) openPanel(activeZone);
+  else if ((e.code === 'KeyE' || e.code === 'Enter') && !panelOpen && activeZone && !onControl) openPanel(activeZone);
   else if (e.code === 'KeyH' && !panelOpen) openA11y();
 });
-window.addEventListener('keyup', e => { keys[e.code] = false; });
-const stick = { x: 0, y: 0 };
-
+window.addEventListener('keyup', e => { keys[e.code] = false; if (e.key === 'Meta' || e.key === 'Control' || e.key === 'Alt') resetInput(); });
+window.addEventListener('blur', resetInput);                                  // a janela perdeu o foco
+document.addEventListener('visibilitychange', () => { if (document.hidden) resetInput(); }); // a aba foi para o segundo plano
+window.addEventListener('contextmenu', () => { if (!touch) resetInput(); });   // menu do botão direito: o navegador engole os keyup. (No toque, um segurar longo não pode soltar o joystick.)
 (function setupJoystick() {
   const R = 44; // até onde o botão pode ir
   let id = null;
@@ -127,14 +139,16 @@ const stick = { x: 0, y: 0 };
     hud.knob.style.transform = 'translate(calc(-50% + ' + dx + 'px), calc(-50% + ' + dy + 'px))';
   }
   function end(e) {
-    if (e.pointerId !== id) return;
+    if (e && e.pointerId !== id) return;
     id = null; stick.x = 0; stick.y = 0;
     hud.knob.style.transform = 'translate(-50%, -50%)';
   }
+  resetStick = () => end(null);
   el.addEventListener('pointerdown', e => { id = e.pointerId; el.setPointerCapture(id); move(e); });
   el.addEventListener('pointermove', e => { if (e.pointerId === id) move(e); });
   el.addEventListener('pointerup', end);
   el.addEventListener('pointercancel', end);
+  el.addEventListener('lostpointercapture', end); // o navegador tirou o "ímã" do dedo (ex.: algo abriu por cima): também é soltar
 })();
 
 // ===== 7. Entrar no mundo =====
@@ -171,10 +185,10 @@ function clampToWorld(p) {
 }
 // ----- Andar sozinho (para quem não consegue segurar teclas): clique/toque no chão ou "Ir até lá" no painel de acessibilidade -----
 // A personagem anda em linha reta até o ponto, como se alguém apertasse a tecla por ela. Qualquer tecla, o joystick ou abrir um painel cancelam.
-const auto = { on: false, x: 0, z: 0 };
+const auto = { on: false, x: 0, z: 0, best: 1e9, since: 0, t0: 0 };
 const marker = new THREE.Mesh(new THREE.RingGeometry(0.45, 0.65, 24), new THREE.MeshBasicMaterial({ color: 0xf2b84b, transparent: true, opacity: 0.85, depthWrite: false }));
 marker.rotation.x = -Math.PI / 2; marker.position.y = 0.09; marker.visible = false; world.add(marker);
-function walkTo(x, z) { const p = { x, z }; clampToWorld(p); auto.on = true; auto.x = p.x; auto.z = p.z; marker.position.x = p.x; marker.position.z = p.z; marker.visible = true; }
+function walkTo(x, z) { const p = { x, z }; clampToWorld(p); auto.on = true; auto.x = p.x; auto.z = p.z; auto.best = 1e9; auto.since = clock.elapsedTime; auto.t0 = clock.elapsedTime; marker.position.x = p.x; marker.position.z = p.z; marker.visible = true; }
 function walkToZone(z) { // para um ponto dentro do alcance da zona, do lado de quem vem do ponto de partida (0, 6)
   const dx = z.pos[0], dz = z.pos[2] - 6, d = Math.hypot(dx, dz) || 1, k = Math.max(0, d - z.r * 0.6) / d; walkTo(dx * k, 6 + dz * k);
 }
@@ -192,7 +206,9 @@ function updateWorld(dt, now) {
   if (ix || iz) auto.on = false; // quem aperta uma tecla ou mexe no joystick assume o controle
   if (auto.on) { // andar sozinho: vai na direção do ponto marcado e para quando chega
     const ax = auto.x - player.position.x, az = auto.z - player.position.z, ad = Math.hypot(ax, az);
-    if (ad < 0.35) auto.on = false; else { ix = ax / ad; iz = az / ad; }
+    // "cão de guarda": se a distância não diminui por 1 s, ou passa de 30 s, desiste (antes, um ponto impossível de alcançar fazia andar para sempre)
+    if (ad < auto.best - 0.25) { auto.best = ad; auto.since = now; }
+    if (ad < 0.35 || now - auto.since > 1 || now - auto.t0 > 30) auto.on = false; else { ix = ax / ad; iz = az / ad; }
   }
   marker.visible = auto.on; if (auto.on) marker.scale.setScalar(calm ? 1 : 1 + Math.sin(now * 8) * 0.15);
   const len = Math.hypot(ix, iz);
@@ -256,6 +272,7 @@ function step() {
 function loop() { step(); rafId = requestAnimationFrame(loop); }
 function syncLoop() { // chame sempre que algo mudar: painel abriu/fechou, aba ficou visível/escondida
   const hidden = document.hidden, covered = phase === 'world' && (panelOpen || mailUi.isOpen);
+  if (covered) resetInput(); // abriu algo por cima: esquece teclas e joystick (o keyup/pointerup pode não chegar mais ao mundo)
   document.querySelectorAll('.hud, #stage, #toSimple').forEach(el => { el.inert = covered; }); // com algo aberto por cima, o resto da página sai do teclado e do leitor de tela ("inert")
   document.documentElement.classList.toggle('paused', hidden); // aba escondida: pausa também as animações de CSS (a tela dos Correios, aberta, continua animada)
   if (!hidden && !covered && !rafId) { clock.oldTime = performance.now(); rafId = requestAnimationFrame(loop); } // oldTime: o tempo parado não vira um "pulo" na animação
