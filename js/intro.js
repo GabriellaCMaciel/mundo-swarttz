@@ -35,7 +35,8 @@ function resize() {
   const w = window.innerWidth, h = window.innerHeight;
   renderer.setSize(w, h, false);
   camera.aspect = w / h;
-  camera.fov = camera.aspect < 1 ? 50 + (1 - camera.aspect) * 50 : 50; // em pé (celular) abre mais o campo de visão
+  const base = 50 + (camera.userData.fovAdd || 0); // fovAdd: no mundo o campo de visão é um pouco maior (veja startWorld em ui.js)
+  camera.fov = camera.aspect < 1 ? base + (1 - camera.aspect) * 50 : base; // em pé (celular) abre mais o campo de visão
   camera.updateProjectionMatrix();
 }
 window.addEventListener('resize', resize);

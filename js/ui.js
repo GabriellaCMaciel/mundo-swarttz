@@ -170,6 +170,7 @@ hud.btnJump.addEventListener('click', e => { if (e.detail === 0) jump(); });    
 
 // ===== 7. Entrar no mundo =====
 const CAM_Y = 9, CAM_Z = 17; // altura e distância da câmera em relação ao personagem
+const LOOK_Y = 2.6, FOV_ADD = 6; // a câmera mira um pouco mais alto e abre mais o campo de visão na vertical: dá para ver mais do que fica no alto (copas, ícones do celular, a biblioteca)
 function startWorld() {
   if (phase === 'world') return;
   phase = 'world';
@@ -183,7 +184,8 @@ function startWorld() {
   hud.acts.hidden = false; // botões "correr" e "pular": para toque e também para quem usa só o mouse
   if (touch) { hud.joy.hidden = false; hud.open.textContent = 'abrir'; } else hud.keys.hidden = false; // no celular não existe a tecla E
   camera.position.set(player.position.x, CAM_Y, player.position.z + CAM_Z);
-  lookNow.set(player.position.x, 1.5, player.position.z);
+  camera.userData.fovAdd = FOV_ADD; resize();
+  lookNow.set(player.position.x, LOOK_Y, player.position.z);
   hud.flash.style.transition = 'none'; hud.flash.style.opacity = '1';
   requestAnimationFrame(() => requestAnimationFrame(() => {
     hud.flash.style.transition = 'opacity 1.2s'; hud.flash.style.opacity = '0';
@@ -281,7 +283,7 @@ function updateWorld(dt, now) {
   const k = 1 - Math.pow(0.0005, dt);
   const boost = libraryCamBoost(); // na biblioteca a câmera sobe e se afasta um pouco
   camWant.set(player.position.x, CAM_Y + LIB_CAM.y * boost, player.position.z + CAM_Z + LIB_CAM.z * boost);
-  lookWant.set(player.position.x, 1.5 + LIB_CAM.look * boost, player.position.z);
+  lookWant.set(player.position.x, LOOK_Y + LIB_CAM.look * boost, player.position.z);
   camera.position.lerp(camWant, k);
   lookNow.lerp(lookWant, k);
   camera.lookAt(lookNow);
