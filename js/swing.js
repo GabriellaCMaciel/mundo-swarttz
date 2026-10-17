@@ -88,10 +88,37 @@ function buildSwing() {
     veg.bush(x, 0.62, z, 0.42, 16, dom, GREENS[(rnd() * 5) | 0]);
   };
   basket(-3.2, 1.0, 0xff7eb6); basket(-2.35, 1.7, 0xf2b84b);
-  [[0x8a5a3a, 0.95, 0.16, 0.64, 0], [0xa9744a, 0.88, 0.15, 0.6, 0.35], [0x6d4630, 0.8, 0.14, 0.56, -0.2]].forEach(([c, w, h, d, r], i) => { // pilha de livros antigos
-    const b = mk(new THREE.BoxGeometry(w, h, d), c, -2.5, 0.08 + i * 0.16, 2.6, g); b.rotation.y = r;
-    mk(new THREE.BoxGeometry(w * 0.96, h * 0.7, d * 0.96), 0xf0e2c4, -2.5, 0.08 + i * 0.16, 2.6, g).rotation.y = r; // miolo das páginas
-  });
+  // Pilha de livros com personalidade: cada livro tem uma cor, um tamanho, um giro e um detalhe dourado próprios.
+  // Um livro é um grupo de peças: capa de baixo, capa de cima, lombada (a lateral colorida) e as páginas creme, um pouco recuadas
+  // para aparecerem como "miolo" entre as capas. Uma fitinha marca a página e uma moldura dourada enfeita a capa.
+  const stack = new THREE.Group(); stack.position.set(-2.5, 0, 2.6); g.add(stack);
+  const bookBlock = (w, h, d, color, ry, ox, y, gold, ribbon) => {
+    const b = new THREE.Group(); b.position.set(ox, y, 0); b.rotation.y = ry; stack.add(b);
+    const t = 0.03; // espessura da capa
+    mk(new THREE.BoxGeometry(w, t, d), color, 0, -h / 2 + t / 2, 0, b);                    // capa de baixo
+    mk(new THREE.BoxGeometry(w, t, d), color, 0, h / 2 - t / 2, 0, b);                     // capa de cima
+    mk(new THREE.BoxGeometry(t * 1.6, h, d), color, -w / 2 + t * 0.8, 0, 0, b);            // lombada
+    mk(new THREE.BoxGeometry(w - 2 * t, h - 2 * t, d - 0.05), 0xf3e7cc, t * 0.6, 0, 0, b);  // páginas (recuadas)
+    if (gold) { // faixas douradas na lombada e uma moldura na capa
+      [-0.3, 0.3].forEach(k => mk(new THREE.BoxGeometry(t * 1.9, h * 0.1, d * 1.02), 0xf2c45a, -w / 2 + t * 0.8, k * h, 0, b));
+      mk(new THREE.BoxGeometry(w * 0.5, 0.004, d * 0.5), 0xf2c45a, w * 0.08, h / 2 + 0.002, 0, b);
+      mk(new THREE.BoxGeometry(w * 0.42, 0.006, d * 0.36), color, w * 0.08, h / 2 + 0.004, 0, b);
+    }
+    if (ribbon) { const r = mk(new THREE.BoxGeometry(0.03, 0.01, 0.34), ribbon, w * 0.2, -h * 0.1, d / 2 + 0.12, b); r.rotation.z = 0.05; } // fitinha saindo das páginas
+    return b;
+  };
+  const SP = [ // [largura, altura, profundidade, cor, giro, deslocamento em x, dourado?, fitinha]
+    [1.05, 0.17, 0.74, 0x7b3fe4, 0.0, 0.0, true, 0xff5fa2], [0.92, 0.15, 0.66, 0xff5fa2, 0.45, 0.06, false, 0xf2b84b], [0.98, 0.19, 0.7, 0x37d0c0, -0.3, -0.05, true, 0x7b3fe4],
+    [0.8, 0.13, 0.6, 0xf2b84b, 0.8, 0.05, false, null], [0.86, 0.16, 0.62, 0xb79af5, -0.15, 0.0, true, 0xff5fa2], [0.7, 0.14, 0.5, 0xf08a3c, 0.55, 0.04, false, null]
+  ];
+  let sy = 0; SP.forEach(([w, h, d, c, ry, ox, gold, rib]) => { bookBlock(w, h, d, c, ry, ox, sy + h / 2, gold, rib); sy += h; });
+  // No topo: um vasinho de suculenta, para a pilha parecer de alguém que mora ali
+  const pot = mk(new THREE.CylinderGeometry(0.17, 0.12, 0.2, 10), 0xd9825b, 0.02, sy + 0.1, 0, stack);
+  for (let i = 0; i < 7; i++) { const a = i / 7 * 6.283, lf = mk(new THREE.ConeGeometry(0.07, 0.26, 5), i % 2 ? 0x4cb88a : 0x3aa17a, Math.cos(a) * 0.07, sy + 0.3, Math.sin(a) * 0.07, stack); lf.rotation.set(Math.sin(a) * 0.6, 0, -Math.cos(a) * 0.6); }
+  mk(new THREE.SphereGeometry(0.06, 8, 6), 0xff7eb6, 0, sy + 0.4, 0, stack); // uma florzinha rosa no meio
+  // Uns livros caídos de lado perto da pilha (um aberto), e florzinhas no caminho
+  const lie = bookBlock(0.8, 0.14, 0.58, 0xff7eb6, 0.9, 0, 0.07, true, null); lie.parent.remove(lie); lie.position.set(-0.8, 0.07, 0.6); stack.add(lie);
+  const lie2 = bookBlock(0.72, 0.12, 0.52, 0x5b8cff, -0.5, 0, 0.06, false, 0xf2b84b); lie2.parent.remove(lie2); lie2.position.set(0.85, 0.06, 0.55); stack.add(lie2);
   const fall = [];
   for (let i = 0; i < 46; i++) { const a = rnd() * 6.283, r = 1 + rnd() * 6; fall.push({ x: Math.cos(a) * r, y: 0.04, z: Math.sin(a) * r * 0.8 + 1, sx: 0.13 + rnd() * 0.08, sy: 0.015, sz: 0.1, ry: rnd() * 3, c: [0xe8a24a, 0xd4783a, 0xf2b84b, 0xc4572f][i % 4] }); }
   g.add(instanced(new THREE.IcosahedronGeometry(1, 0), lam(0xffffff), fall));
