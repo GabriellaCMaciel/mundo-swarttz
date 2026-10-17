@@ -28,7 +28,8 @@ function placeholderTex(c1, c2, label) {
     x.fillStyle = hex(c2); x.fillRect(22, 40, w - 44, 22);
     ['#ff5fa2', '#f2b84b', '#37d0c0'].forEach((c, i) => { x.fillStyle = c; x.beginPath(); x.arc(38 + i * 16, 51, 4, 0, 6.3); x.fill(); });
     x.fillStyle = hex(c1); x.fillRect(38, 82, 90, 12); x.fillRect(38, 104, 150, 8); x.fillRect(38, 120, 120, 8); x.fillRect(38, 150, w - 76, 70);
-    x.fillStyle = '#fff'; x.font = '700 20px "JetBrains Mono", monospace'; x.textAlign = 'center';
+    x.fillStyle = 'rgba(11,6,19,0.84)'; x.fillRect(16, h - 70, w - 32, 56); // faixa escura atrás do texto: ele precisa de contraste sobre qualquer degradê
+    x.fillStyle = '#f6ecd9'; x.font = '700 20px "JetBrains Mono", monospace'; x.textAlign = 'center';
     x.fillText(label, w / 2, h - 44); x.font = '400 13px "JetBrains Mono", monospace'; x.fillText('print do projeto', w / 2, h - 22);
   });
 }

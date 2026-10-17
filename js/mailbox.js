@@ -33,7 +33,7 @@ function mailboxTex() { // a porta da caixa: rosa descascado com "CARTAS" em rel
     const size = Math.min(100, 100 * (w - 140) / x.measureText('CARTAS').width);
     x.font = '800 ' + size + 'px Syne, serif';
     x.fillStyle = 'rgba(255,240,244,0.9)'; x.fillText('CARTAS', w / 2 + 2, h / 2 + 3); // luz do relevo (embaixo)
-    x.fillStyle = '#9c3f5f'; x.fillText('CARTAS', w / 2, h / 2);                          // a letra em si: rosa escuro, para dar leitura
+    x.fillStyle = '#8a3050'; x.fillText('CARTAS', w / 2, h / 2);                          // a letra em si: rosa escuro, para dar leitura
   });
 }
 function envelopeTex() { // o envelope esquecido na prateleira

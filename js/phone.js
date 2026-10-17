@@ -30,6 +30,9 @@ function glassRR(x, X, Y, W, H, R, a = 0.3) { // "vidro": branco translúcido co
   const g = x.createLinearGradient(0, Y, 0, Y + H); g.addColorStop(0, 'rgba(255,255,255,' + (a + 0.12) + ')'); g.addColorStop(1, 'rgba(255,255,255,' + a + ')');
   rrPath(x, X, Y, W, H, R); x.fillStyle = g; x.fill(); x.lineWidth = 2.5; x.strokeStyle = 'rgba(255,255,255,0.55)'; x.stroke();
 }
+function darkGlassRR(x, X, Y, W, H, R) { // "vidro escuro": violeta translúcido. O texto branco em cima dele passa no contraste (WCAG 4.5:1) mesmo sobre as partes claras do degradê
+  rrPath(x, X, Y, W, H, R); x.fillStyle = 'rgba(24,12,70,0.46)'; x.fill(); x.lineWidth = 2.5; x.strokeStyle = 'rgba(255,255,255,0.55)'; x.stroke();
+}
 function rrShape(w, h, r) { // contorno de retângulo arredondado para o Three.js (corpo do celular, ícones, tela)
   const s = new THREE.Shape(), x = -w / 2, y = -h / 2;
   s.moveTo(x + r, y); s.lineTo(x + w - r, y); s.quadraticCurveTo(x + w, y, x + w, y + r); s.lineTo(x + w, y + h - r); s.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
@@ -57,10 +60,10 @@ function ghMark(x, cx, cy, size, color = '#fff') { // desenha a marca centraliza
 // ---------- a tela do celular (fica colada no corpo) ----------
 function phoneScreenTex() {
   return canvasTex(600, 1165, (x, w, h) => {
-    const bg = x.createLinearGradient(0, 0, w, h); bg.addColorStop(0, '#5f73f6'); bg.addColorStop(0.55, '#8a63f0'); bg.addColorStop(1, '#c07df0');
+    const bg = x.createLinearGradient(0, 0, w, h); bg.addColorStop(0, '#4254d8'); bg.addColorStop(0.55, '#6a45d0'); bg.addColorStop(1, '#8a38b8'); // (cores escolhidas para o texto branco ter contraste ≥ 3:1 a 4.5:1)
     x.fillStyle = bg; x.fillRect(0, 0, w, h);
     [[480, 220, 230], [90, 760, 260], [420, 1030, 220]].forEach(([cx, cy, r]) => { // manchas de luz ao fundo
-      const g = x.createRadialGradient(cx, cy, 0, cx, cy, r); g.addColorStop(0, 'rgba(255,255,255,0.22)'); g.addColorStop(1, 'rgba(255,255,255,0)'); x.fillStyle = g; x.fillRect(0, 0, w, h);
+      const g = x.createRadialGradient(cx, cy, 0, cx, cy, r); g.addColorStop(0, 'rgba(255,255,255,0.14)'); g.addColorStop(1, 'rgba(255,255,255,0)'); x.fillStyle = g; x.fillRect(0, 0, w, h);
     });
     put(x, '9:41', 44, 64, 110, 26, 700, PH_FONT, '#fff');                                // barra de status
     rrPath(x, 224, 32, 152, 42, 21); x.fillStyle = '#0b0613'; x.fill();                       // ilha da câmera
@@ -68,15 +71,15 @@ function phoneScreenTex() {
     put(x, 'Fale com a', 44, 150, 360, 28, 600, PH_FONT, 'rgba(255,255,255,0.82)');
     put(x, 'Gabriella', 44, 208, 500, 58, 800, PH_FONT, '#fff');
     // duas telhas grandes
-    glassRR(x, 30, 500, 262, 236, 34, 0.22);
+    darkGlassRR(x, 30, 500, 262, 236, 34);
     ghMark(x, 161, 596, 104);
     put(x, 'GitHub', 161, 690, 220, 36, 800, PH_FONT, '#fff', 'center'); put(x, 'meus projetos', 161, 722, 220, 20, 400, PH_MONO, 'rgba(255,255,255,0.85)', 'center');
-    const pk = x.createLinearGradient(308, 500, 570, 736); pk.addColorStop(0, '#ff8fb8'); pk.addColorStop(1, '#ff5fa2');
+    const pk = x.createLinearGradient(308, 500, 570, 736); pk.addColorStop(0, '#c9327a'); pk.addColorStop(1, '#b02a68');
     rrPath(x, 308, 500, 262, 236, 34); x.fillStyle = pk; x.fill(); x.lineWidth = 2.5; x.strokeStyle = 'rgba(255,255,255,0.5)'; x.stroke();
     x.fillStyle = '#fff'; x.font = '700 84px ' + PH_FONT; x.textAlign = 'center'; x.fillText('♥', 439, 630);
     put(x, 'Instagram', 439, 690, 220, 36, 800, PH_FONT, '#fff', 'center'); put(x, 'dia a dia', 439, 722, 220, 20, 400, PH_MONO, 'rgba(255,255,255,0.9)', 'center');
     // lista de redes
-    glassRR(x, 30, 770, 540, 290, 34, 0.2);
+    darkGlassRR(x, 30, 770, 540, 290, 34);
     put(x, 'Redes', 64, 828, 300, 32, 800, PH_FONT, '#fff'); put(x, 'ver tudo', 536, 828, 140, 20, 400, PH_MONO, 'rgba(255,255,255,0.85)', 'right');
     [['GitHub', 'GabriellaCMaciel', '#2b1b4d'], ['LinkedIn', 'gabriellacmaciel', '#3d7bff'], ['Instagram', '@gabriellaswarttz', '#d6336c']].forEach(([n, s, c], i) => { // (o texto vem dos mesmos @ do SOCIALS em config.js)
       const y = 860 + i * 72; rrPath(x, 62, y, 50, 50, 14); x.fillStyle = c; x.fill(); if (i === 0) ghMark(x, 87, y + 25, 32);
@@ -135,7 +138,7 @@ function buildPhone(g) {
     if (phoneLogo) { const lh = 108, lw = lh * phoneLogo.width / phoneLogo.height; x.drawImage(phoneLogo, 92 - lw / 2, h / 2 - lh / 2 + 2, lw, lh); }
     put(x, 'Gabriella Swarttz', 178, 92, w - 200, 36, 800, PH_FONT, '#2a1745');
     put(x, 'Dev Web & Mobile', 178, 128, w - 200, 24, 400, PH_MONO, '#5a3a7a');
-    put(x, 'Valparaíso de Goiás, BR', 178, 160, w - 200, 21, 400, PH_MONO, '#7a5a9a');
+    put(x, 'Valparaíso de Goiás, BR', 178, 160, w - 200, 21, 400, PH_MONO, '#5f4080');
     rrPath(x, 178, 178, 172, 46, 23); x.fillStyle = '#7b3fe4'; x.fill(); put(x, 'Ver perfil', 264, 209, 150, 24, 700, PH_FONT, '#fff', 'center');
   };
   const prof = card(2.5, 1.1, 230, drawProf, 0.55, T);
@@ -155,19 +158,19 @@ function buildPhone(g) {
   }, 0.85, T); stats.position.set(2.3, 0.0, 0.85); // quase todo para fora da tela: só encosta na borda
 
   const chat = card(2.2, 1.1, 230, (x, w, h) => {
-    const cg = x.createLinearGradient(0, 0, w, h); cg.addColorStop(0, '#ff7a86'); cg.addColorStop(1, '#ff5f93');
+    const cg = x.createLinearGradient(0, 0, w, h); cg.addColorStop(0, '#d63a55'); cg.addColorStop(1, '#b82a68');
     rrPath(x, 4, 4, w - 8, h - 8, 38); x.fillStyle = cg; x.fill(); x.lineWidth = 2.5; x.strokeStyle = 'rgba(255,255,255,0.6)'; x.stroke();
     put(x, 'Vamos conversar?', 36, 92, w - 72, 40, 800, PH_FONT, '#fff'); put(x, 'me chama nas redes', 36, 130, w - 72, 22, 400, PH_MONO, 'rgba(255,255,255,0.92)');
-    rrPath(x, 36, 160, 120, 46, 23); x.fillStyle = 'rgba(255,255,255,0.95)'; x.fill(); put(x, 'abrir (E)', 96, 191, 100, 22, 700, PH_FONT, '#d63a7a', 'center');
+    rrPath(x, 36, 160, 120, 46, 23); x.fillStyle = 'rgba(255,255,255,0.95)'; x.fill(); put(x, 'abrir (E)', 96, 191, 100, 22, 700, PH_FONT, '#b82a68', 'center');
   }, 0.8, T); chat.position.set(-2.25, -1.0, 0.8);
 
   const nav = card(3.2, 0.66, 230, (x, w, h) => {
     glassRR(x, 4, 4, w - 8, h - 8, 44, 0.78);
     rrPath(x, 26, 20, 88, 88, 30); x.fillStyle = '#fff'; x.fill(); x.strokeStyle = '#5b3bc4'; x.lineWidth = 7; x.lineJoin = 'round';
     x.beginPath(); x.moveTo(52, 70); x.lineTo(70, 52); x.lineTo(88, 70); x.lineTo(88, 90); x.lineTo(52, 90); x.closePath(); x.stroke();
-    x.fillStyle = '#b79af5'; [[160, 30], [196, 52], [232, 40]].forEach(([px, hh]) => { rrPath(x, px, 92 - hh, 24, hh, 6); x.fill(); }); // barrinhas do gráfico
+    x.fillStyle = '#6a45d0'; [[160, 30], [196, 52], [232, 40]].forEach(([px, hh]) => { rrPath(x, px, 92 - hh, 24, hh, 6); x.fill(); }); // barrinhas do gráfico
     x.beginPath(); x.arc(w / 2, h / 2, 46, 0, 6.3); x.fillStyle = '#7b3fe4'; x.fill(); x.fillStyle = '#fff'; x.fillRect(w / 2 - 5, h / 2 - 22, 10, 44); x.fillRect(w / 2 - 22, h / 2 - 5, 44, 10);
-    x.strokeStyle = '#b79af5'; x.lineWidth = 7; x.beginPath(); x.arc(w - 220, 64, 22, 0.3, 6); x.stroke();
+    x.strokeStyle = '#6a45d0'; x.lineWidth = 7; x.beginPath(); x.arc(w - 220, 64, 22, 0.3, 6); x.stroke();
     x.beginPath(); x.arc(w - 74, 54, 15, 0, 6.3); x.stroke(); x.beginPath(); x.arc(w - 74, 104, 26, 3.3, 6.1); x.stroke();
   }, 0.5, T); nav.position.set(0, -2.45, 0.5);
 

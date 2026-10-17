@@ -16,7 +16,7 @@ const panels = {
       '<small>' + b.kind + ' · ' + b.org + '</small></span></button>').join('') + '</div>',
   selos: z => heading(z, 'Imagens provisórias. Cada projeto terá vários selos, com prints dele rodando.') +
     '<div class="stamps">' + [['#ff5fa2', '#7b3fe4'], ['#37d0c0', '#7b3fe4'], ['#f2b84b', '#ff5fa2'], ['#7b3fe4', '#37d0c0'], ['#f08a3c', '#ff5fa2'], ['#b79af5', '#37d0c0']]
-      .map((c, i) => '<div class="stamp"><div class="shot" style="background:linear-gradient(135deg,' + c[0] + ',' + c[1] + ')">print do projeto</div><b>Projeto ' + (i + 1) + '</b></div>').join('') + '</div>',
+      .map((c, i) => '<div class="stamp"><div class="shot" style="background:linear-gradient(135deg,' + c[0] + ',' + c[1] + ')"><span>print do projeto</span></div><b>Projeto ' + (i + 1) + '</b></div>').join('') + '</div>',
   telefone: z => heading(z, 'Toque numa rede (aqui ou no celular gigante) para abrir o meu perfil.') + // a lista SOCIALS fica em config.js
     '<div class="links">' + SOCIALS.map(s => s.url
       ? '<a class="link on" href="' + s.url + '"' + (/^mailto:/.test(s.url) ? '' : ' target="_blank" rel="noopener noreferrer"') + '><span>' + s.name + '</span><small>' + (s.handle || 'abrir') + ' ↗</small></a>'
