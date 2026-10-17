@@ -20,9 +20,10 @@ js/garden.js      ajudantes de jardim: flores, arbustos, árvores, postes, luzin
 js/world.js       chão, luzes, céu, personagem e gatas
 js/library.js     a biblioteca: grande pavilhão aberto com jardim, lagoa, estantes, sofás, puffs e livros clicáveis
 js/pond.js        a lagoa viva: peixes nadando e o gato Zé Porempa tentando pegá-los
-js/cherry.js      a cerejeira grande ao lado do banco, na esquerda da lagoa: pétalas caindo ao vento e espalhadas pelo chão
+js/cherry.js      a cerejeira grande (tronco grosso e curvo, galhos em tubo liso, sem emendas) ao lado do banco, na esquerda da lagoa: pétalas caindo ao vento e espalhadas pelo chão
 js/kiara.js       a Kiara: segue a Gabriella e, quando ela para, vem se esfregar nas pernas pedindo carinho
-js/swing.js       o balanço na árvore (cordas com flores e hera, livro, manta, cestos), à direita da biblioteca
+js/swing.js       o balanço na árvore (cordas com flores e hera, livros coloridos empilhados, manta, cestos), à direita da biblioteca
+js/playcats.js    Maria Julietta e o Mocca brincando perto do balanço: ela caça as borboletas, ele persegue e sobe no tronco atrás de um passarinho
 js/mailbox.js     a zona Cartas em 3D: caixa de correio rosa, casinha inclinada e quintal com cerca completa e portão
 js/yardcats.js    a Mel (no telhado, rosna se outro gato chega perto) e os filhotes brincando de lutinha no quintal
 js/phone.js       o celular gigante da zona Telefone: flutua, gira devagar para os lados seguindo a pessoa, com ícones de redes e cartões de vidro
@@ -52,6 +53,9 @@ Use um servidor local (por exemplo, a extensão **Live Server** do VS Code) ou p
 - Logo: `assets/logo-escuro.svg` (para fundo escuro) e `assets/logo-claro.svg` (para fundo claro); o caminho fica em `ASSETS` (`js/config.js`). Se a proporção mudar, ajuste o tamanho nos `drawImage` de `intro.js`, `zones.js` e `phone.js`.
 - Acessibilidade: texto precisa de contraste WCAG AA (4,5:1; 3:1 para texto grande). Ao criar cartões ou cores novos, confira antes.
 - Celular gigante: medidas em `PHONE`, posição dos ícones em `PH_SPOTS` e textos da tela/cartões em `js/phone.js`. O giro (só acompanha a pessoa) é limitado a ±0,38 rad (`want` em `updatePhone`).
+- Olhos dos gatos: `buildCat(cor, mascara, { eye: cor })` ou `{ eye: { l: cor, r: cor } }` para olhos de cores diferentes (esquerdo/direito), em `js/world.js`.
+- Gatos brincalhões: estados e velocidades em `js/playcats.js` (`updateJulietta`, `updateMocca`, `updateBird`). Com `prefers-reduced-motion` eles ficam parados.
+- Regra de clique fora: clicar fora de algo que foi aberto (carta, tela dos Correios, painéis) fecha o que foi aberto. Em `js/mail.js` use `e.envHandled` para cliques que o próprio envelope já tratou.
 - Tamanho de cada zona: campo `size` da lista `zones` (1 = tamanho original). A casa das cartas tem as medidas e o giro em `CARTAS`, `YARD` e `HOUSE`, no topo de `js/mailbox.js`.
 
 Os textos dos painéis, os depoimentos e as imagens dos selos ainda são provisórios.
