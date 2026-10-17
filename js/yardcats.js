@@ -4,7 +4,8 @@
 //    dentro do grupo da zona. Cada pai move e gira os filhos junto, e getWorldPosition() descobre onde ela está no mundo inteiro.
 //  - MÁQUINA DE ESTADOS COM SUAVIZAÇÃO: a Mel tem dois humores (calma / rosnando). Em vez de trocar de uma vez, uma variável
 //    "g" (0 a 1) caminha devagar até o valor desejado, e todas as poses (orelhas, cabeça, tremor) são calculadas a partir dela.
-//  - ANIMAÇÃO POR CICLO: os filhotes seguem um ciclo de 6,4 s. Em cada trecho um deles "ataca" e outro "reage" (veja act()).
+//  - ANIMAÇÃO POR CICLO: os filhotes seguem um ciclo de 7,8 s dividido em três atos de 2,6 s. Em cada ato um é o ATACANTE, outro a VÍTIMA e o terceiro
+//    PLATEIA. Dentro do ato há fases bem separadas (agachar > pular > rolar e brigar > voltar), para a brincadeira ficar nítida (veja updateKittens).
 'use strict';
 
 const yardCats = { mel: null, kittens: [], K: null };
@@ -84,7 +85,8 @@ function buildMel(H, rise, half) {
 function buildKitten(name, color) {
   const k = buildCat(0x2a2233, null, { eye: 0x58d36a }); // pelo preto (um pouquinho arroxeado para a luz não "apagar" o gato) e olhos verdes
   const { body, head, tail } = k.userData;
-  k.scale.setScalar(0.78);                                  // filhote: menor que os adultos...
+  k.scale.setScalar(0.86);                                  // filhote: menor que os adultos...
+  k.rotation.order = 'YXZ';                                 // gira primeiro de lado (y) e depois inclina (x): é a ordem certa para pular e rolar
   head.scale.setScalar(1.25); head.position.y += 0.04;      // ...com a cabeça grande demais para o corpo (a cara de filhote)
   body.children[1].visible = false;                         // a pata da frente da esquerda e a da direita viram "braços" que mexem
   body.children[2].visible = false;
@@ -97,7 +99,11 @@ function buildKitten(name, color) {
   });
   const mouth = new THREE.Mesh(new THREE.SphereGeometry(0.1, 10, 8), new THREE.MeshBasicMaterial({ color: 0x5a1020 })); mouth.scale.set(1.1, 0.7, 0.8); mouth.position.set(0, -0.13, 0.27); mouth.visible = false; head.add(mouth);
   const nose = new THREE.Mesh(new THREE.SphereGeometry(0.03, 6, 5), new THREE.MeshBasicMaterial({ color: 0xc46a7c })); nose.position.set(0, -0.03, 0.33); head.add(nose);
-  return { g: k, body, head, tail, arms, mouth, name, color };
+  // pelo preto-arroxeado com um "brilho próprio" (emissive) leve: sem ele o gato preto vira uma mancha e não se enxerga o movimento
+  body.children.forEach(m => { if (m.isMesh && m.material && m.material.emissive) m.material.emissive.setHex(0x1f1736); });
+  head.children.forEach(m => { if (m.isMesh && m.material && m.material.emissive && m.material.color.getHex() === 0x2a2233) m.material.emissive.setHex(0x1f1736); });
+  const hind = [body.children[3], body.children[4]]; // patas de trás (para chutar quando está de barriga para cima)
+  return { g: k, body, head, tail, arms, hind, mouth, name, color };
 }
 
 function buildKittens(parent) {
@@ -107,12 +113,18 @@ function buildKittens(parent) {
   const cx = defs.reduce((a, d) => a + d[2], 0) / 3, cz = defs.reduce((a, d) => a + d[3], 0) / 3;
   defs.forEach(([name, col, x, z, yaw], i) => {
     const kt = buildKitten(name, col);
-    kt.x = (x - cx) * 1.2; kt.z = (z - cz) * 1.2; kt.yaw = yaw; // 1.2: os filhotes ficaram maiores, então se afastam um pouco
+    kt.x = (x - cx) * 1.45; kt.z = (z - cz) * 1.45; kt.yaw = yaw; kt.yawCur = yaw; // 1.45: espaço para pular uns nos outros sem se sobrepor
+    kt.hx = kt.x; kt.hz = kt.z; // "casa" de cada um: de onde sai e para onde volta depois de cada ato
     kt.g.position.set(kt.x, 0, kt.z); kt.g.rotation.y = yaw; K.add(kt.g);
     const label = makeLabel(name, col, 0.7); label.position.y = 2.3 + i * 0.8; kt.g.add(label); catLabels.push([label, kt.g]); // etiquetas em alturas diferentes para não se sobrepor
     yardCats.kittens.push(kt);
   });
   yardCats.K = K;
+  // "estrelinhas de impacto" (aparecem na hora do bote e da rolada) e "poeirinha": 4 sprites criados uma vez e reaproveitados
+  const starTex = canvasTex(128, 128, x => { x.translate(64, 64); x.beginPath(); for (let i = 0; i < 16; i++) { const r = i % 2 ? 24 : 58, a = i * Math.PI / 8; i ? x.lineTo(Math.cos(a) * r, Math.sin(a) * r) : x.moveTo(r, 0); } x.closePath(); x.fillStyle = '#fff2a8'; x.fill(); x.lineWidth = 8; x.lineJoin = 'round'; x.strokeStyle = '#ff7a3c'; x.stroke(); });
+  yardCats.puffs = [];
+  for (let i = 0; i < 4; i++) { const sp = i % 2 ? glowSprite(0xffffff, 1.6, 0.55) : new THREE.Sprite(new THREE.SpriteMaterial({ map: starTex, transparent: true, depthTest: false })); sp.renderOrder = 11; sp.visible = false; K.add(sp); yardCats.puffs.push({ s: sp, life: 1, star: !(i % 2) }); }
+  yardCats.lastP = 0;
 }
 
 function buildYardCats(g, H, rise, half) { buildMel(H, rise, half); buildKittens(g); }
@@ -151,38 +163,81 @@ function updateYardCats(now, dt) {
   m.gr.material.opacity = SQ((g - 0.3) * 1.7); m.gr.position.y = 2.2 + Math.sin(now * 17) * 0.025 * g;
   const sc = 1 + 0.08 * Math.sin(now * 17); m.gr.scale.set(1.9 * sc, 0.72 * sc, 1);
 
-  // ----- Filhotes: um ciclo de lutinha de 6,4 s -----
-  const K = Y.K, T = 6.4, tm = now % T;
-  K.rotation.y = Math.sin(now * 0.45) * 0.3;                                       // o trio gira devagar, como quem rola no chão
-  const win = (s, d) => { const p = (tm - s) / d; return p < 0 || p > 1 ? 0 : Math.pow(Math.sin(Math.PI * p), 0.6); }; // sobe e desce suave dentro da janela [s, s+d]
-  const hop = (a, f) => Math.abs(Math.sin(now * f)) * a;
-  const [A, B, C] = Y.kittens;
-  const base = i => 0.28 * (0.5 + 0.5 * Math.sin(now * 2.1 + i * 2.2));            // sempre se mexendo um pouquinho
-  const aA = Math.max(base(0), win(0.0, 2.0)), aB = Math.max(base(1), win(2.1, 2.0)), aC = Math.max(base(2), win(4.2, 2.0));
-  const place = (kt, lunge, up, jitter) => { // posição = lugar base + avanço na direção do olhar
-    const yaw = kt.yaw + Math.sin(now * 3 + kt.x * 5) * jitter;
-    kt.g.rotation.y = yaw;
-    kt.g.position.set(kt.x + Math.sin(yaw) * lunge, up, kt.z + Math.cos(yaw) * lunge);
-  };
-  const chomp = (kt, a) => { kt.mouth.visible = a > 0.3; kt.mouth.scale.y = 0.55 + 0.45 * (0.5 + 0.5 * Math.sin(now * 16)); };
+  updateKittens(now, dt);
+}
 
-  // Bangula: tapinhas rápidos na cara do Ônix (patinha da frente indo e voltando)
-  place(A, 0.38 * aA, hop(0.07, 13) * aC, 0.1);
-  const slap = 0.5 + 0.5 * Math.sin(now * 19);
-  A.arms[1].rotation.x = -(0.35 + 1.25 * slap) * aA; A.arms[0].rotation.x = -0.3 * aA * (1 - slap);
-  A.head.rotation.x = 0.12 * aA; A.head.rotation.y = Math.sin(now * 5) * 0.12; A.mouth.visible = false;
-  A.body.rotation.z = Math.sin(now * 14) * 0.15 * aC;                               // sacode quando o Cat Noir morde
-  // Ônix: leva os tapinhas (a cabeça balança) e morde o rabo do Cat Noir
-  place(B, 0.48 * aB, hop(0.08, 11) * aA, 0.12);
-  B.head.rotation.x = 0.5 * aB + Math.sin(now * 15) * 0.08 * aB;
-  B.head.rotation.y = Math.sin(now * 19) * 0.32 * aA;
-  B.arms[0].rotation.x = -0.9 * aB; B.arms[1].rotation.x = -0.9 * aB;              // abraça o rabo com as duas patinhas
-  chomp(B, aB);
-  B.body.rotation.z = Math.sin(now * 12) * 0.1;
-  // Cat Noir: morde o Bangula e sacode o rabo quando é mordido
-  place(C, 0.5 * aC, hop(0.09, 12) * aB, 0.1);
-  C.head.rotation.x = 0.45 * aC + Math.sin(now * 14) * 0.07 * aC; C.head.rotation.y = Math.sin(now * 4) * 0.1;
-  C.arms[0].rotation.x = -0.6 * aC; C.arms[1].rotation.x = -0.4 * aC;
-  chomp(C, aC);
-  [A, B, C].forEach((kt, i) => { kt.tail.rotation.z = Math.sin(now * (5 + i) + i) * (0.3 + 0.6 * [aC, aA, aB][i]); }); // o rabo chicoteia mais em quem acabou de ser atacado
+// ================= A BRINCADEIRA DOS FILHOTES =================
+// Ciclo de 7,8 s = três atos. No ato n: o filhote n ataca o n+1 (vítima) e o n+2 assiste (plateia). Fases do ato (p de 0 a 1):
+//   0,00-0,20  o atacante AGACHA, balança o bumbum e chicoteia o rabo; a vítima fica de olho
+//   0,20-0,42  o atacante PULA em arco até a vítima (patinhas esticadas)
+//   0,42-0,50  BATEU: estrelinha de impacto, a vítima é empurrada e ROLA de barriga para cima
+//   0,50-0,82  LUTINHA: a vítima, de barriga para cima, chuta com as patas de trás e empurra com as da frente; o atacante a "morde" (cabeça balançando)
+//   0,82-1,00  a vítima rola de volta, o atacante volta saltitando para o seu lugar. Todos terminam EXATAMENTE onde começaram, então o próximo ato emenda sem pulo.
+// Conceito: smoothstep ss(a, b, v) = sobe suave de 0 a 1 entre a e b; dá a "troca de fase" sem tranco. E o rolamento é uma rotação em torno do CENTRO do
+// corpo (não dos pés): por isso a posição do corpo é corrigida junto com o ângulo (veja "roll" abaixo).
+const ss = (a, b, v) => { const t = Math.max(0, Math.min(1, (v - a) / (b - a))); return t * t * (3 - 2 * t); };
+function kittenPuff(x, y, z, star) {
+  const q = yardCats.puffs.find(o => o.life >= 1 && o.star === star) || yardCats.puffs.find(o => o.life >= 1); if (!q) return;
+  q.life = 0; q.s.visible = true; q.s.position.set(x, y, z);
+}
+function updateKittens(now, dt) {
+  const Y = yardCats, ks = Y.kittens, T = 7.8, seg = T / 3, ta = now % T, act = Math.floor(ta / seg), p = (ta - act * seg) / seg;
+  const att = ks[act], vic = ks[(act + 1) % 3], wat = ks[(act + 2) % 3];
+  const dx = vic.hx - att.hx, dz = vic.hz - att.hz, dl = Math.hypot(dx, dz) || 1, ux = dx / dl, uz = dz / dl; // direção atacante > vítima
+  const Lx = vic.hx - ux * 0.55, Lz = vic.hz - uz * 0.55;                                                       // onde o atacante cai: logo antes da vítima
+  if (Y.lastP < 0.42 && p >= 0.42) kittenPuff(vic.hx, 0.7, vic.hz, true);                                          // impacto
+  if (Y.lastP < 0.52 && p >= 0.52) kittenPuff(vic.hx + ux * 0.2, 0.25, vic.hz + uz * 0.2, false);                  // poeirinha da rolada
+  Y.lastP = p;
+  ks.forEach((kt, i) => {
+    // pose-base: brincando de leve (balança um pouquinho, rabo mexendo)
+    const P = { x: kt.hx + Math.sin(now * 0.9 + i * 2) * 0.02, z: kt.hz + Math.cos(now * 0.7 + i) * 0.02, y: 0, yaw: kt.yaw, pitch: 0, roll: 0, crouch: 0, hX: 0, hY: 0, aL: 0, aR: 0, hind: 0, mouth: false, tailA: 0.35, tailF: 4 + i };
+    const faceTo = (tx, tz) => Math.atan2(tx - P.x, tz - P.z);
+    if (kt === att) {
+      if (p < 0.2) { // agacha e balança o bumbum
+        const c = ss(0, 0.1, p); P.crouch = c; P.yaw = faceTo(vic.hx, vic.hz); P.hX = -0.25 * c; P.x += Math.sin(now * 36) * 0.025 * c; P.tailA = 0.9; P.tailF = 18; P.aL = P.aR = -0.3 * c;
+      } else if (p < 0.42) { // pula em arco
+        const u = (p - 0.2) / 0.22; P.x = kt.hx + (Lx - kt.hx) * u; P.z = kt.hz + (Lz - kt.hz) * u; P.y = 4 * 0.6 * u * (1 - u); P.yaw = faceTo(vic.hx, vic.hz);
+        P.pitch = -0.55 + 1.0 * u; P.aL = P.aR = -1.35; P.hX = -0.2; P.tailA = 0.3; P.tailF = 6;
+      } else if (p < 0.82) { // lutinha: em cima da vítima, mordiscando
+        P.x = Lx + Math.sin(now * 13) * 0.05; P.z = Lz + Math.cos(now * 11) * 0.05; P.y = Math.abs(Math.sin(now * 9)) * 0.06; P.yaw = faceTo(vic.hx, vic.hz) + Math.sin(now * 8) * 0.25;
+        P.pitch = 0.3 + Math.sin(now * 18) * 0.08; P.hX = 0.35; P.hY = Math.sin(now * 14) * 0.4; P.mouth = true; P.aL = -1.0 + Math.sin(now * 20) * 0.3; P.aR = -1.0 - Math.sin(now * 20) * 0.3; P.roll = Math.sin(now * 11) * 0.14; P.tailA = 0.8; P.tailF = 14;
+      } else { // volta saltitando
+        const u = ss(0.82, 1, p); P.x = Lx + (kt.hx - Lx) * u; P.z = Lz + (kt.hz - Lz) * u; P.y = 0.16 * Math.sin(Math.PI * u) * Math.abs(Math.sin(now * 14)); P.yaw = faceTo(kt.hx, kt.hz) + (1 - u) * 0.0;
+        P.pitch = 0.1 * (1 - u); P.tailA = 0.5; P.tailF = 9;
+      }
+    } else if (kt === vic) {
+      const push = ss(0.4, 0.5, p) * (1 - ss(0.82, 1, p)); // empurrão (volta a zero no fim)
+      P.x = kt.hx + ux * 0.2 * push; P.z = kt.hz + uz * 0.2 * push; P.yaw = faceTo(att.hx, att.hz); P.hY = 0;
+      if (p < 0.4) { const w = ss(0.12, 0.4, p); P.crouch = 0.3 * w; P.hX = -0.2; P.tailA = 0.7; P.tailF = 12; P.x -= ux * 0.06 * w; P.z -= uz * 0.06 * w; }  // se prepara, "recuando" um tiquinho
+      else {
+        const roll = 2.75 * ss(0.4, 0.5, p) * (1 - ss(0.8, 0.92, p)); P.roll = roll; P.y = 0.14 * Math.sin(Math.PI * Math.min(1, ss(0.4, 0.5, p) * 1.0)) * (p < 0.5 ? 1 : 0);
+        const belly = ss(0.48, 0.55, p) * (1 - ss(0.78, 0.84, p)); // 1 = de barriga para cima, brigando
+        P.hind = Math.sin(now * 32) * 0.95 * belly; P.aL = (-1.4 + Math.sin(now * 21) * 0.55) * belly; P.aR = (-1.4 - Math.sin(now * 21) * 0.55) * belly;
+        P.hX = -0.3 * belly + Math.sin(now * 9) * 0.2 * belly; P.hY = Math.sin(now * 12) * 0.5 * belly; P.mouth = belly > 0.5;
+        P.x += -uz * Math.sin(now * 15) * 0.04 * belly; P.z += ux * Math.sin(now * 15) * 0.04 * belly; P.tailA = 0.7; P.tailF = 14;
+        if (p > 0.9) P.y = 0.1 * Math.abs(Math.sin(now * 16)) * (1 - ss(0.9, 1, p)); // levanta saltitando
+      }
+    } else { // plateia: vira a cabeça para a ação, balança o bumbum de ansiedade e pula de empolgação na hora da lutinha
+      P.yaw = faceTo((att.hx + vic.hx) / 2, (att.hz + vic.hz) / 2);
+      const a = 0, into = ss(0.15, 0.3, p) * (1 - ss(0.85, 1, p));
+      P.crouch = 0.2 * into; P.hX = -0.1; P.hY = Math.max(-0.7, Math.min(0.7, (p < 0.42 ? -1 : 1) * 0.5 * Math.sin(p * 6.3))); P.tailA = 0.6 + 0.4 * into; P.tailF = 8 + 8 * into; P.x += Math.sin(now * 30) * 0.015 * into;
+      if (p > 0.45 && p < 0.85) P.y = Math.abs(Math.sin(now * 9 + i)) * 0.07; P.mouth = false; P.aL = P.aR = -0.2 * into + a;
+    }
+    // aplicar a pose
+    kt.yawCur += wrapA(P.yaw - kt.yawCur) * Math.min(1, dt * 11);
+    kt.g.position.set(P.x, P.y, P.z); kt.g.rotation.set(P.pitch, kt.yawCur, 0);
+    const r = P.roll, c = P.crouch;
+    kt.body.rotation.z = r;
+    kt.body.position.set(0.45 * Math.sin(r), 0.45 - 0.45 * Math.cos(r) - 0.1 * Math.sin(r / 2), 0); // girar em torno do CENTRO do corpo (0,45 de altura), e não dos pés
+    kt.body.scale.set(1 + 0.05 * c, 1 - 0.16 * c, 1 + 0.05 * c);
+    kt.head.rotation.x = P.hX; kt.head.rotation.y = P.hY;
+    kt.arms[0].rotation.x = P.aL; kt.arms[1].rotation.x = P.aR; kt.hind[0].rotation.x = P.hind; kt.hind[1].rotation.x = -P.hind;
+    kt.mouth.visible = P.mouth; if (P.mouth) kt.mouth.scale.y = 0.55 + 0.45 * (0.5 + 0.5 * Math.sin(now * 16));
+    kt.tail.rotation.z = Math.sin(now * P.tailF + i) * P.tailA;
+  });
+  Y.puffs.forEach(q => { // as estrelinhas crescem, sobem e somem
+    if (q.life >= 1) return;
+    q.life = Math.min(1, q.life + dt / 0.6); const k = q.life; q.s.material.opacity = (q.star ? 1 : 0.55) * (1 - k * k); const sc = (q.star ? 0.5 + k * 1.2 : 0.8 + k * 1.6); q.s.scale.set(sc, sc, 1); q.s.position.y += dt * 0.5;
+    if (q.life >= 1) q.s.visible = false;
+  });
 }
