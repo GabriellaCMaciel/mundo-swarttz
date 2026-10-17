@@ -28,10 +28,14 @@ function buildSwing() {
   const branch = mk(new THREE.CylinderGeometry(0.17, 0.34, 7.6, 9), 0x6b4a2f, 1.4, 5.45, TZ, g);
   branch.rotation.z = Math.PI / 2 + 0.1; // deitado, com a ponta fina para a esquerda e um pouquinho mais baixa
   const twig = mk(new THREE.CylinderGeometry(0.1, 0.18, 2.6, 7), 0x6b4a2f, 4.0, 6.5, TZ - 0.4, g); twig.rotation.z = 0.7; // galhinho
-  // A copa é calculada a partir do galho: a altura do galho em x é y = 5,45 + 0,1·(x − 1,4) (ele está inclinado). Cada moita fica ~0,9 acima dele,
-  // assim a parte de baixo dela mergulha no galho e não sobra espaço vazio (antes as moitas estavam ~1 unidade altas demais).
-  const by = x => 5.45 + 0.1 * (x - 1.4);
-  [[TX, 8.0, TZ, 2.9], [2.7, by(2.7) + 1.0, 0.2, 2.3], [0.2, by(0.2) + 0.95, -0.7, 2.0], [-1.9, by(-1.9) + 0.9, 0, 1.6], [7.5, 7.0, 0.4, 2.1], [4.6, 8.6, -0.6, 2.2]].forEach(([x, y, z, r]) =>
+  // O galho continua À VISTA e cada bolota de folhas fica ENCOSTADA nele (sem espaço vazio entre os dois):
+  //  - by(x) = altura do centro do galho em x (ele é inclinado: y = 5,45 + 0,1·(x − 1,4));
+  //  - rb(x) = raio do galho em x (é mais fino na ponta esquerda, 0,17, e mais grosso junto ao tronco, 0,34);
+  //  - a "bolota" (moita) tem altura de 0,78·r, então para a parte de baixo dela ficar a meio caminho dentro do galho o centro vai em
+  //    by(x) + 0,5·rb(x) + 0,78·r. Assim as bolotas afundam só um pouquinho e o galho aparece embaixo delas, inteiro e visível.
+  const by = x => 5.45 + 0.1 * (x - 1.4), rb = x => 0.17 + 0.17 * (x + 2.4) / 7.6;
+  const onBranch = (x, r, z) => [x, by(x) + 0.5 * rb(x) + 0.78 * r, z, r];
+  [onBranch(3.3, 1.9, -0.2), onBranch(1.5, 1.6, -0.5), onBranch(-0.3, 1.45, -0.3), onBranch(-1.8, 1.15, -0.3), [TX, 8.0, TZ, 2.9], [7.5, 7.0, 0.4, 2.1], [4.6, 8.6, -0.6, 2.2]].forEach(([x, y, z, r]) =>
     veg.bush(x, y, z, r, 22, [0xfff1f5, 0xff7eb6, 0xf2b84b][(rnd() * 3) | 0], [0xf4a6c9, 0xcdb4f6, 0xe58ab8, 0x4cb88a][(rnd() * 4) | 0])); // copa florida: rosa, lilás e um pouco de verde
   for (let i = 0; i < 26; i++) { // luzinhas na copa e ao longo do galho
     const u = rnd() * 6.283, v = rnd() * 3.14; lights.add(TX - 2.5 + Math.cos(u) * Math.sin(v) * 5.5, 6.9 + Math.cos(v) * 1.8, TZ + Math.sin(u) * Math.sin(v) * 2.5);
