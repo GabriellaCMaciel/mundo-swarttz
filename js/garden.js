@@ -191,7 +191,7 @@ function updateGarden(now) {
   twinkle.forEach(t => { t.pts.material.opacity = 0.7 + 0.3 * Math.sin(now * 2.4 + t.phase * Math.PI); });
   butterflies.forEach(b => {
     const a = now * b.sp + b.ph;
-    b.g.position.set(b.cx + Math.cos(a) * b.r, b.h + Math.sin(now * 1.3 + b.ph) * 0.4, b.cz + Math.sin(a * 0.8) * b.r * 0.7);
+    b.g.position.set(b.cx + Math.cos(a) * b.r, b.h + Math.sin(now * 1.3 + b.ph) * 0.4 + (b.up || 0), b.cz + Math.sin(a * 0.8) * b.r * 0.7); // b.up: susto! quem assusta a borboleta (um gato) põe um valor aqui e ele vai caindo sozinho
     b.g.rotation.y = -a + Math.PI;
     const f = Math.sin(now * 16 + b.ph) * 0.9; b.wL.rotation.z = -f; b.wR.rotation.z = f;
   });
