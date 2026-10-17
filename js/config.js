@@ -50,15 +50,17 @@ const terminalLines = [
   ['>>> ACESSO CONCEDIDO <<<', '#ff5fa2']
 ];
 
-// Depoimentos (provisórios): cada um vira uma carta na caixa de correio, com o nome do remetente no envelope.
-// who = nome de quem escreveu | cat = categoria (aparece no papel) | text = o depoimento (use \n para separar parágrafos)
+// Depoimentos: cada um vira uma carta na caixa de correio, com o nome do remetente no envelope.
+// São mensagens reais que as pessoas mandaram para a Gabriella, com o jeito de falar de cada uma mantido (só ajustei pontuação e tirei o que era conversa particular).
+// who = nome de quem escreveu | cat = quem é a pessoa (aparece no papel) | text = o depoimento (use \n para separar parágrafos)
 // Opcionais: greeting = saudação (padrão "Querida Gabriella,") | photo = foto de quem escreveu, ex.: 'assets/prof-ana.jpg'
 const letters = [
-  { cat: 'Professores', text: 'Texto de exemplo: aprende rápido, ajuda a turma e entrega tudo com capricho.', who: 'Nome do(a) professor(a)' },
-  { cat: 'Professores', text: 'Texto de exemplo: explica conceitos difíceis de um jeito simples e paciente.', who: 'Outro(a) professor(a)' },
-  { cat: 'Colegas', text: 'Texto de exemplo: é a pessoa que não deixa o grupo travar e ainda deixa tudo bonito.', who: 'Nome do(a) colega' },
-  { cat: 'Mentores', text: 'Texto de exemplo: curiosa, constante e com uma visão clara do próprio caminho.', who: 'Nome do(a) mentor(a)' },
-  { cat: 'Clientes', text: 'Texto de exemplo: entendeu o que eu precisava e entregou o site antes do prazo.', who: 'Nome do(a) cliente' }
+  { cat: 'Cliente e parceiro de projeto no EFG', greeting: 'Bom dia!', who: 'Júlio Cézar',
+    text: 'Eu gostei muito, mas muito mesmo, do site.\nFoi exatamente o que eu pensei, porém ficou melhor do que eu imaginava.' },
+  { cat: 'Colega de trabalho no programa START', greeting: 'Gab,', who: 'Juliana Barbosa',
+    text: 'Seus projetos estão tops! Ficaram bem finalizados e organizados. Parabéns pela dedicação.\nVocê precisa se valorizar mais, sério. Você é uma menina dedicada, deu um baita duro por cada projeto.' },
+  { cat: 'Amigo e colega de curso técnico no EFG', greeting: 'Gab, mulher, boa noite 🌙', who: 'Gabriel Carneiro',
+    text: 'Muito obrigado, Gab, uai, por me ajudar e sempre me auxiliar quando eu preciso. Por isso eu sou muito grato por vc.\nEu te agradeço muito, muito, pelo que vc fez por mim. Eu que agradeço por vc ser assim, mulher.\nVc arrasou nessa apresentação, e é isso que importa. Vc foi incrível e estamos muito felizes com isso.' }
 ];
 
 // Os livros da biblioteca: cada um vira um livro brilhante nas estantes (a ordem é da esquerda para a direita).
