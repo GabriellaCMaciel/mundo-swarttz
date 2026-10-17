@@ -36,6 +36,11 @@ body{margin:0;background:var(--ink);color:var(--paper);font-family:var(--font-di
 .hint{right:var(--sr);top:calc(var(--st) + 124px);width:max-content;max-width:min(340px,calc(100% - var(--sl) - var(--sr)));text-align:right;font:700 14px var(--font-mono);letter-spacing:.06em;color:var(--gold);background:rgba(11,6,19,.78);padding:.55em 1em;animation:pulse 1.8s ease-in-out infinite}
 @keyframes pulse{50%{opacity:.8}} /* a pulsação antiga ia até .35 e o texto perdia contraste: agora fica sempre legível */
 .a11y-btn{right:var(--sr);top:calc(var(--st) + 38px)}
+.minimap{right:var(--sr);top:calc(var(--st) + 86px);padding:0;margin:0;border:3px solid #fff6e2;border-radius:18px;background:#b48fd8;box-shadow:0 6px 22px rgba(0,0,0,.45);cursor:pointer;overflow:hidden;line-height:0;touch-action:manipulation}
+.minimap:focus-visible{outline:3px solid var(--gold);outline-offset:3px}
+.minimap canvas{display:block}
+.minimap.big{z-index:3}
+@media (max-width:640px){.minimap{top:calc(var(--st) + 122px);border-width:2px;border-radius:14px}}
 .keys{right:var(--sr);top:var(--st);text-align:right;font:400 12px var(--font-mono);color:var(--paper);background:rgba(11,6,19,.78);padding:.5em .8em}
 .joy{left:var(--sl);bottom:var(--sb);width:124px;height:124px;border-radius:50%;border:2px solid rgba(183,154,245,.55);background:rgba(123,63,228,.18);touch-action:none}
 .acts{right:var(--sr);bottom:var(--sb);display:flex;gap:10px}

@@ -43,7 +43,7 @@ function a11yHtml() {
     '<label class="az-check"><input type="checkbox" id="azRun"' + (runLock ? ' checked' : '') + '> Correr sempre (sem precisar segurar Shift)</label>' +
     '<h3 class="az-h">Como se mover</h3>' +
     '<ul class="az-keys"><li><b>Teclado:</b> WASD ou setas para andar, Shift para correr (R liga e desliga o "correr sempre"), Espaço para pular, E ou Enter para abrir, Esc para fechar, H para esta ajuda.</li>' +
-    '<li><b>Mouse ou toque:</b> clique ou toque no chão para andar até lá sozinho; toque num lugar para abrir. No celular há o joystick e os botões "correr" e "pular" (também aparecem no computador, para quem usa só o mouse).</li>' +
+    '<li><b>Mapa:</b> fica no canto superior direito, com um X onde você está. Aperte M (ou toque nele) para ampliar e ver os nomes.</li><li><b>Mouse ou toque:</b> clique ou toque no chão para andar até lá sozinho; toque num lugar para abrir. No celular há o joystick e os botões "correr" e "pular" (também aparecem no computador, para quem usa só o mouse).</li>' +
     '<li><b>Sem segurar nada:</b> use "Ir até lá" acima: a personagem anda sozinha.</li></ul>';
 }
 function openA11y() { if (panelOpen || phase !== 'world') return; panelOpen = true; showSheet(a11yHtml()); }
@@ -128,7 +128,8 @@ window.addEventListener('keydown', e => {
   if (phase !== 'world') return;
   if (mailKey(e)) return; // com a tela das cartas aberta, ela cuida das teclas
   const onControl = e.target && e.target.closest && e.target.closest('button, a, input, select, textarea'); // com um botão em foco, Espaço e Enter são dele
-  if (e.code === 'Escape') closePanel();
+  if (e.code === 'Escape') { if (WMAP.open) setMapOpen(false); else closePanel(); }
+  else if (e.code === 'KeyM' && !panelOpen && !onControl) setMapOpen(!WMAP.open);
   else if ((e.code === 'KeyE' || e.code === 'Enter') && !panelOpen && activeZone && !onControl) openPanel(activeZone);
   else if (e.code === 'KeyH' && !panelOpen) openA11y();
   else if (e.code === 'Space' && !onControl) { e.preventDefault(); jump(); }
@@ -181,6 +182,7 @@ function startWorld() {
   hud.hint.hidden = true; hud.title.hidden = true; hud.skip.hidden = true; hud.brand.hidden = false;
   document.getElementById('a11yBtn').hidden = false;
   announce('Você entrou no mundo 3D. Aperte H para o menu de acessibilidade, onde dá para ir direto a cada lugar. A versão simples, em texto puro, está no menu e no início da página.');
+  buildWorldMap(); // o mapa ilustrado no canto superior direito (js/worldmap.js)
   hud.acts.hidden = false; // botões "correr" e "pular": para toque e também para quem usa só o mouse
   if (touch) { hud.joy.hidden = false; hud.open.textContent = 'abrir'; } else hud.keys.hidden = false; // no celular não existe a tecla E
   camera.position.set(player.position.x, CAM_Y, player.position.z + CAM_Z);
@@ -274,7 +276,7 @@ function updateWorld(dt, now) {
   }
   updateSparks(dt);
   checkZones(now);
-  updateLibrary(now, dt); updateGarden(now); updateCherry(now); updatePhone(now, dt); updateWorldMap(now);
+  updateLibrary(now, dt); updateGarden(now); updateCherry(now); updatePhone(now, dt); updateWorldMap(now, false);
   if (!calm) { updatePondLife(now, dt); updateSwing(now); updatePlayCats(now, dt); updateMailbox(now, dt); } // com "reduzir movimento" a lagoa, o balanço, os gatinhos e o quintal ficam parados
 
   // 6) o sol (e suas sombras) acompanha o personagem; a câmera também, com suavidade
