@@ -47,6 +47,13 @@ function card(w, h, k, draw, z, parent) { // cartão: plano com textura transpar
   m.position.z = z; m.renderOrder = 4; parent.add(m); return m;
 }
 
+// Marca do GitHub (o "octocat" em silhueta) como um Path2D: um desenho vetorial numa grade de 16x16 que a gente escala para qualquer tamanho.
+const GH_MARK = typeof Path2D !== 'undefined' ? new Path2D('M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z') : null;
+function ghMark(x, cx, cy, size, color = '#fff') { // desenha a marca centralizada em (cx, cy), com "size" pixels de lado
+  if (!GH_MARK) return;
+  x.save(); x.translate(cx - size / 2, cy - size / 2); x.scale(size / 16, size / 16); x.fillStyle = color; x.fill(GH_MARK); x.restore();
+}
+
 // ---------- a tela do celular (fica colada no corpo) ----------
 function phoneScreenTex() {
   return canvasTex(600, 1165, (x, w, h) => {
@@ -62,7 +69,7 @@ function phoneScreenTex() {
     put(x, 'Gabriella', 44, 208, 500, 58, 800, PH_FONT, '#fff');
     // duas telhas grandes
     glassRR(x, 30, 500, 262, 236, 34, 0.22);
-    x.fillStyle = '#fff'; x.font = '700 76px ' + PH_MONO; x.textAlign = 'center'; x.fillText('</>', 161, 628);
+    ghMark(x, 161, 596, 104);
     put(x, 'GitHub', 161, 690, 220, 36, 800, PH_FONT, '#fff', 'center'); put(x, 'meus projetos', 161, 722, 220, 20, 400, PH_MONO, 'rgba(255,255,255,0.85)', 'center');
     const pk = x.createLinearGradient(308, 500, 570, 736); pk.addColorStop(0, '#ff8fb8'); pk.addColorStop(1, '#ff5fa2');
     rrPath(x, 308, 500, 262, 236, 34); x.fillStyle = pk; x.fill(); x.lineWidth = 2.5; x.strokeStyle = 'rgba(255,255,255,0.5)'; x.stroke();
@@ -71,8 +78,8 @@ function phoneScreenTex() {
     // lista de redes
     glassRR(x, 30, 770, 540, 290, 34, 0.2);
     put(x, 'Redes', 64, 828, 300, 32, 800, PH_FONT, '#fff'); put(x, 'ver tudo', 536, 828, 140, 20, 400, PH_MONO, 'rgba(255,255,255,0.85)', 'right');
-    [['GitHub', 'GabriellaCMaciel', '#2b1b4d'], ['LinkedIn', 'em breve', '#3d7bff'], ['E-mail', 'em breve', '#8b4cf0']].forEach(([n, s, c], i) => {
-      const y = 860 + i * 72; rrPath(x, 62, y, 50, 50, 14); x.fillStyle = c; x.fill();
+    [['GitHub', 'GabriellaCMaciel', '#2b1b4d'], ['LinkedIn', 'gabriellacmaciel', '#3d7bff'], ['Instagram', '@gabriellaswarttz', '#d6336c']].forEach(([n, s, c], i) => { // (o texto vem dos mesmos @ do SOCIALS em config.js)
+      const y = 860 + i * 72; rrPath(x, 62, y, 50, 50, 14); x.fillStyle = c; x.fill(); if (i === 0) ghMark(x, 87, y + 25, 32);
       put(x, n, 128, y + 34, 150, 28, 700, PH_FONT, '#fff'); put(x, s, 536, y + 33, 250, 20, 400, PH_MONO, 'rgba(255,255,255,0.9)', 'right');
     });
     rrPath(x, 220, 1128, 160, 8, 4); x.fillStyle = 'rgba(255,255,255,0.85)'; x.fill();
@@ -82,7 +89,7 @@ function phoneScreenTex() {
 // ---------- ícones ----------
 // cada ícone: nome, cor do corpo, texto da etiqueta, desenho (o fundo gradiente + o símbolo, em 256x256)
 const PH_ICONS = [
-  { n: 'GitHub',    c: 0x35246b, g: ['#4b3a8f', '#251648'], draw: x => { x.fillStyle = '#fff'; x.font = '800 104px ' + PH_MONO; x.textAlign = 'center'; x.fillText('</>', 128, 160); } },
+  { n: 'GitHub',    c: 0x35246b, g: ['#4b3a8f', '#251648'], draw: x => ghMark(x, 128, 128, 150) },
   { n: 'LinkedIn',  c: 0x3d7bff, g: ['#5f9bff', '#2f62e8'], draw: x => { x.fillStyle = '#fff'; x.font = '800 132px ' + PH_FONT; x.textAlign = 'center'; x.fillText('in', 128, 170); } },
   { n: 'Instagram', c: 0xff6fa5, g: ['#ff5fa2', '#ff9a4a'], draw: x => { x.strokeStyle = '#fff'; x.lineWidth = 14; rrPath(x, 56, 56, 144, 144, 40); x.stroke(); x.beginPath(); x.arc(128, 128, 32, 0, 6.3); x.stroke(); x.fillStyle = '#fff'; x.beginPath(); x.arc(168, 88, 8, 0, 6.3); x.fill(); } },
   { n: 'E-mail',    c: 0x8b4cf0, g: ['#a870ff', '#6a35d8'], draw: x => { x.strokeStyle = '#fff'; x.lineWidth = 13; x.lineJoin = 'round'; rrPath(x, 52, 78, 152, 100, 14); x.stroke(); x.beginPath(); x.moveTo(60, 90); x.lineTo(128, 142); x.lineTo(196, 90); x.stroke(); } },
