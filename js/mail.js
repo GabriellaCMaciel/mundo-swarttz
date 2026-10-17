@@ -162,10 +162,12 @@ function renderLetter(ts) { // desenha o quadro do instante ts (0 = envelope fec
 }
 
 function stepLetter(now) {
-  const dt = Math.min((now - anim.last) / 1000, 0.05); anim.last = now;
+  // Math.max(0, ...): o relógio do requestAnimationFrame pode ser um pouquinho ANTERIOR ao performance.now() de quando o clique aconteceu.
+  // Sem isso o primeiro quadro tinha dt negativo, a carta "voltava" para antes do começo e fechava sozinha logo depois de abrir (acontecia só às vezes).
+  const dt = Math.max(0, Math.min((now - anim.last) / 1000, 0.05)); anim.last = now;
   anim.ts += anim.dir * dt * (anim.dir > 0 ? 1 : 1.2); // fechar é um pouquinho mais rápido
   if (anim.ts >= TT) { anim.ts = TT; anim.dir = 0; renderLetter(TT); return finishOpen(); }
-  if (anim.ts <= 0) { anim.ts = 0; anim.dir = 0; renderLetter(0); return finishClose(); }
+  if (anim.dir < 0 && anim.ts <= 0) { anim.ts = 0; anim.dir = 0; renderLetter(0); return finishClose(); }
   renderLetter(anim.ts); anim.raf = requestAnimationFrame(stepLetter);
 }
 function playLetter(dir) { anim.dir = dir; anim.last = performance.now(); cancelAnimationFrame(anim.raf); anim.raf = requestAnimationFrame(stepLetter); }
