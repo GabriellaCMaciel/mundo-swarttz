@@ -95,7 +95,7 @@ function buildPlayer() {
 }
 
 // --- As gatas: um construtor de gato que muda cor e mancha ---
-// Cada gato é montado por aqui. opts.eye = cor da íris (hex). Todo gato com olho colorido ganha também uma pupila
+// Cada gato é montado por aqui. opts.eye = cor da íris (hex), ou { l, r } com uma cor para cada olho (olho esquerdo / direito do gato). Todo gato com olho colorido ganha também uma pupila
 // preta redonda e menor por cima da íris. Sem opts.eye, os olhos ficam escuros (só uma bolinha).
 function catEye(color) {
   const g = new THREE.Group();
@@ -152,7 +152,7 @@ function buildCat(baseColor, patchColor, opts = {}) {
   head.add(new THREE.Mesh(new THREE.SphereGeometry(0.33, 14, 10), coat && coat.head ? coatMat(baseColor, coat.head, 2) : fur));
   [-1, 1].forEach(s => {
     const ear = new THREE.Mesh(new THREE.ConeGeometry(0.11, 0.24, 4), coat && coat.ear === s ? lam(coat.head[0].c) : fur); ear.position.set(s * 0.19, 0.3, 0); head.add(ear);
-    const eye = catEye(opts.eye); eye.position.set(s * 0.12, 0.05, 0.3); head.add(eye);
+    const eye = catEye(opts.eye && opts.eye.l !== undefined ? (s === 1 ? opts.eye.l : opts.eye.r) : opts.eye); eye.position.set(s * 0.12, 0.05, 0.3); head.add(eye); // opts.eye = { l, r } dá um olho de cada cor (heterocromia). O lado ESQUERDO do gato é +x (ele olha para +z)
   });
   const tail = new THREE.Group(); tail.position.set(0, 0.6, -0.62); tail.rotation.x = -0.5; body.add(tail);
   const tailMesh = new THREE.Mesh(new THREE.CylinderGeometry(0.06, 0.07, 0.9, 8), coat && coat.tail ? lam(coat.tail) : fur);
