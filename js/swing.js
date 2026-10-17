@@ -5,7 +5,7 @@
 // e Group (tudo que está dentro do grupo anda junto com ele).
 'use strict';
 
-const swing = { pivot: null };
+const swing = { pivot: null, g: null, bf: [] }; // g = grupo do balanço e bf = as borboletas dele (usados por playcats.js)
 
 function knitTex() { // textura de tricô: fileirinhas de "V" em bege
   return canvasTex(128, 128, (x, w) => {
@@ -17,7 +17,7 @@ function knitTex() { // textura de tricô: fileirinhas de "V" em bege
 
 function buildSwing() {
   const rnd = mulberry32(2024), veg = new VegBatch(rnd), lights = new Lights(), lampPos = [];
-  const g = new THREE.Group(); g.position.set(SWING.x, 0, SWING.z); world.add(g);
+  const g = new THREE.Group(); g.position.set(SWING.x, 0, SWING.z); world.add(g); swing.g = g;
   const mk = (geo, color, x, y, z, parent) => { const m = new THREE.Mesh(geo, lam(color)); m.position.set(x, y, z); parent.add(m); return m; };
   const FL = [0xff7eb6, 0xf2b84b, 0xfff1f5, 0xb79af5, 0xf08a3c, 0x37d0c0, 0xff5fa2]; // flores coloridas
 
@@ -127,7 +127,9 @@ function buildSwing() {
   [[-5, 2.5], [3.2, 3.6]].forEach(([x, z]) => { veg.post(x, z, 3.2); lampPos.push(x, 3.4, z); });
   lights.swag({ x: -5, y: 3.2, z: 2.5 }, { x: 3.2, y: 3.2, z: 3.6 }, 0.8, 18);
   veg.addTo(g); lights.addTo(g, 6); lampGlows(g, lampPos, 3.4);
+  const bf0 = butterflies.length;
   addButterflies(g, [[-1.5, 1.5], [1.5, 2.5], [-3, -1], [2.5, 0], [0, 3.5]], 8, rnd);
+  swing.bf = butterflies.slice(bf0); // guardadas para a Maria Julietta caçar (playcats.js)
   enableShadows(g);
 }
 buildSwing();
