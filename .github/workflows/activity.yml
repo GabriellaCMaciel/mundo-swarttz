@@ -1,0 +1,39 @@
+# Atualiza data/activity.json todo dia com as contribuições REAIS do último mês da Gabriella no GitHub
+# (o mesmo número do gráfico verde do perfil). O cartão "Atividade" do celular gigante (js/phone.js) lê esse arquivo.
+# Como funciona: a rotina pergunta ao GitHub (API GraphQL) quantas contribuições houve em cada dia e salva um JSON simples no repositório.
+name: Atualizar atividade do GitHub
+
+on:
+  schedule:
+    - cron: '17 6 * * *'     # todo dia às 06:17 UTC (03:17 em Brasília)
+  workflow_dispatch: {}       # também dá para rodar na mão: aba Actions > Atualizar atividade > Run workflow
+
+permissions:
+  contents: write
+
+jobs:
+  atualizar:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Buscar contribuições dos últimos 30 dias
+        env:
+          GH_TOKEN: ${{ github.token }}
+          LOGIN: GabriellaCMaciel
+        run: |
+          FROM=$(date -u -d '29 days ago' +%Y-%m-%dT00:00:00Z)
+          TO=$(date -u +%Y-%m-%dT23:59:59Z)
+          gh api graphql -f login="$LOGIN" -f from="$FROM" -f to="$TO" -f query='
+            query($login:String!,$from:DateTime!,$to:DateTime!){
+              user(login:$login){ contributionsCollection(from:$from,to:$to){
+                contributionCalendar{ weeks{ contributionDays{ date contributionCount } } } } } }' \
+          | jq --arg user "$LOGIN" --arg upd "$(date -u +%F)" '{
+              user: $user, updated: $upd, source: "GitHub (contribuições públicas)",
+              days: [ .data.user.contributionsCollection.contributionCalendar.weeks[].contributionDays[] | {d: .date, n: .contributionCount} ] | sort_by(.d) | .[-30:] }' > data/activity.json
+          cat data/activity.json | head -c 300
+      - name: Salvar se mudou
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/activity.json
+          git diff --cached --quiet || (git commit -m "chore: update GitHub activity data" && git push)
