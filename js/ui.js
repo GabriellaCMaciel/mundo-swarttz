@@ -49,7 +49,9 @@ function openA11y() { if (panelOpen || phase !== 'world') return; panelOpen = tr
 document.getElementById('a11yBtn').addEventListener('click', openA11y);
 
 let panelOpen = false;
+let lastFocus = null; // quem tinha o foco antes de abrir um painel: o foco volta para ele ao fechar (quem usa teclado ou leitor de tela não "se perde")
 function showSheet(html) { // coloca o conteúdo na folha do painel e leva o foco para o botão de fechar
+  if (hud.panel.hidden && !mailUi.isOpen) lastFocus = document.activeElement;
   hud.sheet.innerHTML = '<button class="close" type="button" aria-label="Fechar">✕</button>' + html;
   hud.panel.hidden = false; syncLoop();
   document.getElementById('panelHint').textContent = touch ? 'toque fora do painel ou no ✕ para fechar' : 'clique fora do painel, ✕ ou Esc para fechar'; // instrução de "algo aberto": canto inferior direito
@@ -66,7 +68,20 @@ function openBook(b) { // chamado também pelo clique do mouse em um livro 3D (l
   if (panelOpen) return;
   panelOpen = true; showSheet(bookHtml(b));
 }
-function closePanel() { panelOpen = false; hud.panel.hidden = true; if (mailUi.isOpen) closeMail(); syncLoop(); }
+function closePanel() {
+  panelOpen = false; hud.panel.hidden = true; if (mailUi.isOpen) closeMail(); syncLoop();
+  if (lastFocus && lastFocus.isConnected && !lastFocus.hidden && lastFocus !== document.body) { try { lastFocus.focus({ preventScroll: true }); } catch (e) { /* sem foco: tudo bem */ } }
+  lastFocus = null;
+}
+// "Armadilha de foco": com um painel aberto, a tecla Tab gira só entre os botões e links DENTRO dele (Shift+Tab volta). É o padrão para janelas modais.
+hud.panel.addEventListener('keydown', e => {
+  if (e.key !== 'Tab') return;
+  const f = [...hud.sheet.querySelectorAll('a[href], button:not([disabled]), input:not([disabled])')].filter(el => el.offsetParent !== null);
+  if (!f.length) return;
+  const first = f[0], last = f[f.length - 1];
+  if (e.shiftKey && (document.activeElement === first || !hud.sheet.contains(document.activeElement))) { e.preventDefault(); last.focus(); }
+  else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+});
 hud.sheet.addEventListener('click', e => {
   if (e.target.closest('.close')) return closePanel();
   const az = e.target.closest('[data-az]');
@@ -133,6 +148,7 @@ function startWorld() {
   scene.fog = new THREE.Fog(WORLD_FOG, 42, 104);
   hud.hint.hidden = true; hud.title.hidden = true; hud.skip.hidden = true; hud.brand.hidden = false;
   document.getElementById('a11yBtn').hidden = false;
+  announce('Você entrou no mundo 3D. Aperte H para o menu de acessibilidade, onde dá para ir direto a cada lugar. A versão simples, em texto puro, está no menu e no início da página.');
   if (touch) { hud.joy.hidden = false; hud.open.textContent = 'abrir'; } else hud.keys.hidden = false; // no celular não existe a tecla E
   camera.position.set(player.position.x, CAM_Y, player.position.z + CAM_Z);
   lookNow.set(player.position.x, 1.5, player.position.z);
@@ -240,6 +256,7 @@ function step() {
 function loop() { step(); rafId = requestAnimationFrame(loop); }
 function syncLoop() { // chame sempre que algo mudar: painel abriu/fechou, aba ficou visível/escondida
   const hidden = document.hidden, covered = phase === 'world' && (panelOpen || mailUi.isOpen);
+  document.querySelectorAll('.hud, #stage, #toSimple').forEach(el => { el.inert = covered; }); // com algo aberto por cima, o resto da página sai do teclado e do leitor de tela ("inert")
   document.documentElement.classList.toggle('paused', hidden); // aba escondida: pausa também as animações de CSS (a tela dos Correios, aberta, continua animada)
   if (!hidden && !covered && !rafId) { clock.oldTime = performance.now(); rafId = requestAnimationFrame(loop); } // oldTime: o tempo parado não vira um "pulo" na animação
   else if ((hidden || covered) && rafId) { cancelAnimationFrame(rafId); rafId = 0; }

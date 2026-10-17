@@ -11,6 +11,10 @@ const hud = {
   knob: $('knob'), keys: $('keys'), flash: $('flash'), panel: $('panel'), sheet: $('sheet')
 };
 
+// Aviso para leitor de tela: escreve numa região "aria-live" invisível (#srLive); o leitor lê o texto novo em voz alta, sem tirar o foco de onde a pessoa está.
+// O truque de limpar e escrever em seguida faz o mesmo texto ser lido de novo se for repetido.
+function announce(msg) { const el = document.getElementById('srLive'); if (!el) return; el.textContent = ''; setTimeout(() => { el.textContent = msg; }, 60); }
+
 let renderer;
 try {
   renderer = new THREE.WebGLRenderer({ canvas: $('stage'), antialias: true });
@@ -180,6 +184,8 @@ const LID_OPEN = -1.95; // ângulo (radianos) da tampa aberta
 const T_OPEN = 2.4, T_DIVE = 2.6; // duração (s) de abrir a tampa e de mergulhar na tela
 camera.position.copy(camClosed);
 lookNow.copy(lookClosed);
+
+setTimeout(() => announce('Abertura do portfólio de Gabriella Swarttz: um notebook faz uma invasão de mentirinha à conta dela. Aperte qualquer tecla para abrir o notebook, ou use o botão Pular intro. Para ler sem o 3D, use o link da versão simples no início da página.'), 800);
 
 // Máquina de estados: fechado -> abrindo -> digitando -> mergulhando -> mundo
 let phase = 'closed', phaseStart = 0;

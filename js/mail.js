@@ -64,6 +64,8 @@ function layout() { // posição de cada envelope: o do meio de frente, os outro
   });
   mailUi.count.textContent = (mailUi.cur + 1) + ' de ' + letters.length;
   mailUi.dots.querySelectorAll('button').forEach((b, i) => b.setAttribute('aria-current', String(i === mailUi.cur)));
+  if (mailUi.isOpen && mailUi.said !== mailUi.cur) announce('Carta ' + (mailUi.cur + 1) + ' de ' + letters.length + ', de ' + letters[mailUi.cur].who + '. Aperte Enter para abrir.');
+  mailUi.said = mailUi.cur; // só avisa quando a carta muda (e não a cada redimensionamento da janela)
   mailUi.root.querySelector('.prev').disabled = mailUi.cur === 0;
   mailUi.root.querySelector('.next').disabled = mailUi.cur === letters.length - 1;
 }
@@ -175,7 +177,8 @@ function playLetter(dir) { anim.dir = dir; anim.last = performance.now(); cancel
 function finishOpen() { // a carta está plana e aberta: trocamos a folha 3D pela versão que rola (idêntica por fora)
   mailUi.state = 'open'; mailUi.lock = false;
   mailUi.big.hidden = false; mailUi.big.scrollTop = 0; SHEET.el.style.display = 'none';
-  mailUi.root.focus({ preventScroll: true });
+  mailUi.big.setAttribute('tabindex', '-1'); mailUi.big.setAttribute('aria-label', 'Carta de ' + letters[mailUi.cur].who);
+  mailUi.big.focus({ preventScroll: true }); // o leitor de tela começa a ler a carta (as teclas Esc, etc. continuam valendo: o tratamento é na janela)
 }
 function finishClose() { // a carta voltou para dentro do envelope e a aba fechou
   if (SHEET.el) SHEET.el.remove();
@@ -214,7 +217,7 @@ function openMail() {
   if (!letters.length) return;
   if (!mailUi.track) buildMail();
   mailUi.isOpen = true; mailUi.cur = Math.min(mailUi.cur, letters.length - 1);
-  abortLetter(); mailUi.root.hidden = false; fit(); layout();
+  abortLetter(); mailUi.root.hidden = false; mailUi.said = -1; fit(); layout();
   mailUi.root.focus({ preventScroll: true }); // o foco fica na tela (não em um botão), para Enter abrir a carta
   setMailHint(false); syncLoop();
 }

@@ -12,7 +12,8 @@
 </head>
 <body>
 <a class="skip-link" id="toSimple" href="?simples">Abrir a versão simples (sem 3D, para leitor de tela e teclado)</a>
-<canvas id="stage" role="img" aria-label="Mundo 3D do portfólio de Gabriella Swarttz"></canvas>
+<p class="vh" id="srLive" role="status" aria-live="polite" aria-atomic="true"></p>
+<canvas id="stage" role="img" aria-label="Mundo 3D interativo do portfólio de Gabriella Swarttz. Para ler sem o 3D, use o link da versão simples no início da página; no mundo, a tecla H abre o menu de acessibilidade."></canvas>
 <div class="hud">
   <div class="title" id="title"><b>Gabriella Swarttz</b><span>portfólio</span></div>
   <div class="brand" id="brand" hidden>Gabriella Swarttz</div>
@@ -21,7 +22,7 @@
   <div class="hint" id="hint">toque ou aperte uma tecla para abrir o notebook</div>
   <div class="keys" id="keys" hidden>WASD ou setas para andar · E para abrir · H ajuda</div>
   <button class="btn a11y-btn" id="a11yBtn" type="button" aria-haspopup="dialog" hidden>Acessibilidade</button>
-  <div class="joy" id="joy" hidden><div class="knob" id="knob"></div></div>
+  <div class="joy" id="joy" aria-hidden="true" hidden><div class="knob" id="knob"></div></div>
 </div>
 <div class="panel" id="panel" hidden><div class="sheet" id="sheet" role="dialog" aria-modal="true" aria-labelledby="sheetTitle"></div><p class="panel-hint" id="panelHint"></p></div>
 <div class="flash" id="flash"></div>

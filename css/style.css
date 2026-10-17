@@ -130,6 +130,7 @@ body{margin:0;background:var(--ink);color:var(--paper);font-family:var(--font-di
 .paper-big{pointer-events:auto;position:relative;width:min(580px,100%);height:min(80vh,720px);overflow:auto;box-sizing:border-box;display:flex;flex-direction:column;padding:34px 30px 34px 62px;color:#3a2a4a;touch-action:pan-y;user-select:text;-webkit-user-select:text;
   background:linear-gradient(90deg,transparent 48px,rgba(255,95,162,.4) 48px 50px,transparent 50px),repeating-linear-gradient(transparent 0 33px,rgba(120,150,200,.3) 33px 34px),#fffaf0;
   box-shadow:0 30px 80px rgba(0,0,0,.65);border-radius:3px;font:500 24px/34px Caveat,'Segoe Script',cursive}
+.paper-big:focus{outline:0}
 .paper-big p{margin:0}
 .paper-big .p-tag{display:block;width:max-content;height:22px;line-height:22px;margin:6px 0;padding:0 .7em}
 .paper-greet{font-size:30px;color:#7b3fe4}
