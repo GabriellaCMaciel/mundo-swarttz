@@ -13,10 +13,13 @@
 
 const PHONE = { W: 3.0, H: 5.6, D: 0.34, cy: 3.55 }; // medidas do corpo (largura, altura, espessura) e altura do centro, em unidades do cenário
 const phoneRig = { built: false, rig: null, yawG: null, tiltG: null, icons: [], cards: [], mats: [], hits: [], yaw: 0, wx: 0, wz: 0 };
-const PH_FONT = 'Syne, system-ui, sans-serif', PH_MONO = '"JetBrains Mono", ui-monospace, monospace';
+// Fonte do celular: Nunito (letras arredondadas, de largura normal, bem legíveis em tamanho pequeno). A Syne era muito larga/achatada e a mono ficava fina.
+// Ela é carregada em index.html (Google Fonts) e esperada em zones.js antes de desenhar as texturas. PH_MONO usa a mesma família: só o peso muda.
+const PH_FONT = 'Nunito, system-ui, "Segoe UI", sans-serif', PH_MONO = PH_FONT;
 
 // ---------- ajudantes de desenho ----------
 function fitFont(x, text, maxW, size, weight, fam, min = 12) { // encolhe a fonte até o texto caber em maxW
+  weight = Math.max(weight, 600); // letra fina some em tela pequena: nada abaixo de "semi-negrito"
   for (let s = size; s >= min; s -= 1) { x.font = weight + ' ' + s + 'px ' + fam; if (x.measureText(text).width <= maxW) return s; }
   x.font = weight + ' ' + min + 'px ' + fam; return min;
 }

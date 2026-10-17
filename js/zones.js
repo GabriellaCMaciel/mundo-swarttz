@@ -160,9 +160,10 @@ function buildZones() {
   catLabels.push([lk, kiara], [lm, maria]);
 }
 const catLabels = []; // [etiqueta, gata]: as etiquetas somem quando estão longe
-// Espera a fonte carregar (no máximo 2,5 s) para as etiquetas saírem bonitas
+// Espera as fontes carregarem (no máximo 2,5 s) para as etiquetas e o celular saírem bonitos.
+// document.fonts.load() é preciso porque uma fonte só é baixada quando alguém a pede: a Nunito (celular) só é usada dentro de textura de canvas.
 Promise.race([
-  document.fonts && document.fonts.ready ? document.fonts.ready : Promise.resolve(),
+  document.fonts && document.fonts.load ? Promise.all([document.fonts.load('800 24px Nunito'), document.fonts.load('600 24px Nunito'), document.fonts.load('800 24px Syne')]).then(() => document.fonts.ready) : Promise.resolve(),
   new Promise(r => setTimeout(r, 2500))
 ]).then(buildZones);
 
