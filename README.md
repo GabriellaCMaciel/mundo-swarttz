@@ -61,6 +61,7 @@ Use um servidor local (por exemplo, a extensão **Live Server** do VS Code) ou p
 - Olhos dos gatos: `buildCat(cor, mascara, { eye: cor })` ou `{ eye: { l: cor, r: cor } }` para olhos de cores diferentes (esquerdo/direito), em `js/world.js`.
 - Controles: correr e pular em `js/ui.js` (`RUN_KEY`, `JUMP`, `resetInput`). O estado das teclas/joystick é zerado ao perder o foco, esconder a aba ou abrir um painel, para a personagem nunca andar sozinha. Velocidade de corrida: `RUN.mul` (`js/world.js`).
 - Trilhas e mapa: lista `TRAILS` em `js/trails.js` (sementes fixas, então a curva é sempre a mesma); ícones e nomes do mapa em `MAP_ICONS`/`mapPlaces` (`js/worldmap.js`).
+- Depoimentos (cartas): lista `letters` em `js/config.js`. `cat` aparece como legenda embaixo do envelope selecionado (não na carta); `photo` (+ `photoAlt`) põe uma foto na carta, e `logo: true` mostra a imagem como logo (sem moldura de foto). Fotos em `assets/depo-*`.
 - Vegetação: as árvores (`tree` em `js/garden.js`) têm altura e inclinação variadas, calculadas a partir da posição.
 - Peixes: as manchas de cor são pintadas na textura do corpo (`makeFish`, `js/pond.js`), igual ao pelo dos gatos.
 - Gatos brincalhões: estados e velocidades em `js/playcats.js` (`updateJulietta`, `updateMocca`, `updateBird`). Com `prefers-reduced-motion` eles ficam parados.
