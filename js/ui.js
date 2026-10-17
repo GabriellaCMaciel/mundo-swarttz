@@ -184,7 +184,7 @@ function startWorld() {
   announce('Você entrou no mundo 3D. Aperte H para o menu de acessibilidade, onde dá para ir direto a cada lugar. A versão simples, em texto puro, está no menu e no início da página.');
   buildWorldMap(); // o mapa ilustrado no canto superior direito (js/worldmap.js)
   hud.acts.hidden = false; // botões "correr" e "pular": para toque e também para quem usa só o mouse
-  if (touch) { hud.joy.hidden = false; hud.open.textContent = 'abrir'; } else hud.keys.hidden = false; // no celular não existe a tecla E
+  if (touch) { hud.joy.hidden = false; hud.open.textContent = 'abrir'; } // no celular não existe a tecla E (as instruções de controle ficam no menu de acessibilidade e na tela de ajuda)
   camera.position.set(player.position.x, CAM_Y, player.position.z + CAM_Z);
   camera.userData.fovAdd = FOV_ADD; resize();
   lookNow.set(player.position.x, LOOK_Y, player.position.z);
