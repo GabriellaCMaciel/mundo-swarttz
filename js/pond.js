@@ -9,12 +9,15 @@ const pondLife = { ready: false, P: null, fish: [], rings: [], drops: [], ze: nu
 const wrapA = a => Math.atan2(Math.sin(a), Math.cos(a)); // deixa um ângulo entre -π e π (para girar pelo lado mais curto)
 const randIn = (a, b) => a + Math.random() * (b - a);
 
-function makeFish(color, patch, size) {
-  const f = new THREE.Group(), mat = lam(color);
-  const body = new THREE.Mesh(new THREE.SphereGeometry(0.25, 10, 8), mat); body.scale.set(0.7, 0.5, 1.7); f.add(body);
-  const p = new THREE.Mesh(new THREE.SphereGeometry(0.2, 8, 6), lam(patch)); p.scale.set(0.8, 0.4, 1.1); p.position.set(0.04, 0.1, -0.05); f.add(p);
+function makeFish(color, patch, size, seed = 1) {
+  // As manchas do peixe são PINTADAS na textura do corpo (coatTex, de world.js), igual ao pelo dos gatos: nada de bolota em relevo por cima.
+  // Poucas manchas grandes de borda macia + algumas pintinhas, só nas costas e nos lados (y da textura entre 26 e 146: costas e lados altos, longe do polo, onde a imagem "amassa").
+  const rnd = mulberry32(seed * 131 + 7), blobs = [];
+  for (let i = 0; i < 6; i++) blobs.push({ x: rnd() * 512, y: 26 + rnd() * 120, r: i < 2 ? 44 + rnd() * 22 : 16 + rnd() * 16, a: 0.7 + rnd() * 0.6, rot: rnd() * 3, c: patch });
+  const f = new THREE.Group(), mat = coatMat(color, blobs, seed), fin_mat = lam(color);
+  const body = new THREE.Mesh(new THREE.SphereGeometry(0.25, 12, 9), mat); body.scale.set(0.7, 0.5, 1.7); f.add(body);
   const tail = new THREE.Group(); tail.position.z = -0.38; f.add(tail);
-  const fin = new THREE.Mesh(new THREE.ConeGeometry(0.17, 0.34, 4), mat); fin.scale.set(0.22, 1, 1.5); fin.rotation.x = Math.PI / 2; fin.position.z = -0.17; tail.add(fin);
+  const fin = new THREE.Mesh(new THREE.ConeGeometry(0.17, 0.34, 4), fin_mat); fin.scale.set(0.22, 1, 1.5); fin.rotation.x = Math.PI / 2; fin.position.z = -0.17; tail.add(fin);
   [-1, 1].forEach(s => { const e = new THREE.Mesh(new THREE.SphereGeometry(0.03, 6, 5), new THREE.MeshBasicMaterial({ color: 0x120b1c })); e.position.set(s * 0.1, 0.05, 0.33); f.add(e); });
   f.scale.setScalar(size);
   return { g: f, tail };
@@ -49,7 +52,7 @@ function buildPondLife(P) { // P = { x, z, r } em coordenadas do mundo
   // ----- Os peixes (carpas coloridas) -----
   const looks = [[0xff8a3c, 0xfff1f5, 1.1], [0xfff1f5, 0xff8a3c, 1.0], [0xf2b84b, 0xfff1f5, 0.95], [0xff7eb6, 0xfff1f5, 0.9], [0xfff1f5, 0xf2b84b, 1.15], [0xff8a3c, 0xf2b84b, 0.8], [0xf2b84b, 0xff7eb6, 1.0], [0xfff1f5, 0xff7eb6, 0.85]];
   looks.forEach(([c, pc, sz], i) => {
-    const { g, tail: tl } = makeFish(c, pc, sz * 1.15);
+    const { g, tail: tl } = makeFish(c, pc, sz * 1.15, i + 1);
     const a = Math.random() * 6.283, r = Math.sqrt(Math.random()) * (P.r - 1);
     const f = { g, tail: tl, x: P.x + Math.cos(a) * r, z: P.z + Math.sin(a) * r, h: Math.random() * 6.283, spd: randIn(0.9, 1.5), tx: P.x, tz: P.z, tNext: 0, flee: 0, ph: i * 1.7 };
     g.position.set(f.x, 0.11, f.z); world.add(g); pondLife.fish.push(f);
