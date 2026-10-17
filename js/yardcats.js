@@ -11,20 +11,16 @@ const yardCats = { mel: null, kittens: [], K: null };
 const _yw = new THREE.Vector3();
 const SQ = x => Math.max(0, Math.min(1, x));
 
-// Manchas de pelo: bolinhas achatadas coladas na superfície de um elipsoide, todas desenhadas numa única chamada (instanced)
-function furPatches(center, radii, n, colors, rnd, size = 1, skipBelow = -0.6) {
-  const items = [], d = new THREE.Object3D(), nrm = new THREE.Vector3();
-  while (items.length < n) {
-    const u = rnd() * 2 - 1, a = rnd() * 6.283, s = Math.sqrt(1 - u * u);
-    const ux = Math.cos(a) * s, uy = u, uz = Math.sin(a) * s;
-    if (uy < skipBelow) continue; // nada na barriga/embaixo
-    d.position.set(center[0] + ux * radii[0] * 1.01, center[1] + uy * radii[1] * 1.01, center[2] + uz * radii[2] * 1.01);
-    nrm.set(ux / radii[0], uy / radii[1], uz / radii[2]).normalize();
-    d.lookAt(d.position.x + nrm.x, d.position.y + nrm.y, d.position.z + nrm.z); // vira a mancha para fora do corpo
-    const r = (0.07 + rnd() * 0.11) * size;
-    items.push({ x: d.position.x, y: d.position.y, z: d.position.z, sx: r * (0.8 + rnd() * 0.7), sy: r * (0.8 + rnd() * 0.7), sz: r * 0.35, rx: d.rotation.x, ry: d.rotation.y, rz: d.rotation.z, c: colors[(rnd() * colors.length) | 0] });
+// Manchas de pelo da Mel: pintadas na textura do corpo (coatTex, em world.js), nunca bolinhas por cima do pelo.
+// Sorteia manchas de tamanho médio e bordas macias; o preto aparece mais vezes, então o escuro continua mandando.
+function melBlobs(rnd, n, rMin, rMax, avoidFace) {
+  const cols = [0xa95a1d, 0xa95a1d, 0xeadfca, 0x0d080a, 0x0d080a, 0x0d080a], out = [];
+  while (out.length < n) {
+    const x = rnd() * 512, y = 36 + rnd() * 170;
+    if (avoidFace && x > 84 && x < 172 && y > 70 && y < 190) continue; // deixa a carinha (olhos e nariz) limpa
+    out.push({ x, y, r: rMin + rnd() * (rMax - rMin), a: 0.7 + rnd() * 0.6, rot: rnd() * 3, c: cols[(rnd() * cols.length) | 0] });
   }
-  return instanced(new THREE.SphereGeometry(1, 8, 6), lam(0xffffff), items);
+  return out;
 }
 
 // ================= A MEL =================
@@ -42,22 +38,19 @@ function buildMel(H, rise, half) {
   const cat = new THREE.Group(); cat.scale.setScalar(0.95); turn.add(cat);
   const body = new THREE.Group(); cat.add(body);
 
-  const fur = lam(0x2b2023);
+  const BASE = 0x2b2023, fur = lam(BASE);
   const ell = (r, sx, sy, sz, x, y, z, parent, m = fur) => { const o = new THREE.Mesh(new THREE.SphereGeometry(r, 14, 10), m); o.scale.set(sx, sy, sz); o.position.set(x, y, z); parent.add(o); return o; };
-  ell(0.5, 0.82, 1.08, 0.8, 0, 0.62, 0, body);                         // tronco (um elipsoide em pé: ela está sentada)
+  // peitinho branco: uma mancha cream pintada na frente do tronco (u = 0,25), junto com as outras cores misturadas
+  const torsoBlobs = [{ x: 128, y: 150, r: 34, a: 0.8, c: 0xeadfca }, ...melBlobs(rnd, 14, 14, 32)];
+  ell(0.5, 0.82, 1.08, 0.8, 0, 0.62, 0, body, coatMat(BASE, torsoBlobs, 11));   // tronco (um elipsoide em pé: ela está sentada)
   [-1, 1].forEach(s => {
-    ell(0.32, 0.9, 0.85, 1.2, s * 0.3, 0.28, -0.08, body);             // as ancas
+    ell(0.32, 0.9, 0.85, 1.2, s * 0.3, 0.28, -0.08, body, coatMat(BASE, melBlobs(rnd, 7, 14, 28), 20 + s)); // as ancas (cada uma com a sua pintura)
     const leg = new THREE.Mesh(new THREE.CylinderGeometry(0.085, 0.085, 0.6, 8), fur); leg.position.set(s * 0.16, 0.3, 0.3); body.add(leg); // patas da frente
     ell(0.1, 1, 0.6, 1.4, s * 0.16, 0.05, 0.36, body);                  // patinhas
   });
-  const patchCols = [0xa95a1d, 0xa95a1d, 0xeadfca, 0x0d080a, 0x0d080a, 0x0d080a, 0x0d080a, 0x0d080a]; // laranja, branco e preto (o preto repete bastante: o escuro tem que mandar)
-  body.add(furPatches([0, 0.62, 0], [0.5 * 0.82, 0.5 * 1.08, 0.5 * 0.8], 34, patchCols, rnd));
-  [-1, 1].forEach(s => body.add(furPatches([s * 0.3, 0.28, -0.08], [0.32 * 0.9, 0.32 * 0.85, 0.32 * 1.2], 9, patchCols, rnd, 1)));
-  ell(0.2, 1, 1.3, 0.5, 0.0, 0.7, 0.37, body, lam(0xeadfca)).scale.set(0.5, 0.7, 0.28); // um peitinho branco mal misturado
 
   const head = new THREE.Group(); head.position.set(0, 1.42, 0.12); body.add(head);
-  head.add(new THREE.Mesh(new THREE.SphereGeometry(0.34, 14, 10), fur));
-  head.add(furPatches([0, 0, 0], [0.34, 0.34, 0.34], 8, patchCols, rnd, 0.55, -0.2));
+  head.add(new THREE.Mesh(new THREE.SphereGeometry(0.34, 14, 10), coatMat(BASE, melBlobs(rnd, 6, 9, 18, true), 30)));
   const ears = [], eyes = [];
   [-1, 1].forEach(s => {
     const ear = new THREE.Mesh(new THREE.ConeGeometry(0.11, 0.24, 4), fur); ear.position.set(s * 0.2, 0.3, 0); ear.userData.s = s; head.add(ear); ears.push(ear);
@@ -71,7 +64,6 @@ function buildMel(H, rise, half) {
   // Rabo enrolado em volta das patas (um pedaço de rosquinha deitado)
   const tail = new THREE.Group(); tail.position.set(0, 0.1, -0.02); body.add(tail);
   const arc = new THREE.Mesh(new THREE.TorusGeometry(0.5, 0.075, 8, 22, 3.9), fur); arc.rotation.x = Math.PI / 2; arc.rotation.z = 0.5; tail.add(arc);
-  const tip = new THREE.Mesh(new THREE.SphereGeometry(0.085, 8, 6), lam(0x0d080a)); tip.position.set(Math.cos(0.5 + 3.9) * 0.5, 0, -Math.sin(0.5 + 3.9) * 0.5); tail.add(tip);
 
   // "grrrr…": um balãozinho de texto que aparece quando ela rosna
   const gr = new THREE.Sprite(new THREE.SpriteMaterial({ map: canvasTex(256, 96, (x, w, h) => {

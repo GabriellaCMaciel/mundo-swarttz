@@ -105,29 +105,57 @@ function catEye(color) {
   pupil.position.z = 0.046; g.add(pupil);
   return g;
 }
+// ----- PELAGEM: cores múltiplas pintadas NA pele (regra de todos os gatos, atuais e futuros) -----
+// NUNCA coloque esferas/bolas de outra cor por cima do corpo para fazer "manchas": isso cria caroços e volume. Em vez disso,
+// a segunda (e terceira) cor é PINTADA numa textura de Canvas 2D que cobre o próprio corpo/cabeça, então a superfície continua lisa.
+// Conceito: UV. Cada ponto da esfera tem uma coordenada (u,v) na imagem. Na SphereGeometry do Three.js, u dá a volta no corpo
+// (0 = lado -x, 0,25 = frente +z, 0,5 = lado +x, 0,75 = costas) e v vai de cima (0) até embaixo (1).
+// A imagem tem 512x256 px, e uma mancha é {x, y, r, a, rot, c}: centro em px, raio, achatamento (a), giro e cor.
+const coatHex = c => '#' + c.toString(16).padStart(6, '0'); // (hex() de zones.js ainda não existe quando esta página carrega)
+function coatTex(base, blobs, seed = 1) {
+  return canvasTex(512, 256, (x, w, h) => {
+    x.fillStyle = coatHex(base); x.fillRect(0, 0, w, h);
+    const rnd = mulberry32(seed * 7919);
+    blobs.forEach(b => {
+      const ph1 = rnd() * 6.28, ph2 = rnd() * 6.28, a = b.a || 1, rot = b.rot || 0;
+      for (const off of [-w, 0, w]) { // desenha também deslocado de uma volta inteira, para a mancha não ser cortada na emenda da textura
+        x.save(); x.translate(b.x + off, b.y); x.rotate(rot); x.scale(1, a);
+        x.beginPath();
+        for (let i = 0; i <= 28; i++) { // contorno irregular (um círculo "amassado" por duas ondas), para a mancha parecer de pelo e não de compasso
+          const t = i / 28 * 6.2832, k = 1 + 0.16 * Math.sin(3 * t + ph1) + 0.09 * Math.sin(5 * t + ph2);
+          i ? x.lineTo(Math.cos(t) * b.r * k, Math.sin(t) * b.r * k) : x.moveTo(b.r * k, 0);
+        }
+        x.closePath(); x.fillStyle = coatHex(b.c); x.shadowColor = coatHex(b.c); x.shadowBlur = b.r * 0.3; x.fill(); // shadowBlur = borda macia, sem corte seco
+        x.restore();
+      }
+    });
+  });
+}
+const coatMat = (base, blobs, seed) => lam(0xffffff, { map: coatTex(base, blobs, seed) }); // material com a pelagem pintada
+
 function buildCat(baseColor, patchColor, opts = {}) {
   const g = new THREE.Group();
   const body = new THREE.Group(); g.add(body);
   const fur = lam(baseColor);
-  const torso = new THREE.Mesh(new THREE.SphereGeometry(0.5, 14, 10), fur);
+  // patchColor = uma segunda cor: duas manchas macias pintadas (uma no dorso, uma na cabeça), orelha e rabo da mesma cor. Sem volume.
+  const coat = opts.coat || (patchColor ? {
+    torso: [{ x: 256, y: 92, r: 62, a: 1.25, c: patchColor }, { x: 318, y: 156, r: 28, c: patchColor }, { x: 390, y: 84, r: 24, c: patchColor }],
+    head: [{ x: 6, y: 72, r: 52, c: patchColor }], ear: -1, tail: patchColor
+  } : null);
+  const torso = new THREE.Mesh(new THREE.SphereGeometry(0.5, 14, 10), coat ? coatMat(baseColor, coat.torso, 1) : fur);
   torso.scale.set(0.9, 0.7, 1.3); torso.position.y = 0.45; body.add(torso);
   [[-0.22, 0.4], [0.22, 0.4], [-0.22, -0.4], [0.22, -0.4]].forEach(([x, z]) => {
     const leg = new THREE.Mesh(new THREE.CylinderGeometry(0.08, 0.08, 0.32, 8), fur);
     leg.position.set(x, 0.16, z); body.add(leg);
   });
   const head = new THREE.Group(); head.position.set(0, 0.85, 0.55); body.add(head);
-  head.add(new THREE.Mesh(new THREE.SphereGeometry(0.33, 14, 10), fur));
+  head.add(new THREE.Mesh(new THREE.SphereGeometry(0.33, 14, 10), coat && coat.head ? coatMat(baseColor, coat.head, 2) : fur));
   [-1, 1].forEach(s => {
-    const ear = new THREE.Mesh(new THREE.ConeGeometry(0.11, 0.24, 4), fur); ear.position.set(s * 0.19, 0.3, 0); head.add(ear);
+    const ear = new THREE.Mesh(new THREE.ConeGeometry(0.11, 0.24, 4), coat && coat.ear === s ? lam(coat.head[0].c) : fur); ear.position.set(s * 0.19, 0.3, 0); head.add(ear);
     const eye = catEye(opts.eye); eye.position.set(s * 0.12, 0.05, 0.3); head.add(eye);
   });
-  if (patchColor) {
-    const patch = lam(patchColor);
-    const p1 = new THREE.Mesh(new THREE.SphereGeometry(0.3, 10, 8), patch); p1.scale.set(0.8, 0.45, 1); p1.position.set(0.28, 0.72, -0.05); body.add(p1);
-    const p2 = new THREE.Mesh(new THREE.SphereGeometry(0.2, 10, 8), patch); p2.position.set(-0.16, 0.16, 0.02); head.add(p2);
-  }
   const tail = new THREE.Group(); tail.position.set(0, 0.6, -0.62); tail.rotation.x = -0.5; body.add(tail);
-  const tailMesh = new THREE.Mesh(new THREE.CylinderGeometry(0.06, 0.07, 0.9, 8), patchColor ? lam(patchColor) : fur);
+  const tailMesh = new THREE.Mesh(new THREE.CylinderGeometry(0.06, 0.07, 0.9, 8), coat && coat.tail ? lam(coat.tail) : fur);
   tailMesh.position.y = 0.45; tail.add(tailMesh);
   g.scale.setScalar(1.25);
   g.userData = { body, head, tail };
