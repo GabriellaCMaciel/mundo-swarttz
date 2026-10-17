@@ -239,18 +239,29 @@ function mailKey(e) {
   root.querySelector('.next').addEventListener('click', () => { mailGo(mailUi.cur + 1); root.focus({ preventScroll: true }); });
   mailUi.openBtn.addEventListener('click', openEnvelope);
   mailUi.dots.addEventListener('click', e => { const b = e.target.closest('[data-dot]'); if (b) { mailGo(+b.dataset.dot); root.focus({ preventScroll: true }); } });
-  let sx = null, moved = false;
-  stage.addEventListener('pointerdown', e => { sx = e.clientX; moved = false; });
+  let sx = null, moved = false, dragged = false;
+  stage.addEventListener('pointerdown', e => { sx = e.clientX; moved = false; dragged = false; });
   stage.addEventListener('pointerup', e => {
     if (sx === null) return;
     const dx = e.clientX - sx; sx = null;
-    if (Math.abs(dx) > 50) { moved = true; mailGo(mailUi.cur + (dx < 0 ? 1 : -1)); }
+    if (Math.abs(dx) > 50) { moved = true; dragged = true; mailGo(mailUi.cur + (dx < 0 ? 1 : -1)); }
   });
   stage.addEventListener('click', e => { // clicar numa carta: se for do lado, ela vem para o meio; se for a do meio, abre
     if (moved) { moved = false; return; }
     const el = e.target.closest('.env'); if (!el) return;
+    e.envHandled = true; // avisa o clique-fora (logo abaixo) que este clique já foi usado num envelope
     const i = +el.dataset.i;
     if (i === mailUi.cur) openEnvelope(); else mailGo(i);
+  });
+  // CLICAR FORA FECHA O QUE FOI ABERTO (regra do site inteiro: quem abre algo com um clique, fecha com um clique na parte de fora).
+  // Carta aberta: clicar fora do papel fecha a carta (volta para o envelope). Só os envelopes na tela: clicar no vazio fecha a tela dos correios.
+  // "Dentro" = papel, envelopes, botões e setas. O arrasto para trocar de carta não conta como clique.
+  root.addEventListener('click', e => {
+    if (dragged) { dragged = false; return; }
+    if (e.envHandled) return;
+    if (e.target.closest('button, .mail-dots, .mail-keys')) return;
+    if (mailUi.state !== 'closed') { if (!e.target.closest('.paper-big, .sheet3d')) closeLetter(); }
+    else if (!e.target.closest('.env')) closeMail();
   });
   let wheelAt = 0;
   root.addEventListener('wheel', e => { // rodinha do mouse (ou touchpad) troca de carta
