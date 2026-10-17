@@ -3,6 +3,25 @@
 // (em library.js) e aqui a decoração continua a partir de onde ele acaba, sem nenhuma borda no meio.
 'use strict';
 
+// MURALHA DE FLORESTA: duas a três fileiras de árvores baixas-poligonais em anel, logo depois do limite onde dá para andar (WORLD_LIMIT, em ui.js).
+// Cada árvore é um tronco + 4 "bolas" de folhas simples (20 triângulos cada), então 400 árvores custam pouco.
+// Conceito: coordenadas polares. Para espalhar em círculo a gente sorteia um ângulo (a) e um raio (r) e converte: x = sen(a)·r, z = cos(a)·r.
+function buildForestWall(veg, rnd) {
+  const cols = [0x1d6650, 0x247a5a, 0x2f8f6b, 0x164f40, 0x3a2a7a, 0x4a2f8a]; // verdes e roxos escuros, combinando com o resto do mundo
+  [[95, 3.0, 7, 10], [103, 3.4, 9, 13], [113, 4.0, 11, 16]].forEach(([r0, step, hMin, hMax]) => { // [raio da fileira, espaço entre árvores, altura mínima e máxima]
+    const n = Math.round(2 * Math.PI * r0 / step);
+    for (let i = 0; i < n; i++) {
+      const a = (i + rnd() * 0.8) / n * 2 * Math.PI, r = r0 + (rnd() - 0.5) * 3.5, x = Math.sin(a) * r, z = Math.cos(a) * r;
+      const h = hMin + rnd() * (hMax - hMin), cr = h * 0.34, col = cols[(rnd() * cols.length) | 0];
+      veg.trunks.push({ x, y: h * 0.3, z, sx: 0.4 + h * 0.03, sy: h * 0.6, sz: 0.4 + h * 0.03, c: 0x4a3322 });
+      veg.leaves.push({ x, y: h * 0.62, z, sx: cr * 1.2, sy: cr * 0.95, sz: cr * 1.2, ry: rnd() * 3, c: col });
+      veg.leaves.push({ x: x + cr * 0.7, y: h * 0.52, z: z + cr * 0.3, sx: cr * 0.85, sy: cr * 0.7, sz: cr * 0.85, ry: rnd() * 3, c: col });
+      veg.leaves.push({ x: x - cr * 0.7, y: h * 0.5, z: z - cr * 0.3, sx: cr * 0.8, sy: cr * 0.7, sz: cr * 0.8, ry: rnd() * 3, c: col });
+      veg.leaves.push({ x, y: h * 0.86, z, sx: cr * 0.8, sy: cr * 0.75, sz: cr * 0.8, ry: rnd() * 3, c: col });
+    }
+  });
+}
+
 function buildDecor() {
   const rnd = mulberry32(77), veg = new VegBatch(rnd), lights = new Lights(), lampPos = [];
 
@@ -49,6 +68,8 @@ function buildDecor() {
       }
     });
   });
+
+  buildForestWall(veg, rnd); // muralha de árvores em volta de todo o mundo (esconde o "fim" do cenário)
 
   veg.addTo(world); lights.addTo(world, 6);
   lampGlows(world, lampPos, 3.6);

@@ -47,7 +47,7 @@ Use um servidor local (por exemplo, a extensão **Live Server** do VS Code) ou p
 - Livros da biblioteca: lista `books` em `js/config.js` (título, tipo, status, carga horária, certificado, cor da capa). São 6 livros, bem espaçados num arco no fundo da biblioteca.
 - Zonas (nome, cor, posição, texto do cartão): lista `zones` em `js/zones.js`.
 - Conteúdo dos painéis: objeto `panels` em `js/ui.js`.
-- Velocidade do personagem e tamanho do mundo: `SPEED` e `LIMIT` em `js/ui.js`.
+- Velocidade do personagem e tamanho do mundo: `SPEED` e `WORLD_LIMIT` em `js/ui.js` (a muralha de árvores da borda fica em `buildForestWall`, `js/decor.js`).
 - Links das redes sociais: lista `SOCIALS` em `js/config.js` (cole o link do seu perfil em `url`; vazio = "em breve").
 - Gatos: gato com mais de uma cor tem as cores PINTADAS no corpo (`coatTex` e `coatMat` em `js/world.js`), nunca esferas coladas por cima, que viram "caroços". Vale para todos os gatos, inclusive os próximos.
 - Logo: `assets/logo-escuro.svg` (para fundo escuro) e `assets/logo-claro.svg` (para fundo claro); o caminho fica em `ASSETS` (`js/config.js`). Se a proporção mudar, ajuste o tamanho nos `drawImage` de `intro.js`, `zones.js` e `phone.js`.

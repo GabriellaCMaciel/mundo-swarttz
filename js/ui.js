@@ -115,7 +115,16 @@ function startWorld() {
 }
 
 // ===== 8. O coração: o loop que roda ~60 vezes por segundo =====
-const SPEED = 11, LIMIT = 92; // LIMIT = até onde dá para andar (raio a partir do centro)
+const SPEED = 11, WORLD_LIMIT = 84; // WORLD_LIMIT = até onde dá para andar (raio a partir do centro). Logo depois dele começa a muralha de árvores (js/decor.js)
+// Limite de caminhada: dois círculos ao mesmo tempo. O segundo é o da CÂMERA, que fica CAM_Z unidades atrás da personagem (no +z):
+// sem ele, ao andar para a borda de trás a câmera passaria por dentro das árvores e se veria o "fim" do mundo.
+// Conceito: projetar um ponto de volta para dentro de um círculo (ele fica na borda, na mesma direção do centro).
+function clampToWorld(p) {
+  for (let i = 0; i < 3; i++) { // alternar as duas projeções converge para um ponto dentro dos dois círculos
+    let r = Math.hypot(p.x, p.z); if (r > WORLD_LIMIT) { p.x *= WORLD_LIMIT / r; p.z *= WORLD_LIMIT / r; }
+    const cz = p.z + CAM_Z; r = Math.hypot(p.x, cz); if (r > WORLD_LIMIT) { const k = WORLD_LIMIT / r; p.x *= k; p.z = cz * k - CAM_Z; }
+  }
+}
 const camWant = new THREE.Vector3(), lookWant = new THREE.Vector3();
 function angLerp(a, b, t) { // gira suave pelo caminho mais curto
   const d = ((b - a + Math.PI) % (Math.PI * 2) + Math.PI * 2) % (Math.PI * 2) - Math.PI;
@@ -134,8 +143,7 @@ function updateWorld(dt, now) {
   // 2) mover e girar o personagem
   if (moving) {
     player.position.x += ix * SPEED * dt; player.position.z += iz * SPEED * dt;
-    const r = Math.hypot(player.position.x, player.position.z);
-    if (r > LIMIT) { player.position.x *= LIMIT / r; player.position.z *= LIMIT / r; } // borda do mundo
+    clampToWorld(player.position); // borda do mundo
     player.rotation.y = angLerp(player.rotation.y, Math.atan2(ix, iz), Math.min(1, dt * 12));
     sparkTimer += dt; if (sparkTimer > 0.07) { emitSpark(); sparkTimer = 0; }
   }
