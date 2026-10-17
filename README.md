@@ -8,7 +8,7 @@ Você abre o notebook, "hackeia" o perfil e entra num mundo com zonas para explo
 
 - Computador: `WASD` ou setas para andar, `Shift` para correr (ou `R` liga/desliga), `Espaço` para pular, `E` (ou clicar na coisa) para abrir uma zona, `M` para ampliar o mapa, `H` para acessibilidade, `Esc` para fechar.
 - Celular: joystick na tela e botões "correr" e "pular"; toque na coisa (ou no cartão/botão "abrir") para abrir; toque no mapinha para ampliar.
-- Mapa: um mapinha ilustrado fica fixo no canto superior direito, com um X vermelho que acompanha a pessoa; ampliado, mostra o nome de cada lugar.
+- Mapa: um mapinha redondo fica fixo no canto superior direito, com um X vermelho que acompanha a pessoa; ampliado, mostra o nome de cada lugar.
 
 ## Estrutura
 
@@ -28,13 +28,14 @@ js/playcats.js    Maria Julietta e o Mocca brincando perto do balanço: ela caç
 js/mailbox.js     a zona Cartas em 3D: caixa de correio rosa, casinha inclinada e quintal com cerca completa e portão
 js/yardcats.js    a Mel (no telhado, rosna se outro gato chega perto) e os filhotes brincando de lutinha no quintal
 js/phone.js       o celular gigante da zona Telefone: flutua, gira devagar para os lados seguindo a pessoa, com ícones de redes e cartões de vidro
+js/guide.js       o livro de instruções (2D) que abre ao entrar no mundo: 3 páginas com o hacker animado andando, correndo, pulando e interagindo (estilos em css/guide.css)
 js/pick.js        toque/clique nas coisas do mundo: ícones do celular abrem os perfis, zonas abrem o painel
 js/boot.js        porta de entrada: escolhe entre o mundo 3D e a versão simples e carrega os outros arquivos em ordem
 js/simple.js      a versão simples (texto puro, acessível): mesmas informações do 3D, para leitor de tela, teclado e aparelhos sem WebGL
 js/mail.js        a tela das cartas: carrossel de envelopes e a carta dobrada em três (animação por linha do tempo, reversível)
 js/zones.js       cenários e etiquetas das outras zonas (sem círculos: tudo faz parte do mesmo mundo)
-js/trails.js      as trilhas de terra batida (curvas, com pedrinhas nas beiradas) que ligam o ponto de partida a cada lugar; o mapa e a decoração usam o mesmo traçado
-js/worldmap.js    o mapa ilustrado (mapinha fixo no canto + versão ampliada) com um X vermelho no lugar onde a pessoa está agora
+js/trails.js      as trilhas (curvas invisíveis) que ligam o ponto de partida a cada lugar; só guiam a decoração e os postes de luz
+js/worldmap.js    o mapa redondo com o mesmo chão bordado do mundo (mapinha fixo no canto + versão ampliada) com um X vermelho no lugar onde a pessoa está agora
 js/decor.js       decoração do mundo inteiro: flores, árvores floridas, postes e fios de luz ligando as zonas
 js/ui.js          painéis, controles e o loop principal
 assets/           logos (SVG, versões para fundo escuro e claro) e foto
@@ -59,15 +60,17 @@ Use um servidor local (por exemplo, a extensão **Live Server** do VS Code) ou p
 - Acessibilidade: texto precisa de contraste WCAG AA (4,5:1; 3:1 para texto grande). Ao criar cartões ou cores novos, confira antes.
 - Celular gigante: medidas em `PHONE`, posição dos ícones em `PH_SPOTS` e textos da tela/cartões em `js/phone.js`. O giro (só acompanha a pessoa) é limitado a ±0,38 rad (`want` em `updatePhone`).
 - Olhos dos gatos: `buildCat(cor, mascara, { eye: cor })` ou `{ eye: { l: cor, r: cor } }` para olhos de cores diferentes (esquerdo/direito), em `js/world.js`.
+- Instruções: o conteúdo do livro está em `PAGES` (`js/guide.js`): cada página tem duas metades (texto e animação). Palavras-chave em amarelo com `hl()`, teclas com `kbd()`. O botão "?" do canto reabre; o ícone de acessibilidade ao lado abre o menu de acessibilidade. Com "reduzir movimento" as animações ficam paradas.
+- Atividade do celular: o gráfico lê `data/activity.json`, atualizado todo dia pela rotina `.github/workflows/activity.yml` (aba Actions > Run workflow para rodar na hora).
 - Controles: correr e pular em `js/ui.js` (`RUN_KEY`, `JUMP`, `resetInput`). O estado das teclas/joystick é zerado ao perder o foco, esconder a aba ou abrir um painel, para a personagem nunca andar sozinha. Velocidade de corrida: `RUN.mul` (`js/world.js`).
-- Trilhas e mapa: lista `TRAILS` em `js/trails.js` (sementes fixas, então a curva é sempre a mesma); ícones e nomes do mapa em `MAP_ICONS`/`mapPlaces` (`js/worldmap.js`).
+- Trilhas e mapa: lista `TRAILS` em `js/trails.js` (guias invisíveis, sementes fixas); ícones e nomes do mapa em `MAP_ICONS`/`mapPlaces` (`js/worldmap.js`).
 - Depoimentos (cartas): lista `letters` em `js/config.js`. `cat` aparece como legenda embaixo do envelope selecionado (não na carta); `photo` (+ `photoAlt`) vira o SELO personalizado do envelope (a foto de quem escreveu), e `logo: true` mostra a imagem como logo, sem cortar. Imagens em `assets/depo-*`.
 - Vegetação: as árvores (`tree` em `js/garden.js`) têm altura e inclinação variadas, calculadas a partir da posição.
 - Peixes: as manchas de cor são pintadas na textura do corpo (`makeFish`, `js/pond.js`), igual ao pelo dos gatos.
 - Gatos brincalhões: estados e velocidades em `js/playcats.js` (`updateJulietta`, `updateMocca`, `updateBird`). Com `prefers-reduced-motion` eles ficam parados.
 - Regra de clique fora: clicar fora de algo que foi aberto (carta, tela dos Correios, painéis) fecha o que foi aberto. Em `js/mail.js` use `e.envHandled` para cliques que o próprio envelope já tratou.
 - Acessibilidade: o site tem uma **versão simples** (texto puro) em `?simples` (e `?3d` volta ao mundo 3D); ela abre sozinha se o aparelho não tiver WebGL. No 3D, a tecla **H** (ou o botão Acessibilidade) abre o menu: ir direto a cada lugar, andar sozinho até lá, reduzir movimento. Clicar/tocar no chão também faz a personagem andar. Leitores de tela recebem avisos (região `#srLive`, função `announce()` em `js/intro.js`).
-- Instruções de controle: ficam sempre no canto superior direito (`.keys`, `.hint`); quando algo abre na tela (painel, Correios, carta) elas vão para o canto inferior direito, discretas (`.panel-hint`, `.mail-keys`).
+- Dicas na tela: o aviso da abertura (`.hint`) fica embaixo, no centro. Quando algo abre (painel, Correios, carta), a dica de fechar fica no canto inferior direito (`.panel-hint`, `.mail-keys`). As instruções de movimento ficam só no livro (`js/guide.js`) e no menu de acessibilidade.
 - Economia de energia: com um painel/Correios aberto ou a aba em segundo plano o loop de animação é parado (`syncLoop` em `js/ui.js`) e volta sozinho.
 - Tamanho de cada zona: campo `size` da lista `zones` (1 = tamanho original). A casa das cartas tem as medidas e o giro em `CARTAS`, `YARD` e `HOUSE`, no topo de `js/mailbox.js`.
 
