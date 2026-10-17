@@ -28,6 +28,15 @@ function buildSwing() {
   const branch = mk(new THREE.CylinderGeometry(0.17, 0.34, 7.6, 9), 0x6b4a2f, 1.4, 5.45, TZ, g);
   branch.rotation.z = Math.PI / 2 + 0.1; // deitado, com a ponta fina para a esquerda e um pouquinho mais baixa
   const twig = mk(new THREE.CylinderGeometry(0.1, 0.18, 2.6, 7), 0x6b4a2f, 4.0, 6.5, TZ - 0.4, g); twig.rotation.z = 0.7; // galhinho
+  // Dois "poleiros" de madeira para o passarinho (ver playcats.js): um galhinho baixo no tronco, onde o Mocca consegue chegar pulando,
+  // e um galhinho comprido que sai da copa, lá em cima, na frente da folhagem (para o passarinho aparecer).
+  const stub = mk(new THREE.CylinderGeometry(0.07, 0.09, 0.9, 6), 0x6b4a2f, TX - 1.23, 1.2, TZ + 0.3, g); stub.rotation.z = Math.PI / 2;
+  const limb = (a, b, r0, r1) => { // cilindro que vai do ponto a até o ponto b (a ponta fina é a b)
+    const d = new THREE.Vector3().subVectors(b, a), m = mk(new THREE.CylinderGeometry(r1, r0, d.length(), 6), 0x6b4a2f, 0, 0, 0, g);
+    m.position.copy(a).addScaledVector(d, 0.5); m.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), d.normalize()); return m;
+  };
+  limb(new THREE.Vector3(TX - 0.4, 5.6, TZ + 0.1), new THREE.Vector3(3.0, 6.55, 2.6), 0.16, 0.06);
+  mk(new THREE.SphereGeometry(0.1, 6, 5), 0x6b4a2f, 3.0, 6.55, 2.6, g);
   // O galho continua À VISTA e cada bolota de folhas fica ENCOSTADA nele (sem espaço vazio entre os dois):
   //  - by(x) = altura do centro do galho em x (ele é inclinado: y = 5,45 + 0,1·(x − 1,4));
   //  - rb(x) = raio do galho em x (é mais fino na ponta esquerda, 0,17, e mais grosso junto ao tronco, 0,34);
