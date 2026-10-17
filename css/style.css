@@ -105,8 +105,10 @@ body{margin:0;background:var(--ink);color:var(--paper);font-family:var(--font-di
 .env-from{left:0;right:0;bottom:22px;z-index:5;text-align:center;color:#5a3a4a;text-shadow:0 0 6px #f8ecde,0 0 3px #f8ecde;pointer-events:none}
 .env-from small{display:block;font:700 10px var(--font-mono);letter-spacing:.2em;text-transform:uppercase;color:#5e2c44}
 .env-from b{display:block;max-width:230px;margin:0 auto;font:700 25px/1.05 Caveat,'Segoe Script',cursive;overflow-wrap:anywhere}
-.env-stamp{right:24px;top:70px;width:50px;height:62px;z-index:5;box-sizing:border-box;padding:5px;background:#fff4dc;box-shadow:0 1px 3px rgba(0,0,0,.3);outline:2px dashed rgba(120,90,60,.45);outline-offset:-3px;transform:rotate(4deg)}
+.env-stamp{right:20px;top:62px;width:68px;height:82px;z-index:5;box-sizing:border-box;padding:5px;background:#fff4dc;box-shadow:0 1px 3px rgba(0,0,0,.3);outline:2px dashed rgba(120,90,60,.45);outline-offset:-3px;transform:rotate(4deg)}
 .env-stamp i{display:block;width:100%;height:100%;background:linear-gradient(135deg,var(--gold),var(--pink))}
+.env-stamp i.foto{background-size:cover;background-position:center 25%;background-repeat:no-repeat} /* selo personalizado: a foto de quem escreveu */
+.env-stamp i.logo{background-color:#0f2a2e;background-size:82% auto;background-position:center;background-repeat:no-repeat}
 .env-flap{left:0;top:0;width:340px;height:125px;z-index:4;transform-origin:50% 0;transform-style:preserve-3d;transform:perspective(800px) rotateX(0deg)} /* o ângulo e o z-index da aba são escritos pelo JS a cada quadro (js/mail.js) */
 .f-out,.f-in{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden}
 .f-in{transform:rotateY(180deg)} /* o lado de dentro é o verso: vira em torno do eixo vertical. Com rotateX ele ficaria virado duas vezes e a ponta apareceria para baixo, longe da dobradiça */
@@ -148,8 +150,6 @@ body{margin:0;background:var(--ink);color:var(--paper);font-family:var(--font-di
 .paper-big .paper-sign b{display:block;font-size:32px;line-height:34px;color:#d63a7a}
 .mail-cat{min-height:1.5em;text-align:center;max-width:min(92vw,520px);text-transform:none;letter-spacing:.02em}
 .mail-foot p.mail-cat{font:700 13px/1.4 var(--font-mono);color:var(--gold)}
-.paper-photo.paper-logo{width:96px;border:0;border-radius:18px;box-shadow:0 4px 12px rgba(0,0,0,.3);transform:rotate(3deg);margin:0 0 12px 16px;background:#0f2a2e}
-.paper-photo{float:right;width:118px;margin:0 0 12px 16px;border:8px solid #fff;border-bottom-width:26px;box-shadow:0 6px 16px rgba(0,0,0,.35);transform:rotate(4deg)}
 @media (max-width:520px){.paper-big{padding:34px 18px 34px 46px;font-size:21px}.paper-big{background-position:0 0}.paper-back{margin-left:-24px}.paper-greet{font-size:26px}.mail-nav{width:44px;height:44px;font-size:26px}}
 @media (prefers-reduced-motion:reduce){.mail-petals i{animation:none;opacity:0}.env.cur .env-bob{animation:none}}
 @media (max-width:520px){.about{grid-template-columns:1fr}.about img{max-width:220px}}

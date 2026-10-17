@@ -29,7 +29,7 @@ function envHtml(l, i) {
     '<div class="env-front"><svg viewBox="0 0 340 230" aria-hidden="true"><polygon points="0,0 170,122 0,230" fill="#f1e1cf"/><polygon points="340,0 170,122 340,230" fill="#ecd9c4"/>' +
     '<polygon points="0,230 170,116 340,230" fill="#f8ecde"/><path d="M0 0 L170 122 L340 0 M0 230 L170 116 L340 230" fill="none" stroke="rgba(150,110,80,.35)" stroke-width="1.5"/></svg></div>' +
     '<div class="env-from"><small>De</small><b>' + esc(l.who) + '</b></div>' +
-    '<div class="env-stamp"><i></i></div>' +
+    '<div class="env-stamp"' + (l.photoAlt ? ' title="' + esc(l.photoAlt) + '"' : '') + '><i' + (l.photo ? ' class="' + (l.logo ? 'logo' : 'foto') + '" style="background-image:url(\'' + esc(l.photo) + '\')"' : '') + '></i></div>' +
     '<div class="env-flap"><div class="f-out"><svg viewBox="0 0 340 125" preserveAspectRatio="none" aria-hidden="true"><polygon points="0,0 340,0 170,125" fill="#fbf0e2" stroke="rgba(150,110,80,.4)" stroke-width="1.5"/></svg><span class="env-seal">♥</span></div>' +
     '<div class="f-in"><svg viewBox="0 0 340 125" preserveAspectRatio="none" aria-hidden="true"><polygon points="0,0 340,0 170,125" fill="#d6b99f" stroke="rgba(120,80,60,.4)" stroke-width="1.5"/></svg></div></div>' +
     '</div></div>';
@@ -80,8 +80,7 @@ function mailGo(i) {
 function letterInner(l) { // o miolo da carta (usado na folha que dobra e na versão final, que rola)
   // .paper-flow = tudo menos a assinatura. A folha é uma coluna flex e a assinatura tem margin-top:auto,
   // então ela sempre vai para o canto inferior direito da folha, não importa o tamanho do texto.
-  return '<div class="paper-flow">' + (l.photo ? '<img class="paper-photo' + (l.logo ? ' paper-logo' : '') + '" src="' + esc(l.photo) + '" alt="' + esc(l.photoAlt || '') + '">' : '') +
-    '<p class="paper-greet">' + esc(l.greeting || 'Querida Gabriella,') + '</p>' +
+  return '<div class="paper-flow">' + '<p class="paper-greet">' + esc(l.greeting || 'Querida Gabriella,') + '</p>' +
     '<div class="paper-text">' + esc(l.text).split(/\n+/).map(t => '<p>' + t + '</p>').join('') + '</div></div>' +
     '<p class="paper-sign">com carinho,<b>' + esc(l.who) + '</b></p>';
 }
