@@ -38,5 +38,5 @@
   if (!simple && typeof THREE === 'undefined') { simple = true; why = 'Não foi possível carregar o mundo 3D (sem conexão com a biblioteca de gráficos), então esta é a versão simples.'; }
   window.SWARTTZ_MODE = simple ? 'simples' : '3d';
   if (simple) load(['config', 'simple'], function () { renderSimple(why, webglOK() && typeof THREE !== 'undefined'); });
-  else load(['config', 'intro', 'garden', 'world', 'cherry', 'library', 'pond', 'kiara', 'mailbox', 'yardcats', 'phone', 'zones', 'trails', 'worldmap', 'decor', 'swing', 'playcats', 'mail', 'ui', 'pick']);
+  else load(['config', 'intro', 'garden', 'world', 'cherry', 'library', 'pond', 'kiara', 'mailbox', 'yardcats', 'phone', 'zones', 'trails', 'worldmap', 'decor', 'swing', 'playcats', 'mail', 'guide', 'ui', 'pick']);
 })();

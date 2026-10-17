@@ -44,6 +44,7 @@ function a11yHtml() {
     '<h3 class="az-h">Como se mover</h3>' +
     '<ul class="az-keys"><li><b>Teclado:</b> WASD ou setas para andar, Shift para correr (R liga e desliga o "correr sempre"), Espaço para pular, E ou Enter para abrir, Esc para fechar, H para esta ajuda.</li>' +
     '<li><b>Mapa:</b> fica no canto superior direito, com um X onde você está. Aperte M (ou toque nele) para ampliar e ver os nomes.</li><li><b>Mouse ou toque:</b> clique ou toque no chão para andar até lá sozinho; toque num lugar para abrir. No celular há o joystick e os botões "correr" e "pular" (também aparecem no computador, para quem usa só o mouse).</li>' +
+    '<li><b>Instruções:</b> o botão "?" no canto superior direito reabre o livro com o passo a passo (andar, correr, pular e interagir).</li>' +
     '<li><b>Sem segurar nada:</b> use "Ir até lá" acima: a personagem anda sozinha.</li></ul>';
 }
 function openA11y() { if (panelOpen || phase !== 'world') return; panelOpen = true; showSheet(a11yHtml()); }
@@ -126,6 +127,7 @@ window.addEventListener('keydown', e => {
   if (e.metaKey || e.ctrlKey || e.altKey) { resetInput(); return; } // atalho do navegador/sistema: o keyup dessas combinações costuma se perder
   keys[e.code] = true;
   if (phase !== 'world') return;
+  if (guideOpen) { guideKey(e); return; } // com o livro de instruções aberto, ele cuida das teclas
   if (mailKey(e)) return; // com a tela das cartas aberta, ela cuida das teclas
   const onControl = e.target && e.target.closest && e.target.closest('button, a, input, select, textarea'); // com um botão em foco, Espaço e Enter são dele
   if (e.code === 'Escape') { if (WMAP.open) setMapOpen(false); else closePanel(); }
@@ -180,7 +182,7 @@ function startWorld() {
   scene.background = skyTex;
   scene.fog = new THREE.Fog(WORLD_FOG, 42, 104);
   hud.hint.hidden = true; hud.title.hidden = true; hud.skip.hidden = true; hud.brand.hidden = false;
-  document.getElementById('a11yBtn').hidden = false;
+  document.getElementById('a11yBtn').hidden = false; document.getElementById('helpBtn').hidden = false;
   announce('Você entrou no mundo 3D. Aperte H para o menu de acessibilidade, onde dá para ir direto a cada lugar. A versão simples, em texto puro, está no menu e no início da página.');
   buildWorldMap(); // o mapa ilustrado no canto superior direito (js/worldmap.js)
   hud.acts.hidden = false; // botões "correr" e "pular": para toque e também para quem usa só o mouse
@@ -192,6 +194,7 @@ function startWorld() {
   requestAnimationFrame(() => requestAnimationFrame(() => {
     hud.flash.style.transition = 'opacity 1.2s'; hud.flash.style.opacity = '0';
   }));
+  setTimeout(openGuide, 1100); // o livro de instruções abre logo depois da entrada (js/guide.js), com o mundo já desenhado atrás
 }
 
 // ===== 8. O coração: o loop que roda ~60 vezes por segundo =====
@@ -304,7 +307,7 @@ function step() {
 }
 function loop() { step(); rafId = requestAnimationFrame(loop); }
 function syncLoop() { // chame sempre que algo mudar: painel abriu/fechou, aba ficou visível/escondida
-  const hidden = document.hidden, covered = phase === 'world' && (panelOpen || mailUi.isOpen);
+  const hidden = document.hidden, covered = phase === 'world' && (panelOpen || mailUi.isOpen || guideOpen);
   if (covered) resetInput(); // abriu algo por cima: esquece teclas e joystick (o keyup/pointerup pode não chegar mais ao mundo)
   document.querySelectorAll('.hud, #stage, #toSimple').forEach(el => { el.inert = covered; }); // com algo aberto por cima, o resto da página sai do teclado e do leitor de tela ("inert")
   document.documentElement.classList.toggle('paused', hidden); // aba escondida: pausa também as animações de CSS (a tela dos Correios, aberta, continua animada)

@@ -35,12 +35,19 @@ body{margin:0;background:var(--ink);color:var(--paper);font-family:var(--font-di
 .card p{margin:0;font:400 13px/1.5 var(--font-mono);color:var(--paper)}
 .hint{left:50%;right:auto;top:auto;bottom:calc(var(--sb) + 18px);transform:translateX(-50%);width:max-content;max-width:calc(100% - 2 * var(--sl));text-align:center;font:700 14px var(--font-mono);letter-spacing:.06em;color:var(--gold);background:rgba(11,6,19,.78);padding:.55em 1em;animation:pulse 1.8s ease-in-out infinite}
 @keyframes pulse{50%{opacity:.8}} /* a pulsação antiga ia até .35 e o texto perdia contraste: agora fica sempre legível */
-.a11y-btn{right:var(--sr);top:calc(var(--st) + 38px)}
-.minimap{right:var(--sr);top:calc(var(--st) + 86px);padding:0;margin:0;border:3px solid #fff6e2;border-radius:50%;background:#2a1745;box-shadow:0 6px 22px rgba(0,0,0,.45);cursor:pointer;overflow:hidden;line-height:0;touch-action:manipulation}
+/* botões redondos só com ícone (acessibilidade e ajuda): o nome aparece num balãozinho ao passar o mouse ou focar com o teclado, e o aria-label cobre o leitor de tela */
+.ibtn{width:44px;height:44px;padding:0;border-radius:50%;display:grid;place-items:center;color:var(--paper);background:rgba(11,6,19,.78);border:1px solid var(--gold);cursor:pointer;font:800 20px var(--font-mono);touch-action:manipulation}
+.ibtn:hover{background:var(--gold);color:var(--ink)}
+.ibtn:focus-visible{outline:2px solid var(--lilac);outline-offset:3px}
+.ibtn::after{content:attr(data-tip);position:absolute;top:calc(100% + 8px);right:0;white-space:nowrap;padding:.4em .7em;font:700 12px var(--font-mono);letter-spacing:.06em;color:var(--ink);background:var(--gold);opacity:0;pointer-events:none;transform:translateY(-4px);transition:opacity .15s,transform .15s}
+.ibtn:hover::after,.ibtn:focus-visible::after{opacity:1;transform:none}
+.a11y-btn{right:var(--sr);top:var(--st)}
+.help-btn{right:calc(var(--sr) + 54px);top:var(--st)}
+.minimap{right:var(--sr);top:calc(var(--st) + 60px);padding:0;margin:0;border:3px solid #fff6e2;border-radius:50%;background:#2a1745;box-shadow:0 6px 22px rgba(0,0,0,.45);cursor:pointer;overflow:hidden;line-height:0;touch-action:manipulation}
 .minimap:focus-visible{outline:3px solid var(--gold);outline-offset:3px}
 .minimap canvas{display:block}
 .minimap.big{z-index:3}
-@media (max-width:640px){.minimap{top:calc(var(--st) + 122px);border-width:2px}}
+@media (max-width:640px){.minimap{border-width:2px}}
 .joy{left:var(--sl);bottom:var(--sb);width:124px;height:124px;border-radius:50%;border:2px solid rgba(183,154,245,.55);background:rgba(123,63,228,.18);touch-action:none}
 .acts{right:var(--sr);bottom:var(--sb);display:flex;gap:10px}
 .act{width:60px;height:60px;min-width:0;min-height:0;padding:0;border-radius:50%;display:grid;place-items:center;background:rgba(11,6,19,.78);touch-action:manipulation} /* botões redondos só com o desenho (o nome vem de aria-label e title) */

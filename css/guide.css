@@ -1,0 +1,143 @@
+/* A tela de instruções (o "livro"): js/guide.js monta o HTML, aqui fica o visual e as animações do hacker.
+   Páginas escuras e palavras-chave em amarelo (o dourado do site) para quem tem pressa conseguir ler batendo o olho. */
+.guide{position:fixed;inset:0;z-index:6;display:grid;place-items:center;box-sizing:border-box;padding:var(--st) var(--sr) var(--sb) var(--sl);background:rgba(11,6,19,.84)}
+.g-book{position:relative;width:min(1060px,100%);height:min(640px,100%);box-sizing:border-box;perspective:2400px;background:#150a28;border:2px solid var(--gold);border-radius:20px;box-shadow:0 18px 60px rgba(0,0,0,.6),0 0 0 6px rgba(242,184,75,.12);overflow:hidden}
+.g-pages{position:absolute;inset:0 0 74px 0}
+.g-page{position:absolute;inset:0;transform-origin:left center;backface-visibility:hidden;background:#1c1033;transition:transform .85s cubic-bezier(.6,.04,.3,1),opacity .5s .35s;overflow:hidden}
+.g-page.turned{transform:rotateY(-110deg);opacity:0;pointer-events:none}
+.g-spread{display:grid;grid-template-columns:1fr 1fr;height:100%;position:relative}
+.g-spread::before{content:"";position:absolute;left:50%;top:0;bottom:0;width:36px;margin-left:-18px;background:linear-gradient(90deg,transparent,rgba(0,0,0,.34),transparent);pointer-events:none;z-index:2} /* a sombra da lombada, no meio do livro */
+.g-spread::after{content:"";position:absolute;left:50%;top:22px;bottom:22px;border-left:2px dashed rgba(242,184,75,.4);pointer-events:none;z-index:2}
+.g-half{box-sizing:border-box;padding:30px 36px 18px;overflow:auto;display:flex;flex-direction:column;justify-content:center;gap:12px;min-height:0}
+.g-half.left{padding-right:44px}.g-half.right{padding-left:44px}
+
+/* texto */
+.g-half h2{margin:0 0 4px;font:800 28px/1.1 var(--font-display);color:var(--paper);display:flex;align-items:center;gap:12px}
+.g-half h2 .n{display:inline-grid;place-items:center;width:34px;height:34px;border-radius:50%;background:var(--gold);color:var(--ink);font:800 18px var(--font-mono)}
+.g-half .lead{margin:0 0 4px;font:600 17px/1.5 var(--font-display);color:#e4d9f7}
+.g-list{list-style:none;margin:0;padding:0;display:grid;gap:12px}
+.g-list li{font:600 18px/1.7 var(--font-display);color:var(--paper)}
+.g-list .k{display:block;margin-bottom:1px;font:700 12px/1.4 var(--font-mono);letter-spacing:.14em;text-transform:uppercase;color:var(--lilac)}
+.hl{color:var(--gold);font-weight:800}
+.g-tip{margin:6px 0 0;padding:8px 12px;border-left:4px solid var(--gold);background:rgba(242,184,75,.08);font:600 15px/1.5 var(--font-display);color:#e4d9f7}
+kbd{display:inline-block;min-width:26px;box-sizing:border-box;padding:3px 9px;margin:0 1px;border-radius:7px;background:#f6ecd9;color:#1c1033;font:800 14px/1.3 var(--font-mono);text-align:center;border-bottom:4px solid #b9a47e}
+
+/* animação: a cena, o chão bordado que rola e o hacker */
+.g-animwrap{display:flex;flex-direction:column;gap:10px}
+.g-scene{position:relative;height:216px;border-radius:16px;overflow:hidden;background:linear-gradient(#32165e,#1a0b33);border:1px solid rgba(183,154,245,.4)}
+.g-half.both .g-scene{height:150px;--j1:-26px;--j2:-30px}
+.g-half.both .g-hero{width:66px;height:88px;margin-left:-33px}
+.g-half.both{gap:10px}
+.g-stars{position:absolute;inset:0;opacity:.85;background-image:radial-gradient(1.6px 1.6px at 20px 30px,#f6ecd9,transparent),radial-gradient(1.2px 1.2px at 90px 62px,#f2b84b,transparent),radial-gradient(1.6px 1.6px at 150px 22px,#ff5fa2,transparent),radial-gradient(1.2px 1.2px at 60px 92px,#fff,transparent);background-size:180px 120px}
+.g-ground{position:absolute;left:0;right:0;bottom:0;height:50px;background-color:#33195a;
+  background-image:repeating-linear-gradient(90deg,rgba(242,184,75,.9) 0 14px,transparent 14px 26px),url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='40'%3E%3Cpath d='M14 14l12 12M26 14L14 26' stroke='%23ff5fa2' stroke-opacity='.65' stroke-width='3' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-size:auto 3px,40px 40px;background-repeat:repeat-x,repeat;background-position:0 6px,0 12px;border-top:2px solid rgba(183,154,245,.4)}
+@keyframes gscroll{to{background-position:-104px 6px,-80px 12px}}
+.g-shadow{position:absolute;left:50%;bottom:20px;width:70px;height:12px;margin-left:-35px;border-radius:50%;background:rgba(0,0,0,.42)}
+.g-hero{position:absolute;left:50%;bottom:26px;width:90px;height:120px;margin-left:-45px;transform-origin:50% 100%}
+.hero-svg{width:100%;height:100%;display:block;overflow:visible}
+.hero-svg .h-fl,.hero-svg .h-fr,.hero-svg .h-cloak,.hero-svg .h-eyes{transform-box:fill-box}
+.hero-svg .h-eyes{transform-origin:center;animation:gblink 4s infinite}
+@keyframes gblink{0%,92%,100%{transform:scaleY(1)}95%{transform:scaleY(.1)}}
+.hero-svg .h-arm,.hero-svg .h-hand{opacity:0}
+@keyframes gstep{from{transform:translateY(0)}to{transform:translateY(-8px)}}
+
+/* andar */
+.s-walk .g-ground{animation:gscroll 2.2s linear infinite}
+.s-walk .g-hero{animation:gbob .55s ease-in-out infinite alternate}
+@keyframes gbob{from{transform:translateY(0) rotate(-2.5deg)}to{transform:translateY(-6px) rotate(2.5deg)}}
+.s-walk .h-fl{animation:gstep .55s ease-in-out infinite alternate}.s-walk .h-fr{animation:gstep .55s ease-in-out infinite alternate-reverse}
+.s-walk .g-shadow{animation:gshw .55s ease-in-out infinite alternate}
+@keyframes gshw{from{transform:scale(1)}to{transform:scale(.9)}}
+/* correr: mais rápido, inclinado para a frente, capa esvoaçante e riscos de velocidade */
+.s-run .g-ground{animation:gscroll .5s linear infinite}
+.s-run .g-hero{animation:grun .26s ease-in-out infinite alternate}
+@keyframes grun{from{transform:translateY(0) rotate(11deg)}to{transform:translateY(-13px) rotate(15deg)}}
+.s-run .h-fl{animation:gstep .26s ease-in-out infinite alternate}.s-run .h-fr{animation:gstep .26s ease-in-out infinite alternate-reverse}
+.s-run .h-cloak{transform-origin:50% 0;animation:gflap .26s ease-in-out infinite alternate}
+@keyframes gflap{from{transform:skewX(-5deg)}to{transform:skewX(-12deg) scaleY(.97)}}
+.g-lines{position:absolute;inset:0;pointer-events:none}
+.g-lines i{position:absolute;right:-70px;height:3px;width:56px;border-radius:3px;background:rgba(246,236,217,.75);opacity:0;animation:gline .55s linear infinite}
+.g-lines i:nth-child(1){top:60px}.g-lines i:nth-child(2){top:92px;animation-delay:.18s;width:40px}.g-lines i:nth-child(3){top:124px;animation-delay:.3s}.g-lines i:nth-child(4){top:150px;animation-delay:.08s;width:34px}
+@keyframes gline{0%{transform:translateX(0);opacity:0}15%{opacity:1}100%{transform:translateX(-520px);opacity:0}}
+/* pular: agacha (achata), sobe esticando, cai e amortece; a sombra encolhe no alto */
+.s-jump .g-ground{animation:gscroll 3.4s linear infinite}
+.s-jump .g-hero{animation:gjump 1.7s ease-in-out infinite}
+@keyframes gjump{0%{transform:translateY(0) scale(1,1)}8%{transform:translateY(0) scale(1.14,.84)}24%{transform:translateY(var(--j1,-78px)) scale(.93,1.1)}48%{transform:translateY(var(--j2,-90px)) scale(.97,1.03)}72%{transform:translateY(0) scale(.97,1.04)}80%{transform:translateY(0) scale(1.16,.82)}90%{transform:translateY(0) scale(.99,1.02)}100%{transform:translateY(0) scale(1,1)}}
+.s-jump .g-shadow{animation:gjsh 1.7s ease-in-out infinite}
+@keyframes gjsh{0%,8%,72%,100%{transform:scale(1);opacity:.42}24%,48%{transform:scale(.55);opacity:.18}80%{transform:scale(1.15)}}
+.s-jump .h-fl{animation:gtuck 1.7s ease-in-out infinite}.s-jump .h-fr{animation:gtuck 1.7s ease-in-out infinite}
+@keyframes gtuck{0%,10%,70%,100%{transform:translateY(0)}24%,48%{transform:translateY(-12px)}}
+/* interagir: aparece o "E", o hacker aponta, a placa brilha e o painel abre */
+.s-act .g-hero{left:32%}.s-act .g-shadow{left:32%}
+.g-sign{position:absolute;right:50px;bottom:48px;width:96px;height:78px;animation:gsign 3.8s infinite}
+.g-sign i{position:absolute;inset:0;border:6px solid #8a5a3a;border-radius:6px;background:#3a2350}
+.g-sign b{position:absolute;left:14px;top:14px;width:30px;height:38px;background:#f6ecd9;box-shadow:34px 6px 0 -8px #b79af5}
+.g-sign::before,.g-sign::after{content:"";position:absolute;bottom:-14px;width:7px;height:16px;background:#8a5a3a}.g-sign::before{left:14px}.g-sign::after{right:14px}
+@keyframes gsign{0%,32%{filter:none}38%,60%{filter:drop-shadow(0 0 14px #f2b84b)}70%,100%{filter:none}}
+.g-key{position:absolute;left:32%;bottom:154px;width:34px;height:34px;margin-left:-17px;border-radius:8px;background:#f6ecd9;color:#1c1033;font:800 19px/34px var(--font-mono);text-align:center;border-bottom:4px solid #b9a47e;opacity:0;animation:gkey 3.8s infinite}
+@keyframes gkey{0%,8%{opacity:0;transform:translateY(8px)}16%,28%{opacity:1;transform:translateY(0)}32%{opacity:1;transform:translateY(3px);border-bottom-width:1px}38%{opacity:1;transform:translateY(0);border-bottom-width:4px}84%{opacity:1}94%,100%{opacity:0}}
+.g-win{position:absolute;right:30px;bottom:132px;width:132px;height:64px;box-sizing:border-box;padding:10px 12px;border-radius:10px;background:#f6ecd9;display:grid;gap:7px;align-content:center;transform:scale(0);transform-origin:70% 100%;opacity:0;animation:gwin 3.8s infinite}
+.g-win i{display:block;height:7px;border-radius:4px;background:#b79af5}.g-win i:nth-child(1){width:60%;background:#7b3fe4}.g-win i:nth-child(3){width:75%}
+@keyframes gwin{0%,36%{transform:scale(0);opacity:0}46%{transform:scale(1.06);opacity:1}50%,86%{transform:scale(1);opacity:1}94%,100%{transform:scale(.6);opacity:0}}
+.s-act .h-arm,.s-act .h-hand{animation:garm 3.8s infinite}
+@keyframes garm{0%,16%{opacity:0}24%,62%{opacity:1}70%,100%{opacity:0}}
+
+/* legendas que se revezam e os pictogramas das formas de fazer a ação */
+.g-pics{display:flex;justify-content:center;gap:14px;align-items:center;min-height:46px}
+.g-pic{display:inline-grid;place-items:center;min-width:56px;min-height:44px;padding:4px 10px;border-radius:12px;border:2px solid rgba(183,154,245,.4);color:var(--paper);opacity:.45;animation:gpic 9s infinite}
+.g-pic.c1{animation-delay:3s}.g-pic.c2{animation-delay:6s}
+@keyframes gpic{0%{opacity:.45;transform:scale(1);border-color:rgba(183,154,245,.4)}4%,30%{opacity:1;transform:scale(1.1);border-color:var(--gold)}34%,100%{opacity:.45;transform:scale(1);border-color:rgba(183,154,245,.4)}}
+.g-pic .kb{display:inline-flex;gap:2px}
+.g-pic .ib{display:inline-grid;place-items:center;color:var(--gold)}
+.g-caps{position:relative;height:30px;text-align:center;font:600 16px/30px var(--font-display);color:var(--paper)}
+.g-caps span{position:absolute;inset:0;opacity:0;animation:gcap 9s infinite}
+.g-caps span.c1{animation-delay:3s}.g-caps span.c2{animation-delay:6s}
+@keyframes gcap{0%{opacity:0;transform:translateY(6px)}4%,30%{opacity:1;transform:translateY(0)}34%,100%{opacity:0}}
+.pic-stick{display:block;position:relative;width:34px;height:34px;border-radius:50%;border:2px solid var(--lilac)}
+.pic-stick i{position:absolute;left:50%;top:50%;width:14px;height:14px;margin:-7px;border-radius:50%;background:var(--gold);animation:gknob 2s linear infinite}
+@keyframes gknob{0%{transform:translate(0,-8px)}25%{transform:translate(8px,0)}50%{transform:translate(0,8px)}75%{transform:translate(-8px,0)}100%{transform:translate(0,-8px)}}
+.pic-click{display:block;position:relative;width:46px;height:34px}
+.pic-click i{position:absolute;left:6px;bottom:2px;width:30px;height:12px;border-radius:50%;border:2px solid var(--gold);animation:gripple 1.6s ease-out infinite}
+@keyframes gripple{0%{transform:scale(.3);opacity:1}100%{transform:scale(1.2);opacity:0}}
+.pic-click u{position:absolute;left:18px;top:2px;width:16px;height:20px;background:var(--paper);clip-path:polygon(0 0,0 100%,30% 76%,52% 100%,70% 90%,48% 66%,86% 62%)}
+
+/* botões do livro */
+.g-x{position:absolute;right:14px;top:12px;z-index:30;width:44px;height:44px;border-radius:50%;border:1px solid var(--gold);background:rgba(11,6,19,.8);color:var(--paper);font:700 18px var(--font-mono);cursor:pointer}
+.g-x:hover{background:var(--gold);color:var(--ink)}
+.g-acc{position:absolute;right:66px;top:12px;z-index:30}
+.g-accbtn{align-self:flex-start;display:inline-flex;align-items:center;gap:10px;margin-top:4px;padding:10px 16px;border-radius:999px;border:2px solid var(--gold);background:rgba(11,6,19,.6);color:var(--paper);font:700 15px var(--font-display);cursor:pointer}
+.g-accbtn:hover{background:var(--gold);color:var(--ink)}.g-accbtn:hover .hl{color:var(--ink)}
+.g-foot{position:absolute;left:0;right:0;bottom:0;height:74px;display:flex;align-items:center;justify-content:center;gap:18px;z-index:30;background:linear-gradient(transparent,#150a28 40%)}
+.g-nav{width:48px;height:48px;border-radius:50%;border:1px solid var(--gold);background:rgba(11,6,19,.8);color:var(--paper);font:700 28px/1 var(--font-mono);cursor:pointer;padding:0 0 4px}
+.g-nav:hover:not(:disabled){background:var(--gold);color:var(--ink)}.g-nav:disabled{opacity:.25;cursor:default}
+.g-done{font-size:14px;padding:.85em 1.4em;background:var(--gold);color:var(--ink)}
+.g-done:hover{background:var(--paper)}
+.g-dots{display:flex;gap:12px}
+.g-dots button{width:12px;height:12px;padding:0;border-radius:50%;border:1px solid var(--gold);background:transparent;cursor:pointer}
+.g-dots button[aria-current="true"]{background:var(--gold)}
+.guide button:focus-visible{outline:3px solid var(--lilac);outline-offset:3px}
+
+/* celular em pé: as metades empilham e a página rola */
+@media (max-width:760px){
+  .g-book{height:100%;border-radius:14px}
+  .g-spread{grid-template-columns:1fr;grid-auto-rows:max-content;height:auto;min-height:100%;align-content:start}
+  .g-spread::before,.g-spread::after{display:none}
+  .g-half,.g-half.left,.g-half.right{padding:16px 18px 20px;justify-content:flex-start;overflow:visible;min-height:auto}
+  .g-scene{height:170px;--j1:-34px;--j2:-40px}.g-half.both .g-scene{height:150px;--j1:-26px;--j2:-30px}
+  .g-scene .g-hero{width:72px;height:96px;margin-left:-36px}
+  .g-half h2{font-size:23px}.g-list li{font-size:16px}
+  .g-half:first-child{padding-top:54px}
+  .g-page{overflow-y:auto;overflow-x:hidden;padding-bottom:20px}
+  .g-done{font-size:12px;padding:.8em 1em}
+}
+/* "reduzir movimento": tudo parado, e as legendas ficam todas à mostra (sem se revezar) */
+.guide.calm *,.guide.calm *::before,.guide.calm *::after{animation:none!important;transition:none!important}
+.guide.calm .g-caps{height:auto}.guide.calm .g-caps span{position:static;display:block;opacity:1}
+.guide.calm .g-pic{opacity:1}
+.guide.calm .s-act .g-key,.guide.calm .s-act .g-win{opacity:1;transform:none}
+@media (prefers-reduced-motion:reduce){
+  .guide *,.guide *::before,.guide *::after{animation:none!important;transition:none!important}
+  .guide .g-caps{height:auto}.guide .g-caps span{position:static;display:block;opacity:1}
+  .guide .g-pic{opacity:1}.guide .s-act .g-key,.guide .s-act .g-win{opacity:1;transform:none}
+}
