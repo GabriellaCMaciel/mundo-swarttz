@@ -18,8 +18,8 @@ const phoneRig = { built: false, rig: null, yawG: null, tiltG: null, icons: [], 
 const PH_FONT = 'Nunito, system-ui, "Segoe UI", sans-serif', PH_MONO = PH_FONT;
 
 // ---------- ajudantes de desenho ----------
-function fitFont(x, text, maxW, size, weight, fam, min = 12) { // encolhe a fonte até o texto caber em maxW
-  weight = Math.max(weight, 600); // letra fina some em tela pequena: nada abaixo de "semi-negrito"
+function fitFont(x, text, maxW, size, weight, fam, min = 18) { // encolhe a fonte até o texto caber em maxW
+  weight = Math.max(weight, 700); // letra fina some em tela pequena: nada abaixo de negrito leve. (O mínimo de 18 px evita encolher demais até caber; o celular é visto de longe.)
   for (let s = size; s >= min; s -= 1) { x.font = weight + ' ' + s + 'px ' + fam; if (x.measureText(text).width <= maxW) return s; }
   x.font = weight + ' ' + min + 'px ' + fam; return min;
 }
@@ -84,25 +84,25 @@ function phoneScreenTex() {
     [[480, 220, 230], [90, 760, 260], [420, 1030, 220]].forEach(([cx, cy, r]) => { // manchas de luz ao fundo
       const g = x.createRadialGradient(cx, cy, 0, cx, cy, r); g.addColorStop(0, 'rgba(255,255,255,0.14)'); g.addColorStop(1, 'rgba(255,255,255,0)'); x.fillStyle = g; x.fillRect(0, 0, w, h);
     });
-    put(x, '9:41', 44, 64, 110, 26, 700, PH_FONT, '#fff');                                // barra de status
+    put(x, '9:41', 44, 66, 130, 32, 800, PH_FONT, '#fff');                                // barra de status
     rrPath(x, 224, 32, 152, 42, 21); x.fillStyle = '#0b0613'; x.fill();                       // ilha da câmera
     rrPath(x, 498, 46, 46, 22, 6); x.strokeStyle = 'rgba(255,255,255,0.9)'; x.lineWidth = 3; x.stroke(); rrPath(x, 503, 51, 30, 12, 3); x.fillStyle = '#fff'; x.fill();
-    put(x, 'Fale com a', 44, 150, 360, 28, 600, PH_FONT, 'rgba(255,255,255,0.82)');
+    put(x, 'Fale com a', 44, 152, 400, 38, 700, PH_FONT, 'rgba(255,255,255,0.82)');
     put(x, 'Gabriella', 44, 208, 500, 58, 800, PH_FONT, '#fff');
     // duas telhas grandes
     darkGlassRR(x, 30, 500, 262, 236, 34);
     ghMark(x, 161, 596, 104);
-    put(x, 'GitHub', 161, 690, 220, 36, 800, PH_FONT, '#fff', 'center'); put(x, 'meus projetos', 161, 722, 220, 20, 400, PH_MONO, 'rgba(255,255,255,0.85)', 'center');
+    put(x, 'GitHub', 161, 690, 220, 36, 800, PH_FONT, '#fff', 'center'); put(x, 'meus projetos', 161, 726, 240, 30, 700, PH_MONO, 'rgba(255,255,255,0.85)', 'center');
     const pk = x.createLinearGradient(308, 500, 570, 736); pk.addColorStop(0, '#c9327a'); pk.addColorStop(1, '#b02a68');
     rrPath(x, 308, 500, 262, 236, 34); x.fillStyle = pk; x.fill(); x.lineWidth = 2.5; x.strokeStyle = 'rgba(255,255,255,0.5)'; x.stroke();
     igMark(x, 439, 596, 104);
-    put(x, 'Instagram', 439, 690, 220, 36, 800, PH_FONT, '#fff', 'center'); put(x, 'dia a dia', 439, 722, 220, 20, 400, PH_MONO, 'rgba(255,255,255,0.9)', 'center');
+    put(x, 'Instagram', 439, 690, 220, 36, 800, PH_FONT, '#fff', 'center'); put(x, 'dia a dia', 439, 726, 240, 30, 700, PH_MONO, 'rgba(255,255,255,0.9)', 'center');
     // lista de redes
     darkGlassRR(x, 30, 770, 540, 290, 34);
-    put(x, 'Redes', 64, 828, 300, 32, 800, PH_FONT, '#fff'); put(x, 'ver tudo', 536, 828, 140, 20, 400, PH_MONO, 'rgba(255,255,255,0.85)', 'right');
+    put(x, 'Redes', 64, 828, 300, 32, 800, PH_FONT, '#fff'); put(x, 'ver tudo', 536, 828, 170, 28, 700, PH_MONO, 'rgba(255,255,255,0.85)', 'right');
     [['GitHub', 'GabriellaCMaciel', '#2b1b4d'], ['LinkedIn', 'gabriellacmaciel', '#3d7bff'], ['Instagram', '@gabriellaswarttz', '#d6336c']].forEach(([n, s, c], i) => { // (o texto vem dos mesmos @ do SOCIALS em config.js)
       const y = 860 + i * 72; rrPath(x, 62, y, 50, 50, 14); x.fillStyle = c; x.fill(); if (i === 0) ghMark(x, 87, y + 25, 32); else if (i === 1) liMark(x, 87, y + 25, 30); else igMark(x, 87, y + 25, 32);
-      put(x, n, 128, y + 34, 150, 28, 700, PH_FONT, '#fff'); put(x, s, 536, y + 33, 250, 20, 400, PH_MONO, 'rgba(255,255,255,0.9)', 'right');
+      put(x, n, 128, y + 35, 150, 30, 800, PH_FONT, '#fff'); put(x, s, 536, y + 35, 240, 26, 700, PH_MONO, 'rgba(255,255,255,0.9)', 'right');
     });
     rrPath(x, 220, 1128, 160, 8, 4); x.fillStyle = 'rgba(255,255,255,0.85)'; x.fill();
   });
@@ -126,10 +126,10 @@ const PH_SPOTS = [[-3.1, 0.7, 0.5, 0.85], [-2.6, 1.8, 0.8, 0.8], [2.9, -1.7, 0.8
 // ordem dos ícones em PH_ICONS: GitHub, LinkedIn, Instagram, E-mail, WhatsApp, YouTube, TikTok, Currículo
 
 function iconLabel(text, parent) { // etiqueta de vidro embaixo do ícone: a largura se ajusta ao texto, então nada é cortado
-  const c = document.createElement('canvas'), x = c.getContext('2d'), size = 44;
-  x.font = '800 ' + size + 'px ' + PH_FONT; const W = Math.ceil(x.measureText(text).width) + 56, H = 80; c.width = W; c.height = H;
+  const c = document.createElement('canvas'), x = c.getContext('2d'), size = 54;
+  x.font = '800 ' + size + 'px ' + PH_FONT; const W = Math.ceil(x.measureText(text).width) + 60, H = 96; c.width = W; c.height = H;
   glassRR(x, 4, 4, W - 8, H - 8, 34, 0.55); x.fillStyle = '#2a1745'; x.font = '800 ' + size + 'px ' + PH_FONT; x.textAlign = 'center'; x.textBaseline = 'middle'; x.fillText(text, W / 2, H / 2 + 3);
-  const m = flat(new THREE.Mesh(new THREE.PlaneGeometry(W / H * 0.3, 0.3), keepT(new THREE.MeshBasicMaterial({ map: new THREE.CanvasTexture(c), transparent: true, depthWrite: false }))));
+  const m = flat(new THREE.Mesh(new THREE.PlaneGeometry(W / H * 0.4, 0.4), keepT(new THREE.MeshBasicMaterial({ map: new THREE.CanvasTexture(c), transparent: true, depthWrite: false }))));
   m.renderOrder = 5; parent.add(m); return m;
 }
 
@@ -156,9 +156,9 @@ function buildPhone(g) {
     x.beginPath(); x.arc(92, h / 2, 62, 0, 6.3); x.fillStyle = ag; x.fill(); x.lineWidth = 6; x.strokeStyle = '#fff'; x.stroke();
     if (phoneLogo) { const lh = 108, lw = lh * phoneLogo.width / phoneLogo.height; x.drawImage(phoneLogo, 92 - lw / 2, h / 2 - lh / 2 + 2, lw, lh); }
     put(x, 'Gabriella Swarttz', 178, 92, w - 200, 36, 800, PH_FONT, '#2a1745');
-    put(x, 'Dev Web & Mobile', 178, 128, w - 200, 24, 400, PH_MONO, '#5a3a7a');
-    put(x, 'Valparaíso de Goiás, BR', 178, 160, w - 200, 21, 400, PH_MONO, '#5f4080');
-    rrPath(x, 178, 178, 172, 46, 23); x.fillStyle = '#7b3fe4'; x.fill(); put(x, 'Ver perfil', 264, 209, 150, 24, 700, PH_FONT, '#fff', 'center');
+    put(x, 'Dev Web & Mobile', 178, 130, w - 200, 30, 700, PH_MONO, '#5a3a7a');
+    put(x, 'Valparaíso de Goiás, BR', 178, 164, w - 200, 26, 700, PH_MONO, '#5f4080');
+    rrPath(x, 178, 178, 172, 46, 23); x.fillStyle = '#7b3fe4'; x.fill(); put(x, 'Ver perfil', 264, 211, 160, 28, 800, PH_FONT, '#fff', 'center');
   };
   const prof = card(2.5, 1.1, 230, drawProf, 0.55, T);
   loadImg(ASSETS.logoDark, im => { // chegou a logo: limpa o cartão, desenha de novo com ela e avisa o Three.js que a textura mudou (needsUpdate)
@@ -168,19 +168,19 @@ function buildPhone(g) {
 
   const stats = card(2.1, 1.3, 230, (x, w, h) => {
     rrPath(x, 4, 4, w - 8, h - 8, 36); x.fillStyle = 'rgba(52,38,110,0.82)'; x.fill(); x.lineWidth = 2.5; x.strokeStyle = 'rgba(255,255,255,0.4)'; x.stroke();
-    put(x, 'Atividade', 36, 62, w - 200, 32, 800, PH_FONT, '#fff'); put(x, 'Out 2026', 36, 92, w - 200, 20, 400, PH_MONO, 'rgba(255,255,255,0.7)');
-    rrPath(x, w - 150, 34, 112, 40, 20); x.fillStyle = 'rgba(255,255,255,0.92)'; x.fill(); put(x, 'GitHub', w - 94, 62, 90, 22, 700, PH_FONT, '#5b3bc4', 'center');
+    put(x, 'Atividade', 36, 62, w - 200, 32, 800, PH_FONT, '#fff'); put(x, 'Out 2026', 36, 94, w - 200, 26, 700, PH_MONO, 'rgba(255,255,255,0.7)');
+    rrPath(x, w - 150, 34, 112, 40, 20); x.fillStyle = 'rgba(255,255,255,0.92)'; x.fill(); put(x, 'GitHub', w - 94, 64, 100, 26, 800, PH_FONT, '#5b3bc4', 'center');
     const g2 = x.createLinearGradient(0, 120, 0, h - 60); g2.addColorStop(0, 'rgba(183,154,245,0.55)'); g2.addColorStop(1, 'rgba(183,154,245,0)');
     x.beginPath(); x.moveTo(36, h - 60); for (let i = 0; i <= 24; i++) { const px = 36 + i * (w - 72) / 24; x.lineTo(px, 190 - 34 * Math.sin(i * 0.55) - 14 * Math.sin(i * 1.3)); } x.lineTo(w - 36, h - 60); x.closePath(); x.fillStyle = g2; x.fill();
     x.beginPath(); for (let i = 0; i <= 24; i++) { const px = 36 + i * (w - 72) / 24, py = 190 - 34 * Math.sin(i * 0.55) - 14 * Math.sin(i * 1.3); i ? x.lineTo(px, py) : x.moveTo(px, py); } x.lineWidth = 5; x.strokeStyle = '#d9c8ff'; x.lineJoin = 'round'; x.stroke();
-    for (let i = 0; i < 7; i++) put(x, '0' + (i + 1), 44 + i * (w - 88) / 6, h - 24, 40, 17, 400, PH_MONO, 'rgba(255,255,255,0.7)', 'center');
+    for (let i = 0; i < 7; i++) put(x, '0' + (i + 1), 44 + i * (w - 88) / 6, h - 22, 44, 24, 700, PH_MONO, 'rgba(255,255,255,0.7)', 'center');
   }, 0.85, T); stats.position.set(2.3, 0.0, 0.85); // quase todo para fora da tela: só encosta na borda
 
   const chat = card(2.2, 1.1, 230, (x, w, h) => {
     const cg = x.createLinearGradient(0, 0, w, h); cg.addColorStop(0, '#d63a55'); cg.addColorStop(1, '#b82a68');
     rrPath(x, 4, 4, w - 8, h - 8, 38); x.fillStyle = cg; x.fill(); x.lineWidth = 2.5; x.strokeStyle = 'rgba(255,255,255,0.6)'; x.stroke();
-    put(x, 'Vamos conversar?', 36, 92, w - 72, 40, 800, PH_FONT, '#fff'); put(x, 'me chama nas redes', 36, 130, w - 72, 22, 400, PH_MONO, 'rgba(255,255,255,0.92)');
-    rrPath(x, 36, 160, 120, 46, 23); x.fillStyle = 'rgba(255,255,255,0.95)'; x.fill(); put(x, 'abrir (E)', 96, 191, 100, 22, 700, PH_FONT, '#b82a68', 'center');
+    put(x, 'Vamos conversar?', 36, 92, w - 72, 40, 800, PH_FONT, '#fff'); put(x, 'me chama nas redes', 36, 134, w - 72, 28, 700, PH_MONO, 'rgba(255,255,255,0.92)');
+    rrPath(x, 36, 160, 120, 46, 23); x.fillStyle = 'rgba(255,255,255,0.95)'; x.fill(); put(x, 'abrir (E)', 96, 193, 112, 26, 800, PH_FONT, '#b82a68', 'center');
   }, 0.8, T); chat.position.set(-2.25, -1.0, 0.8);
 
   const nav = card(3.2, 0.66, 230, (x, w, h) => {
@@ -212,7 +212,7 @@ function buildPhone(g) {
       const sh = x.createRadialGradient(80, 60, 0, 80, 60, 150); sh.addColorStop(0, 'rgba(255,255,255,0.35)'); sh.addColorStop(1, 'rgba(255,255,255,0)'); rrPath(x, 6, 6, w - 12, h - 12, 62); x.fillStyle = sh; x.fill();
       ic.draw(x); }) }))));
     face.scale.set(0.97, 0.97, 1); face.position.z = 0.168; face.renderOrder = 3; it.add(face);
-    const lab = iconLabel(ic.n, it); lab.position.set(0, -0.76, 0.2);
+    const lab = iconLabel(ic.n, it); lab.position.set(0, -0.84, 0.2);
     // área de clique invisível (ícone + etiqueta), um pouco maior que o desenho: bom para o dedo no celular
     const hit = new THREE.Mesh(new THREE.PlaneGeometry(1.35, 1.7), new THREE.MeshBasicMaterial({ visible: false, side: THREE.DoubleSide }));
     hit.position.set(0, -0.22, 0.25); hit.userData.social = SOCIALS.find(o => o.name === ic.n) || { name: ic.n, url: '' }; it.add(hit); R.hits.push(hit);
