@@ -118,13 +118,20 @@ class VegBatch {
   leaf(x, y, z, s, c) { const rnd = this.rnd; this.leaves.push({ x, y, z, sx: s, sy: s * 0.6, sz: s, ry: rnd() * 3, rz: rnd(), c: c || GREENS[(rnd() * 5) | 0] }); }
   post(x, z, h, c = 0x3a2350, w = 0.1) { this.trunks.push({ x, y: h / 2, z, sx: w, sy: h, sz: w, c }); } // poste fino
   // Árvore: tronco + 3 bolas de folhas. blossom = árvore de flor-de-cerejeira (copa rosa/lilás)
+  // "Despojada": cada árvore tem um tamanho um pouco diferente e fica levemente TORTA (o tronco inclina e a copa acompanha), como no mundo de verdade.
+  // Os sorteios vêm de um "hash" da posição (seno bagunçado) e não do this.rnd: assim o resto do mundo não muda de lugar quando isto muda.
   tree(x, z, h, blossom) {
-    const rnd = this.rnd, w = 0.14 + h * 0.035;
-    this.trunks.push({ x, y: h * 0.3, z, sx: w, sy: h * 0.6, sz: w, c: 0x6b4a2f });
-    const cr = h * 0.36, col = blossom ? [0xf4a6c9, 0xe58ab8, 0xcdb4f6][(rnd() * 3) | 0] : null, dom = blossom ? 0xfff1f5 : FLOWER_COLS[(rnd() * 6) | 0];
-    this.bush(x, h * 0.72, z, cr, 12, dom, col);
-    this.bush(x + cr * 0.75, h * 0.6, z + cr * 0.2, cr * 0.65, 6, dom, col);
-    this.bush(x - cr * 0.65, h * 0.62, z - cr * 0.4, cr * 0.6, 6, dom, col);
+    const rnd = this.rnd, hs = k => { const v = Math.sin(x * 12.9898 + z * 78.233 + k * 37.719) * 43758.5453; return v - Math.floor(v); }; // número "aleatório" fixo para este ponto, de 0 a 1
+    h *= 0.82 + hs(1) * 0.4;                                   // altura de 82% a 122%
+    const lean = 0.05 + hs(2) * 0.17, dir = hs(3) * 6.283;     // inclinação (rad, ~3° a ~13°) e para que lado
+    const lx = Math.cos(dir) * lean, lz = Math.sin(dir) * lean, L = h * 0.6, w = 0.14 + h * 0.035;
+    // tronco: gira em torno do centro dele; o centro sobe junto da inclinação (metade do deslocamento do topo)
+    this.trunks.push({ x: x + Math.sin(lx) * L * 0.5, y: Math.cos(lx) * Math.cos(lz) * L * 0.5, z: z + Math.sin(lz) * L * 0.5, sx: w, sy: L, sz: w, c: 0x6b4a2f, rz: -lx, rx: lz });
+    const tx = x + Math.sin(lx) * h * 0.72, tz = z + Math.sin(lz) * h * 0.72; // onde fica a copa: acima da ponta do tronco inclinado
+    const cr = h * 0.36 * (0.9 + hs(4) * 0.25), col = blossom ? [0xf4a6c9, 0xe58ab8, 0xcdb4f6][(rnd() * 3) | 0] : null, dom = blossom ? 0xfff1f5 : FLOWER_COLS[(rnd() * 6) | 0];
+    this.bush(tx, h * 0.72, tz, cr, 12, dom, col);
+    this.bush(tx + cr * 0.75, h * 0.6, tz + cr * 0.2, cr * 0.65, 6, dom, col);
+    this.bush(tx - cr * 0.65, h * 0.62, tz - cr * 0.4, cr * 0.6, 6, dom, col);
     return cr;
   }
   // Divide tudo em "quadradinhos" de 18x18 unidades do mundo: só os quadradinhos que aparecem na tela são desenhados
