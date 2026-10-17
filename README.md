@@ -20,6 +20,7 @@ js/garden.js      ajudantes de jardim: flores, arbustos, árvores, postes, luzin
 js/world.js       chão, luzes, céu, personagem e gatas
 js/library.js     a biblioteca: grande pavilhão aberto com jardim, lagoa, estantes, sofás, puffs e livros clicáveis
 js/pond.js        a lagoa viva: peixes nadando e o gato Zé Porempa tentando pegá-los
+js/cherry.js      a cerejeira grande ao lado do banco, na esquerda da lagoa: pétalas caindo ao vento e espalhadas pelo chão
 js/kiara.js       a Kiara: segue a Gabriella e, quando ela para, vem se esfregar nas pernas pedindo carinho
 js/swing.js       o balanço na árvore (cordas com flores e hera, livro, manta, cestos), à direita da biblioteca
 js/mailbox.js     a zona Cartas em 3D: caixa de correio rosa, casinha inclinada e quintal com cerca completa e portão
@@ -30,7 +31,7 @@ js/mail.js        a tela das cartas: carrossel de envelopes e a carta dobrada em
 js/zones.js       cenários e etiquetas das outras zonas (sem círculos: tudo faz parte do mesmo mundo)
 js/decor.js       decoração do mundo inteiro: flores, árvores floridas, postes e fios de luz ligando as zonas
 js/ui.js          painéis, controles e o loop principal
-assets/           logos e foto
+assets/           logos (SVG, versões para fundo escuro e claro) e foto
 ```
 
 Os arquivos JS dependem uns dos outros, então a ordem das tags `<script>` no `index.html` importa.
@@ -48,6 +49,8 @@ Use um servidor local (por exemplo, a extensão **Live Server** do VS Code) ou p
 - Velocidade do personagem e tamanho do mundo: `SPEED` e `LIMIT` em `js/ui.js`.
 - Links das redes sociais: lista `SOCIALS` em `js/config.js` (cole o link do seu perfil em `url`; vazio = "em breve").
 - Gatos: gato com mais de uma cor tem as cores PINTADAS no corpo (`coatTex` e `coatMat` em `js/world.js`), nunca esferas coladas por cima, que viram "caroços". Vale para todos os gatos, inclusive os próximos.
+- Logo: `assets/logo-escuro.svg` (para fundo escuro) e `assets/logo-claro.svg` (para fundo claro); o caminho fica em `ASSETS` (`js/config.js`). Se a proporção mudar, ajuste o tamanho nos `drawImage` de `intro.js`, `zones.js` e `phone.js`.
+- Acessibilidade: texto precisa de contraste WCAG AA (4,5:1; 3:1 para texto grande). Ao criar cartões ou cores novos, confira antes.
 - Celular gigante: medidas em `PHONE`, posição dos ícones em `PH_SPOTS` e textos da tela/cartões em `js/phone.js`. O giro (só acompanha a pessoa) é limitado a ±0,38 rad (`want` em `updatePhone`).
 - Tamanho de cada zona: campo `size` da lista `zones` (1 = tamanho original). A casa das cartas tem as medidas e o giro em `CARTAS`, `YARD` e `HOUSE`, no topo de `js/mailbox.js`.
 
