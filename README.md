@@ -28,6 +28,8 @@ js/mailbox.js     a zona Cartas em 3D: caixa de correio rosa, casinha inclinada 
 js/yardcats.js    a Mel (no telhado, rosna se outro gato chega perto) e os filhotes brincando de lutinha no quintal
 js/phone.js       o celular gigante da zona Telefone: flutua, gira devagar para os lados seguindo a pessoa, com ícones de redes e cartões de vidro
 js/pick.js        toque/clique nas coisas do mundo: ícones do celular abrem os perfis, zonas abrem o painel
+js/boot.js        porta de entrada: escolhe entre o mundo 3D e a versão simples e carrega os outros arquivos em ordem
+js/simple.js      a versão simples (texto puro, acessível): mesmas informações do 3D, para leitor de tela, teclado e aparelhos sem WebGL
 js/mail.js        a tela das cartas: carrossel de envelopes e a carta dobrada em três (animação por linha do tempo, reversível)
 js/zones.js       cenários e etiquetas das outras zonas (sem círculos: tudo faz parte do mesmo mundo)
 js/worldmap.js    o mapa do mundo numa tábua ao lado da placa "Sobre", com um X vermelho no lugar onde a pessoa está agora

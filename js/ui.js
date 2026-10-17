@@ -7,10 +7,9 @@ const heading = (z, sub) => '<h2 id="sheetTitle" style="color:' + hex(z.color) +
 const panels = {
   sobre: z => heading(z, 'Texto provisório: troque pela sua apresentação.') +
     '<div class="about"><img src="' + ASSETS.photo + '" alt="Foto de Gabriella Swarttz"><div>' +
-    '<p>Sou a Gabriella Swarttz. Estudo Desenvolvimento Web e Mobile, sou monitora no projeto START e estou construindo meu caminho até a engenharia de IA.</p>' +
-    '<p>Gosto de livros, gatos, pintura, bordado, selos e de tudo que é colorido.</p></div></div>',
+    ABOUT.map(t => '<p>' + t + '</p>').join('') + '</div></div>', // os textos ficam em config.js (ABOUT)
   atelie: z => heading(z, 'Soft skills (lista provisória). Depois cada uma vira uma ilustração ou um bordado.') +
-    '<div class="chips">' + ['Didática', 'Criatividade', 'Comunicação', 'Trabalho em equipe', 'Resiliência', 'Organização'].map(s => '<span class="chip" style="cursor:default">' + s + '</span>').join('') + '</div>',
+    '<div class="chips">' + SOFT_SKILLS.map(s => '<span class="chip" style="cursor:default">' + s + '</span>').join('') + '</div>',
   biblioteca: z => heading(z, 'Cada livro que brilha nas estantes é uma formação. Escolha um aqui ou clique nele no mundo.') +
     '<div class="shelf">' + books.map(b => '<button class="bk" type="button" data-book="' + b.id + '" style="border-left-color:' + hex(b.color) + '"><span>' + b.title +
       '<small>' + b.kind + ' · ' + b.org + '</small></span></button>').join('') + '</div>',

@@ -27,6 +27,13 @@ const SOCIALS = [
   { name: 'Currículo', url: '', handle: '' }
 ];
 
+// Textos compartilhados pelo painel do mundo 3D (ui.js) e pela versão simples (simple.js): mude aqui e muda nos dois.
+const ABOUT = [
+  'Sou a Gabriella Swarttz. Estudo Desenvolvimento Web e Mobile, sou monitora no projeto START e estou construindo meu caminho até a engenharia de IA.',
+  'Gosto de livros, gatos, pintura, bordado, selos e de tudo que é colorido.'
+];
+const SOFT_SKILLS = ['Didática', 'Criatividade', 'Comunicação', 'Trabalho em equipe', 'Resiliência', 'Organização'];
+
 // O roteiro do "hack" da abertura (o notebook invadindo a conta da Gabriella). Cada linha: [texto, cor]. Mantenha cada linha com até ~36 letras (a logo aparece à direita no final).
 // Linhas que começam com "ALERTA" deixam a barra do terminal vermelha e piscando devagar (1 vez por segundo).
 const terminalLines = [

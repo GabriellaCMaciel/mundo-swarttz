@@ -11,6 +11,7 @@
   <link rel="stylesheet" href="css/style.css?v=20261017a">
 </head>
 <body>
+<a class="skip-link" id="toSimple" href="?simples">Abrir a versão simples (sem 3D, para leitor de tela e teclado)</a>
 <canvas id="stage" role="img" aria-label="Mundo 3D do portfólio de Gabriella Swarttz"></canvas>
 <div class="hud">
   <div class="title" id="title"><b>Gabriella Swarttz</b><span>portfólio</span></div>
@@ -38,26 +39,9 @@
 </div>
 
   <!-- Three.js (biblioteca de 3D) e depois os nossos arquivos, na ordem em que dependem uns dos outros -->
-  <!-- O "?v=..." depois de cada arquivo força o navegador a baixar a versão nova (cache). Troque o valor a cada atualização. -->
+  <!-- O "?v=..." força o navegador a baixar a versão nova (cache). Troque o valor a cada atualização: aqui, no CSS e no boot.js (ele repassa o mesmo valor aos outros arquivos). -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-  <script src="js/config.js?v=20261017a"></script>
-  <script src="js/intro.js?v=20261017a"></script>
-  <script src="js/garden.js?v=20261017a"></script>
-  <script src="js/world.js?v=20261017a"></script>
-  <script src="js/cherry.js?v=20261017a"></script>
-  <script src="js/library.js?v=20261017a"></script>
-  <script src="js/pond.js?v=20261017a"></script>
-  <script src="js/kiara.js?v=20261017a"></script>
-  <script src="js/mailbox.js?v=20261017a"></script>
-  <script src="js/yardcats.js?v=20261017a"></script>
-  <script src="js/phone.js?v=20261017a"></script>
-  <script src="js/zones.js?v=20261017a"></script>
-  <script src="js/worldmap.js?v=20261017a"></script>
-  <script src="js/decor.js?v=20261017a"></script>
-  <script src="js/swing.js?v=20261017a"></script>
-  <script src="js/playcats.js?v=20261017a"></script>
-  <script src="js/mail.js?v=20261017a"></script>
-  <script src="js/ui.js?v=20261017a"></script>
-  <script src="js/pick.js?v=20261017a"></script>
+  <!-- boot.js decide entre o mundo 3D e a versão simples (texto puro) e carrega os demais arquivos, em ordem: veja js/boot.js. -->
+  <script src="js/boot.js?v=20261017a"></script>
 </body>
 </html>
