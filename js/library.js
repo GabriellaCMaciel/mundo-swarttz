@@ -423,7 +423,8 @@ function buildLibrary(g) {
     [-1, 1].forEach(s => bx(0.14, 0.6, 0.8, 0x4b2e3f, s * 1.2, 0.3, 0, b));
     veg.post(x + Math.cos(face) * 1.9, z - Math.sin(face) * 1.9, 2.0); lampPos.push(x + Math.cos(face) * 1.9, 2.2, z - Math.sin(face) * 1.9);
   };
-  bench(pond.x + pond.r + 1.7, pond.z - 3.8, -Math.PI / 2); // o único banco: de frente para a lagoa
+  bench(BENCH_SPOT.x - (POND.x - pond.x), BENCH_SPOT.z - (POND.z - pond.z), Math.PI / 2); // o único banco: do lado ESQUERDO da lagoa, olhando para a água (posição em cherry.js)
+  buildCherry(g, rnd, lights, pond); // a cerejeira grande ao lado do banco, com pétalas ao vento (cherry.js)
   // Lagoa com pedras na borda, vitórias-régias e flores de lótus
   const water = flat(new THREE.Mesh(new THREE.CircleGeometry(pond.r, 40), new THREE.MeshBasicMaterial({ map: pondTex() })));
   water.rotation.x = -Math.PI / 2; water.position.set(pond.x, 0.06, pond.z); g.add(water);
