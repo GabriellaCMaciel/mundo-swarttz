@@ -166,15 +166,33 @@ function buildPhone(g) {
   });
   prof.position.set(-0.28, 1.1, 0.55); // fica sobre o espaço vazio da tela (entre o título e as telhas), então não cobre nenhum texto
 
-  const stats = card(2.1, 1.3, 230, (x, w, h) => {
-    rrPath(x, 4, 4, w - 8, h - 8, 36); x.fillStyle = 'rgba(52,38,110,0.82)'; x.fill(); x.lineWidth = 2.5; x.strokeStyle = 'rgba(255,255,255,0.4)'; x.stroke();
-    put(x, 'Atividade', 36, 62, w - 200, 32, 800, PH_FONT, '#fff'); put(x, 'Out 2026', 36, 94, w - 200, 26, 700, PH_MONO, 'rgba(255,255,255,0.7)');
-    rrPath(x, w - 150, 34, 112, 40, 20); x.fillStyle = 'rgba(255,255,255,0.92)'; x.fill(); put(x, 'GitHub', w - 94, 64, 100, 26, 800, PH_FONT, '#5b3bc4', 'center');
-    const g2 = x.createLinearGradient(0, 120, 0, h - 60); g2.addColorStop(0, 'rgba(183,154,245,0.55)'); g2.addColorStop(1, 'rgba(183,154,245,0)');
-    x.beginPath(); x.moveTo(36, h - 60); for (let i = 0; i <= 24; i++) { const px = 36 + i * (w - 72) / 24; x.lineTo(px, 190 - 34 * Math.sin(i * 0.55) - 14 * Math.sin(i * 1.3)); } x.lineTo(w - 36, h - 60); x.closePath(); x.fillStyle = g2; x.fill();
-    x.beginPath(); for (let i = 0; i <= 24; i++) { const px = 36 + i * (w - 72) / 24, py = 190 - 34 * Math.sin(i * 0.55) - 14 * Math.sin(i * 1.3); i ? x.lineTo(px, py) : x.moveTo(px, py); } x.lineWidth = 5; x.strokeStyle = '#d9c8ff'; x.lineJoin = 'round'; x.stroke();
-    for (let i = 0; i < 7; i++) put(x, '0' + (i + 1), 44 + i * (w - 88) / 6, h - 22, 44, 24, 700, PH_MONO, 'rgba(255,255,255,0.7)', 'center');
-  }, 0.85, T); stats.position.set(2.3, 0.0, 0.85); // quase todo para fora da tela: só encosta na borda
+  // Cartão "Atividade": o gráfico mostra as contribuições REAIS do último mês, lidas de data/activity.json.
+  // Esse arquivo é atualizado todo dia por uma rotina do GitHub (.github/workflows/activity.yml), que pergunta ao GitHub quantas contribuições
+  // houve em cada dia. Se o arquivo não carregar, o cartão mostra a linha vazia e um aviso (nunca um gráfico inventado).
+  const activity = { days: null };
+  const drawStats = (x, w, h) => {
+    rrPath(x, 4, 4, w - 8, h - 8, 36); x.fillStyle = 'rgba(52,38,110,0.9)'; x.fill(); x.lineWidth = 2.5; x.strokeStyle = 'rgba(255,255,255,0.4)'; x.stroke();
+    const D = activity.days, total = D ? D.reduce((n, d) => n + d.n, 0) : 0;
+    put(x, 'Atividade', 34, 64, w - 220, 38, 800, PH_FONT, '#fff');
+    put(x, D ? total + ' contribuições em 30 dias' : 'sem dados no momento', 34, 100, w - 68, 26, 700, PH_MONO, 'rgba(255,255,255,0.88)');
+    rrPath(x, w - 156, 32, 122, 44, 22); x.fillStyle = 'rgba(255,255,255,0.94)'; x.fill(); put(x, 'GitHub', w - 95, 63, 100, 26, 800, PH_FONT, '#5b3bc4', 'center');
+    const X0 = 38, X1 = w - 38, Y0 = 140, Y1 = h - 58, n = D ? D.length : 30, max = Math.max(4, ...(D ? D.map(d => d.n) : [0]));
+    const pt = i => [X0 + i * (X1 - X0) / (n - 1), D ? Y1 - (Y1 - Y0) * D[i].n / max : Y1];
+    if (D) { // área suave + linha + pontinhos nos dias com atividade
+      const g2 = x.createLinearGradient(0, Y0, 0, Y1); g2.addColorStop(0, 'rgba(183,154,245,0.6)'); g2.addColorStop(1, 'rgba(183,154,245,0)');
+      x.beginPath(); x.moveTo(X0, Y1); for (let i = 0; i < n; i++) x.lineTo(...pt(i)); x.lineTo(X1, Y1); x.closePath(); x.fillStyle = g2; x.fill();
+      x.beginPath(); for (let i = 0; i < n; i++) i ? x.lineTo(...pt(i)) : x.moveTo(...pt(i)); x.lineWidth = 5; x.strokeStyle = '#d9c8ff'; x.lineJoin = 'round'; x.stroke();
+      for (let i = 0; i < n; i++) if (D[i].n > 0) { const [px, py] = pt(i); x.beginPath(); x.arc(px, py, 5, 0, 6.3); x.fillStyle = '#ffd98a'; x.fill(); }
+    } else { x.beginPath(); x.moveTo(X0, Y1); x.lineTo(X1, Y1); x.lineWidth = 4; x.setLineDash([10, 10]); x.strokeStyle = 'rgba(217,200,255,0.6)'; x.stroke(); x.setLineDash([]); }
+    const dm = d => d.slice(8, 10) + '/' + d.slice(5, 7);                   // "2026-10-17" vira "17/10"
+    put(x, D ? dm(D[0].d) : '', X0, h - 20, 110, 24, 700, PH_MONO, 'rgba(255,255,255,0.85)');
+    put(x, D ? 'hoje' : '', X1, h - 20, 110, 24, 700, PH_MONO, 'rgba(255,255,255,0.85)', 'right');
+  };
+  const stats = card(2.1, 1.3, 230, drawStats, 0.85, T); stats.position.set(1.75, 0.5, 0.85); // sai "de dentro" da tela: cerca de 1/3 do cartão fica sobre o lado direito da tela do celular, o resto para fora (longe dos ícones)
+  fetch('data/activity.json?h=' + Math.floor(Date.now() / 3600000)).then(r => r.ok ? r.json() : null).then(j => { // chegou o arquivo: redesenha o cartão com os dados
+    if (!j || !Array.isArray(j.days) || j.days.length < 2) return;
+    activity.days = j.days; const cv = stats.material.map.image, cx = cv.getContext('2d'); cx.clearRect(0, 0, cv.width, cv.height); drawStats(cx, cv.width, cv.height); stats.material.map.needsUpdate = true;
+  }).catch(() => {});
 
   const chat = card(2.2, 1.1, 230, (x, w, h) => {
     const cg = x.createLinearGradient(0, 0, w, h); cg.addColorStop(0, '#d63a55'); cg.addColorStop(1, '#b82a68');
