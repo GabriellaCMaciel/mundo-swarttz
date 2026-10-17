@@ -133,40 +133,90 @@ function jumpArc(C, a, b, H, u) { // salto de a para b, com altura máxima H; u 
   C.g.position.set(a.x + (b.x - a.x) * u, a.y + (b.y - a.y) * u + 4 * H * u * (1 - u), a.z + (b.z - a.z) * u);
 }
 
+// ---------- as borboletas do balanço: voo irregular (não é mais uma elipse) e susto de verdade ----------
+// Cada borboleta escolhe um ponto (muitas vezes uma flor: os cestos), voa até lá em zigue-zague, paira um instante "bebendo" e escolhe outro.
+// Se um gato chega perto, ela dispara para longe (flee) e sobe. Conceito: velocidade suavizada (a velocidade real persegue a desejada),
+// por isso as curvas são macias; e um pouco de ruído (senos de fases diferentes) tira a regularidade do voo.
+const BAREA = { x0: -7, x1: 6.2, z0: -3, z1: 7, y0: 0.45, y1: 2.7 };
+const FLOWER_SPOTS = [[-3.2, 1.25, 1.0], [-2.35, 1.25, 1.7], [-2.5, 1.5, 2.6], [-1.0, 1.0, 3.8], [1.5, 0.9, 4.4], [2.4, 1.2, 1.2]]; // [x, y, z]: cestos, pilha de livros, florzinhas
+function scareButterfly(b, x, z, t = 0.9) { b.flee = t; const dx = b.g.position.x - x, dz = b.g.position.z - z, d = Math.hypot(dx, dz) || 1; b.fx = dx / d; b.fz = dz / d; }
+function newBfTarget(b) {
+  if (Math.random() < 0.4) { const f = FLOWER_SPOTS[(Math.random() * FLOWER_SPOTS.length) | 0]; b.tx = f[0] + rr(-0.3, 0.3); b.ty = f[1] + 0.35; b.tz = f[2] + rr(-0.3, 0.3); b.sip = true; }
+  else { b.tx = rr(BAREA.x0 + 0.5, BAREA.x1 - 0.5); b.ty = rr(0.7, 2.3); b.tz = rr(BAREA.z0 + 0.5, BAREA.z1 - 0.5); b.sip = false; }
+}
+function updateButterflies(dt, now) {
+  const cats = [PCATS.J.g.position, PCATS.M.g.position];
+  swing.bf.forEach((b, i) => {
+    const p = b.g.position;
+    if (b.vx === undefined) { b.vx = b.vy = b.vz = 0; b.flee = 0; b.hov = 0; b.ph2 = Math.random() * 6.3; newBfTarget(b); }
+    cats.forEach(c => { if (b.flee <= 0 && Math.hypot(c.x - p.x, c.z - p.z) < 1.1 && p.y < c.y + 1.9) scareButterfly(b, c.x, c.z, 0.9); }); // chegou perto: susto
+    let dx, dy, dz, sp;
+    if (b.flee > 0) { b.flee -= dt; dx = b.fx; dz = b.fz; dy = 0.5; sp = 4.2; newBfTarget(b); } // dispara para longe e para cima
+    else if (b.hov > 0) { b.hov -= dt; dx = Math.sin(now * 2 + b.ph2) * 0.2; dz = Math.cos(now * 1.7 + b.ph2) * 0.2; dy = 0; sp = 0.5; if (b.hov <= 0) newBfTarget(b); } // paira na flor
+    else { dx = b.tx - p.x; dy = (b.ty - p.y) * 0.6; dz = b.tz - p.z; const d = Math.hypot(dx, dy, dz) || 1; dx /= d; dy /= d; dz /= d; sp = 1.5; if (d < 0.45) b.hov = b.sip ? rr(0.8, 1.8) : rr(0.1, 0.5); }
+    const nz = Math.sin(now * 3.1 + b.ph2 + i) * 0.7, ny = Math.sin(now * 5.3 + i * 2) * 0.55; // ruído: o zigue-zague
+    const k = Math.min(1, dt * 3.2);
+    b.vx += (dx * sp + nz * dz * 0.8 + nz * 0.5 - b.vx) * k; b.vz += (dz * sp - nz * dx * 0.8 + ny * 0.3 - b.vz) * k; b.vy += (dy * sp + ny - b.vy) * k;
+    p.x += b.vx * dt; p.y += b.vy * dt; p.z += b.vz * dt;
+    p.x = Math.max(BAREA.x0, Math.min(BAREA.x1, p.x)); p.z = Math.max(BAREA.z0, Math.min(BAREA.z1, p.z)); p.y = Math.max(BAREA.y0, Math.min(BAREA.y1, p.y));
+    if (Math.hypot(b.vx, b.vz) > 0.2) b.g.rotation.y = lerpA(b.g.rotation.y, Math.atan2(b.vx, b.vz) + Math.PI, Math.min(1, dt * 6));
+    b.fl = b.flee > 0 ? 2.1 : b.hov > 0 ? 0.55 : 1; // ritmo das asas (usado por updateGarden)
+  });
+}
+
 // ---------- Maria Julietta: caça as borboletas ----------
-function nearestButterfly(C, maxD) {
-  let best = null, bd = maxD;
-  swing.bf.forEach(b => { const d = Math.hypot(b.g.position.x - C.g.position.x, b.g.position.z - C.g.position.z); if (d < bd) { bd = d; best = b; } });
+// Estados: roam (passeia) > stalk (espreita, de olho na borboleta, mirando um pouco à frente dela) > crouch (agacha e balança o bumbum) > pounce (pula, subindo
+// até a altura da borboleta) > recover (cai e olha para cima). A borboleta se assusta ANTES de o pulo chegar (quase sempre), então o pulo erra e a Julietta
+// parte atrás dela (chase). Depois de errar umas vezes ela senta e fica só olhando (watch). Isso mantém a caçada viva e crível.
+function nearestButterfly(C, maxD, maxY = 2.0) {
+  let best = null, bs = maxD;
+  swing.bf.forEach(b => { const q = b.g.position; if (q.y > maxY) return; const d = Math.hypot(q.x - C.g.position.x, q.z - C.g.position.z) + q.y * 0.4; if (d < bs) { bs = d; best = b; } });
   return best;
 }
+function lead(b, t) { return [b.g.position.x + (b.vx || 0) * t, b.g.position.z + (b.vz || 0) * t]; } // onde a borboleta vai estar daqui a t segundos
 function updateJulietta(C, M, dt, now) {
   const p = C.g.position; C.t += dt;
   let amp = 0, rate = 12, tailUp = -0.5, headX = 0, headY = 0, pitch = 0, crouch = 0;
+  const watch = b => { // a cabeça acompanha a borboleta: gira para o lado dela e sobe o focinho se ela está alta
+    const q = b.g.position, rel = Math.atan2(q.x - p.x, q.z - p.z) - C.yaw; headY = Math.max(-0.8, Math.min(0.8, Math.atan2(Math.sin(rel), Math.cos(rel))));
+    headX = -Math.max(0.05, Math.min(0.75, Math.atan2(q.y - 0.5, Math.hypot(q.x - p.x, q.z - p.z) + 0.3)));
+  };
   if (C.state === 'roam') {
-    if (C.t > C.wait) { C.t = 0; const b = nearestButterfly(C, 7); if (b) { C.target = b; C.state = 'stalk'; } else if (Math.random() < 0.3) { C.state = 'zoom'; C.t = 0; C.tx = rr(AREA.x0 + 1, AREA.x1 - 1); C.tz = rr(AREA.z0 + 1, AREA.z1 - 1); } else { C.tx = rr(AREA.x0 + 1, AREA.x1 - 0.5); C.tz = rr(AREA.z0 + 1, AREA.z1 - 0.5); C.wait = rr(1.4, 3.2); } }
+    if (C.t > C.wait) { C.t = 0; const b = nearestButterfly(C, 7); if (b) { C.target = b; C.state = 'stalk'; } else if (Math.random() < 0.25) { C.state = 'zoom'; C.t = 0; [C.tx, C.tz] = freeSpot(); } else { [C.tx, C.tz] = freeSpot(); C.wait = rr(1.2, 2.8); } }
     const d = steer(C, C.tx, C.tz, 2.6, dt); amp = d > 0.3 ? 1 : 0; rate = 13; tailUp = -0.3;
     if (d < 0.4) C.t = Math.max(C.t, C.wait); // chegou: escolhe outra coisa para fazer (esses dois não param quietos)
-  } else if (C.state === 'stalk') { // espreita: anda direto até a borboleta, de cabeça erguida seguindo ela com os olhos
-    const b = C.target, bp = b.g.position;
-    const d = steer(C, bp.x, bp.z, 3.3, dt, 10); amp = 1; rate = 15; headX = -0.45; tailUp = -0.15;
-    const rel = Math.atan2(bp.x - p.x, bp.z - p.z) - C.yaw; headY = Math.max(-0.7, Math.min(0.7, Math.atan2(Math.sin(rel), Math.cos(rel))));
-    if (d < 1.7) { C.state = 'crouch'; C.t = 0; } else if (C.t > 7) { C.state = 'roam'; C.t = 0; C.wait = 0.3; }
+  } else if (C.state === 'stalk') { // espreita: vai atrás da borboleta (mirando à frente dela), de cabeça erguida e corpo baixo
+    const b = C.target, [lx, lz] = lead(b, 0.4);
+    const d = steer(C, lx, lz, 3.4, dt, 10); amp = 1; rate = 15; tailUp = -0.15; crouch = d < 3.2 ? 0.35 : 0; watch(b);
+    if (b.flee > 0 && d < 5) { C.state = 'chase'; C.t = 0; }
+    else if (d < 1.9 && b.g.position.y < 1.9) { C.state = 'crouch'; C.t = 0; }
+    else if (C.t > 8 || b.g.position.y > 2.2) { C.state = 'roam'; C.t = 0; C.wait = 0.3; }
+  } else if (C.state === 'chase') { // a borboleta disparou: corre atrás dela
+    const b = C.target, [lx, lz] = lead(b, 0.5);
+    const d = steer(C, lx, lz, 5.4, dt, 12); amp = 1; rate = 23; tailUp = 0.05; watch(b);
+    if (d < 1.6 && b.g.position.y < 1.9 && b.flee <= 0) { C.state = 'crouch'; C.t = 0; }
+    else if (C.t > 1.9) { C.state = 'watch'; C.t = 0; }
   } else if (C.state === 'crouch') { // agacha e balança o bumbum, de olho na presa
-    crouch = 1; headX = -0.5; amp = 0; tailUp = -0.1; const bp = C.target.g.position;
-    C.yaw = lerpA(C.yaw, Math.atan2(bp.x - p.x, bp.z - p.z), Math.min(1, 12 * dt));
+    crouch = 1; amp = 0; tailUp = -0.1; const b = C.target; watch(b); headX = Math.min(headX, -0.3);
+    const bp = b.g.position; C.yaw = lerpA(C.yaw, Math.atan2(bp.x - p.x, bp.z - p.z), Math.min(1, 12 * dt));
     C.g.position.x += Math.sin(now * 34) * 0.002;
-    if (C.t > 0.55) { // PULO: mira onde a borboleta está agora (e ela vai se mexer, então às vezes erra)
-      C.state = 'pounce'; C.t = 0; C.from = p.clone(); const dx = bp.x - p.x, dz = bp.z - p.z, d = Math.hypot(dx, dz), k = Math.min(d, 2.4) / (d || 1);
-      C.to = new THREE.Vector3(p.x + dx * k, 0, p.z + dz * k); C.H = Math.max(0.5, Math.min(1.4, bp.y * 0.75));
+    if (C.t > 0.5) { // PULO: mira onde a borboleta VAI estar, e sobe até a altura dela
+      C.state = 'pounce'; C.t = 0; C.from = p.clone(); const [lx, lz] = lead(b, 0.5), dx = lx - p.x, dz = lz - p.z, d = Math.hypot(dx, dz), k = Math.min(d, 2.5) / (d || 1);
+      C.to = new THREE.Vector3(p.x + dx * k, 0, p.z + dz * k); C.H = Math.max(0.45, Math.min(1.5, bp.y * 0.85)); C.pt = 0; landOk(C);
     }
   } else if (C.state === 'pounce') {
-    const u = Math.min(1, C.t / 0.62); jumpArc(C, C.from, C.to, C.H, u); amp = 0; pitch = -0.7 + u * 1.2; headX = -0.3;
+    const u = Math.min(1, C.t / 0.6); jumpArc(C, C.from, C.to, C.H, u); amp = 0; pitch = -0.6 + u * 1.1; headX = -0.3; watch(C.target); headX = Math.min(headX, -0.2);
     C.legs[0].rotation.x = C.legs[1].rotation.x = -1.1 * (1 - u * 0.4); // patinhas da frente esticadas
-    if (u >= 1) { C.state = 'recover'; C.t = 0; C.target.up = 1.3; /* a borboleta se assusta e sobe */ avoid(C); C.legs[0].rotation.x = C.legs[1].rotation.x = 0; }
-  } else if (C.state === 'recover') { // aterrissa, balança a cabeça, e quase sempre tenta de novo
-    headY = Math.sin(now * 22) * 0.35 * Math.max(0, 1 - C.t / 0.5); amp = 0;
-    if (C.t > 0.7) { C.state = 'roam'; C.t = 0; C.wait = Math.random() < 0.7 ? 0.05 : 1.4; }
-  } else if (C.state === 'zoom') { // corrida maluca: foge do Mocca (ou só está animada)
+    const b = C.target;
+    if (u > 0.5 && !C.scared && Math.hypot(b.g.position.x - p.x, b.g.position.z - p.z) < 1.7) { C.scared = true; scareButterfly(b, p.x, p.z, 1.1); } // a borboleta percebe o bote no último instante e escapa
+    if (u >= 1) { C.state = 'recover'; C.t = 0; C.scared = false; C.miss = (C.miss || 0) + 1; avoid(C); C.legs[0].rotation.x = C.legs[1].rotation.x = 0; }
+  } else if (C.state === 'recover') { // aterrissa, olha para cima acompanhando a fuga e quase sempre corre atrás dela
+    watch(C.target); headX = Math.min(headX, -0.25); amp = 0; crouch = 0.3 * Math.max(0, 1 - C.t / 0.4);
+    if (C.t > 0.7) { if ((C.miss || 0) >= 4) { C.state = 'watch'; C.t = 0; } else if (Math.hypot(C.target.g.position.x - p.x, C.target.g.position.z - p.z) < 5) { C.state = 'chase'; C.t = 0; } else { C.state = 'roam'; C.t = 0; C.wait = 0.2; } }
+  } else if (C.state === 'watch') { // senta e fica olhando as borboletas (ela cansou um pouquinho)
+    crouch = 0.55; amp = 0; tailUp = -0.8; const b = nearestButterfly(C, 12, 9) || C.target; if (b) watch(b);
+    if (C.t > 1.2) { C.state = 'roam'; C.t = 0; C.wait = 0.2; C.miss = 0; }
+  } else if (C.state === 'zoom') { // corrida maluca: só está animada
     const d = steer(C, C.tx, C.tz, 5.4, dt, 12); amp = 1; rate = 22; tailUp = 0.1;
     if (d < 0.5 || C.t > 1.8) { C.state = 'roam'; C.t = 0; C.wait = 0.2; }
   }
@@ -316,6 +366,7 @@ function updatePlayCats(now, dt) {
   if (calm) { return; } // "reduzir movimento": os bichinhos ficam onde estão
   const { J, M, B } = PCATS;
   if (!J.init) { J.init = true; J.wait = 0.5; J.tx = J.g.position.x; J.tz = J.g.position.z; J.blocked = 0; M.init = true; M.state = 'follow'; M.tx = M.g.position.x; M.tz = M.g.position.z; M.blocked = 0; }
+  updateButterflies(dt, now);
   updateJulietta(J, M, dt, now); updateMocca(M, J, B, dt, now); updateBird(B, M, dt, now);
   // DESTRAVAR: se um deles "anda" há mais de 1 s sem sair do lugar (preso numa quina), esquece o que estava fazendo e escolhe outra coisa
   if (!['roam', 'stalk', 'chase', 'zoom'].includes(J.state)) J.blocked = 0; if (!['follow', 'stalk', 'toTree'].includes(M.state)) M.blocked = 0; // só conta quando ele estava mesmo andando
@@ -323,6 +374,5 @@ function updatePlayCats(now, dt) {
   if (M.blocked > 1) { M.blocked = 0; M.t = 0; if (M.state === 'toTree' || M.state === 'stalk') M.state = 'follow'; B.threat = false; }
   // se os dois ficarem colados, um empurra o outro de leve (nada de gato dentro de gato)
   if (M.g.position.y < 0.3 && J.g.position.y < 0.3) { const dx = M.g.position.x - J.g.position.x, dz = M.g.position.z - J.g.position.z, d = Math.hypot(dx, dz); if (d < 0.8 && d > 0.001) { const k = (0.8 - d) * 0.5; M.g.position.x += dx / d * k; M.g.position.z += dz / d * k; J.g.position.x -= dx / d * k; J.g.position.z -= dz / d * k; avoid(M); avoid(J); } }
-  swing.bf.forEach(b => { if (b.up > 0) b.up = Math.max(0, b.up - dt * 0.9); });
 }
 buildPlayCats();
