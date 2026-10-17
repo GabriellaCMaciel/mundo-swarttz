@@ -8,7 +8,7 @@ const $ = id => document.getElementById(id);
 const hud = {
   hint: $('hint'), skip: $('skip'), brand: $('brand'), title: $('title'), card: $('card'),
   cardTitle: $('cardTitle'), cardText: $('cardText'), open: $('open'), joy: $('joy'),
-  knob: $('knob'), acts: $('acts'), btnRun: $('btnRun'), btnJump: $('btnJump'), keys: $('keys'), flash: $('flash'), panel: $('panel'), sheet: $('sheet')
+  knob: $('knob'), acts: $('acts'), btnRun: $('btnRun'), btnJump: $('btnJump'), flash: $('flash'), panel: $('panel'), sheet: $('sheet')
 };
 
 // Aviso para leitor de tela: escreve numa região "aria-live" invisível (#srLive); o leitor lê o texto novo em voz alta, sem tirar o foco de onde a pessoa está.
@@ -152,8 +152,8 @@ function drawTerminal(typed, now) {
   // Barra de cima: roxa no começo; depois que a linha "ALERTA" aparece, fica vermelha e pisca devagar (1x por segundo, seguro para quem é sensível a luzes piscando)
   let alert = false, acc = 0;
   for (const [text] of terminalLines) { if (text.startsWith('ALERTA') && typed > acc) alert = true; acc += text.length + PAUSE; }
-  const granted = typed > totalChars - 30; // chegou no "acesso concedido": a barra volta a ser roxa
-  const red = alert && !granted, on = !red || calm || Math.floor(now) % 2 === 0;
+  const granted = typed > totalChars - 30; // chegou no "acesso concedido" (aparece a logo, mas o notebook CONTINUA vermelho: a invasão só termina quando a câmera entra no mundo)
+  const red = alert, on = !red || calm || Math.floor(now) % 2 === 0;
   tctx.fillStyle = '#0b0613'; tctx.fillRect(0, 0, 610, 400);
   tctx.fillStyle = red ? (on ? '#c4143c' : '#7a0d26') : '#7b3fe4'; tctx.fillRect(0, 0, 610, 34);
   tctx.font = '700 18px "JetBrains Mono", monospace';
@@ -218,9 +218,10 @@ function updateIntro(now, dt) {
   } else if (phase === 'typing') {
     const n = Math.floor(e * CPS);
     const red = drawTerminal(n, now);
-    glow.color.lerp(red ? glowRed : glowViolet, Math.min(1, dt * 6)); // a luz do notebook fica vermelha durante a invasão e volta ao roxo no fim
+    glow.color.lerp(red ? glowRed : glowViolet, Math.min(1, dt * 6)); // a luz do notebook fica vermelha desde o alerta e assim continua até o fim da animação
     if (n > totalChars + 45) go('diving');                   // segura ~2 s no "acesso concedido"
   } else if (phase === 'diving') {
+    drawTerminal(totalChars + 45, now); glow.color.lerp(glowRed, Math.min(1, dt * 6)); // mergulhando: a tela segue vermelha e piscando
     const k = ease(Math.min(e / T_DIVE, 1));
     camera.position.lerpVectors(camOpen, camDive, k);
     lookNow.lerpVectors(lookOpen, lookDive, k);
