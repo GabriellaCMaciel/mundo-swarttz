@@ -140,7 +140,7 @@ window.addEventListener('blur', resetInput);                                  //
 document.addEventListener('visibilitychange', () => { if (document.hidden) resetInput(); }); // a aba foi para o segundo plano
 window.addEventListener('contextmenu', () => { if (!touch) resetInput(); });   // menu do botão direito: o navegador engole os keyup. (No toque, um segurar longo não pode soltar o joystick.)
 hud.btnRun.setAttribute('aria-pressed', runLock ? 'true' : 'false');
-hud.btnRun.addEventListener('click', () => setRun(!runLock));
+hud.btnRun.addEventListener('click', () => { setRun(!runLock); announce(runLock ? 'Correr sempre: ligado.' : 'Correr sempre: desligado.'); }); // o leitor de tela avisa o novo estado
 hud.btnJump.addEventListener('pointerdown', e => { e.preventDefault(); jump(); }); // pointerdown: o pulo sai no instante do toque, sem esperar o "click"
 hud.btnJump.addEventListener('click', e => { if (e.detail === 0) jump(); });       // detail 0 = veio do teclado (Enter/Espaço no botão em foco)
 

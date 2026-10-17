@@ -43,7 +43,8 @@ body{margin:0;background:var(--ink);color:var(--paper);font-family:var(--font-di
 @media (max-width:640px){.minimap{top:calc(var(--st) + 122px);border-width:2px}}
 .joy{left:var(--sl);bottom:var(--sb);width:124px;height:124px;border-radius:50%;border:2px solid rgba(183,154,245,.55);background:rgba(123,63,228,.18);touch-action:none}
 .acts{right:var(--sr);bottom:var(--sb);display:flex;gap:10px}
-.act{min-width:88px;min-height:48px;font-size:13px}
+.act{width:60px;height:60px;min-width:0;min-height:0;padding:0;border-radius:50%;display:grid;place-items:center;background:rgba(11,6,19,.78);touch-action:manipulation} /* botões redondos só com o desenho (o nome vem de aria-label e title) */
+.act svg{display:block;pointer-events:none}
 .act[aria-pressed="true"]{background:var(--gold);color:var(--ink)}
 .knob{position:absolute;left:50%;top:50%;width:52px;height:52px;border-radius:50%;background:var(--gold);transform:translate(-50%,-50%)}
 .flash{position:fixed;inset:0;pointer-events:none;opacity:0;background:radial-gradient(circle,#fff 0%,var(--lilac) 55%,var(--violet) 100%)}
