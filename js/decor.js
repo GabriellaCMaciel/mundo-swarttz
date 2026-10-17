@@ -31,11 +31,7 @@ function buildDecor() {
   spots.push({ x: 0, z: 6, r: 6 }, { x: POND.x, z: POND.z, r: POND.r + 2.5 }, { x: CHERRY.x, z: CHERRY.z, r: 7 }, { x: SWING.x + 3, z: SWING.z, r: 10 }, { x: YARD.cx, z: YARD.cz, r: YARD.r }); // ponto de partida, lagoa, balanço e o quintal da casa das cartas
   // Onde NÃO nascem árvores (só moitas baixas): no corredor entre o ponto de partida e a câmera, e na frente da lagoa
   const noTree = (x, z) => (Math.abs(x) < 9 && z > -4) || (Math.abs(x - POND.x) < POND.r + 14 && z > POND.z + 2 && z < POND.z + 20) || Math.hypot(x - YARD.cx, z - YARD.cz) < YARD.r + 6;
-  const trails = zones.map(z => ({ len: Math.hypot(z.pos[0], z.pos[2]), x: z.pos[0], z: z.pos[2], r: zr(z) }));
-  const onTrail = (px, pz, w) => trails.some(t => { // distância do ponto até o segmento que vai do centro até a zona
-    const k = Math.max(0, Math.min(1, (px * t.x + pz * t.z) / (t.len * t.len)));
-    return Math.hypot(px - t.x * k, pz - t.z * k) < w;
-  });
+  const onTrail = (px, pz, w) => distToTrails(px, pz) < w; // as trilhas são curvas (js/trails.js): a distância é até o traçado de verdade
   const free = (x, z, w) => !spots.some(s => Math.hypot(x - s.x, z - s.z) < s.r) && !onTrail(x, z, w);
   // Quanto mais perto de uma zona, mais enfeitado (o jardim "nasce" em volta das construções)
   const nearness = (x, z) => Math.min(...zones.map(zn => Math.hypot(x - zn.pos[0], z - zn.pos[2]) - zr(zn)));
@@ -55,13 +51,12 @@ function buildDecor() {
     } else veg.groundBush(x, z, 0.5 + rnd() * 0.5, 6, dom);
   }
 
-  // Postes de luz dos dois lados de cada trilha, ligados por fios de luzinhas: assim as zonas ficam "interligadas"
-  zones.forEach(z => {
-    const d = Math.hypot(z.pos[0], z.pos[2]), ux = z.pos[0] / d, uz = z.pos[2] / d, R = zr(z);
+  // Postes de luz dos dois lados de cada trilha (acompanhando as curvas), ligados por fios de luzinhas: assim as zonas ficam "interligadas"
+  TRAILS.filter(tr => tr.zone).forEach(tr => {
     [-1, 1].forEach(side => {
       let prev = null;
-      for (let t = 9; t < d - R - 2.5; t += 8.5) {
-        const x = ux * t - uz * side * 3.1, zz = uz * t + ux * side * 3.1, h = 3.2;
+      for (let s = 9; s < tr.len - 1; s += 8.5) {
+        const q = trailAt(tr, s), x = q.x + q.nx * side * 3.1, zz = q.z + q.nz * side * 3.1, h = 3.2;
         veg.post(x, zz, h); lampPos.push(x, h + 0.2, zz);
         if (prev) lights.swag(prev, { x, y: h, z: zz }, 0.9, 16);
         prev = { x, y: h, z: zz };

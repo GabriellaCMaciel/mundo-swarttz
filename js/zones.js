@@ -64,7 +64,6 @@ const props = {
     note.position.set(1.55, 3.0, 0.12); note.rotation.z = -0.05; g.add(note);
     const nt = new THREE.Mesh(new THREE.PlaneGeometry(0.8, 0.28), new THREE.MeshBasicMaterial({ color: 0xf2b84b, transparent: true, opacity: 0.85, side: THREE.DoubleSide }));
     nt.position.set(1.55, 4.28, 0.14); nt.rotation.z = 0.1; g.add(nt);
-    buildWorldMap(g); // segunda tábua, ao lado: o mapa do mundo com o X de onde você está (js/worldmap.js)
   },
   atelie(g) { // cavalete com pintura, bastidor de bordado e novelos de lã
     box(2.8, 3.4, 0.14, 0xf6ecd9, 0, 2.7, 0, g);
@@ -149,12 +148,6 @@ function buildZones() {
     enableShadows(g);
     g.userData.zoneId = z.id; z.group = g; // o clique (js/pick.js) descobre a zona subindo pelos pais até achar este id
     z.built = true; z.light = light; z.label = label; z.r = R;
-
-    // "Fio de bordado": trilha pontilhada colorida que leva do centro até a zona
-    const d = Math.hypot(z.pos[0], z.pos[2]), ux = z.pos[0] / d, uz = z.pos[2] / d;
-    const dashes = []; // todos os tracinhos da trilha viram um único objeto
-    for (let t = 6.5; t < d - R - 1.1; t += 1.7) dashes.push({ x: ux * t, y: 0.06, z: uz * t, sx: 0.9, sy: 0.06, sz: 0.2, ry: -Math.atan2(uz, ux), c: z.color });
-    if (dashes.length) world.add(instanced(new THREE.BoxGeometry(1, 1, 1), new THREE.MeshBasicMaterial({ color: 0xffffff }), dashes));
   });
   const lk = makeLabel('Kiara', 0xf08a3c, 0.55); lk.position.y = 2.3; kiara.add(lk);
   const lm = makeLabel('Maria Marta', 0xf6ecd9, 0.6); lm.position.y = 2.3; maria.add(lm);
@@ -164,7 +157,7 @@ const catLabels = []; // [etiqueta, gata]: as etiquetas somem quando estão long
 // Espera as fontes carregarem (no máximo 2,5 s) para as etiquetas e o celular saírem bonitos.
 // document.fonts.load() é preciso porque uma fonte só é baixada quando alguém a pede: a Nunito (celular) só é usada dentro de textura de canvas.
 Promise.race([
-  document.fonts && document.fonts.load ? Promise.all([document.fonts.load('800 24px Nunito'), document.fonts.load('600 24px Nunito'), document.fonts.load('800 24px Syne')]).then(() => document.fonts.ready) : Promise.resolve(),
+  document.fonts && document.fonts.load ? Promise.all([document.fonts.load('800 24px Nunito'), document.fonts.load('600 24px Nunito'), document.fonts.load('800 24px Syne'), document.fonts.load('700 24px Caveat')]).then(() => document.fonts.ready) : Promise.resolve(),
   new Promise(r => setTimeout(r, 2500))
 ]).then(buildZones);
 
