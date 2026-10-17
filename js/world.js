@@ -165,8 +165,8 @@ function buildCat(baseColor, patchColor, opts = {}) {
 function enableShadows(obj) { obj.traverse(o => { if (o.isMesh && !o.userData.flat) o.castShadow = true; }); }
 
 const player = buildPlayer(); player.position.set(0, 0, 6); world.add(player); enableShadows(player);
-const kiara = buildCat(0xf6ecd9, 0xf08a3c); kiara.position.set(3, 0, 8); world.add(kiara); enableShadows(kiara);   // branca e laranja, pestinha carente
-const maria = buildCat(0xf6ecd9, null); maria.position.set(-3.2, 0, -24.5); maria.rotation.y = 0.6; world.add(maria); enableShadows(maria); // branca, vive na biblioteca
+const kiara = buildCat(0xf6ecd9, 0xf08a3c, { eye: 0xe0a030 }); kiara.position.set(3, 0, 8); world.add(kiara); enableShadows(kiara);   // branca e laranja, pestinha carente (íris cor de mel)
+const maria = buildCat(0xf6ecd9, null, { eye: 0xf5cf1f }); maria.position.set(-3.2, 0, -24.5); maria.rotation.y = 0.6; world.add(maria); enableShadows(maria); // branca, vive na biblioteca (íris amarela)
 
 // Rastro de faíscas atrás de quem anda (um "pool" de brilhos que vão sendo reaproveitados)
 const sparks = [];
