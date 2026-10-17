@@ -167,3 +167,5 @@ body{margin:0;background:var(--ink);color:var(--paper);font-family:var(--font-di
 }
 /* telas estreitas: o título desce um pouco para não ficar por baixo do botão "pular intro" (canto superior direito) */
 @media (max-width:520px){.title{top:calc(var(--st) + 58px)}.hint{top:calc(var(--st) + 160px)}}
+/* aba em segundo plano ou algo aberto por cima do mundo: tudo que se mexe em CSS fica parado (js/ui.js > syncLoop) */
+html.paused *,html.paused *::before,html.paused *::after{animation-play-state:paused!important}

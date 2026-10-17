@@ -216,7 +216,7 @@ function openMail() {
   mailUi.isOpen = true; mailUi.cur = Math.min(mailUi.cur, letters.length - 1);
   abortLetter(); mailUi.root.hidden = false; fit(); layout();
   mailUi.root.focus({ preventScroll: true }); // o foco fica na tela (não em um botão), para Enter abrir a carta
-  setMailHint(false);
+  setMailHint(false); syncLoop();
 }
 function abortLetter() { // para qualquer animação e deixa tudo no estado "fechado" (usado ao abrir e ao fechar a tela)
   cancelAnimationFrame(anim.raf); anim.dir = 0; anim.ts = 0;
@@ -225,7 +225,7 @@ function abortLetter() { // para qualquer animação e deixa tudo no estado "fec
   mailUi.big.hidden = true; mailUi.root.classList.remove('opening', 'reading');
   mailUi.state = 'closed'; mailUi.reading = false; mailUi.lock = false;
 }
-function closeMail() { abortLetter(); mailUi.isOpen = false; mailUi.root.hidden = true; panelOpen = false; }
+function closeMail() { abortLetter(); mailUi.isOpen = false; mailUi.root.hidden = true; panelOpen = false; syncLoop(); }
 
 // Esc volta da carta e, depois, fecha a tela; setas trocam de carta; Enter/Espaço abrem a carta do meio
 function mailKey(e) {

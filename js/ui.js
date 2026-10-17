@@ -35,7 +35,7 @@ function bookHtml(b) {
 let panelOpen = false;
 function showSheet(html) { // coloca o conteúdo na folha do painel e leva o foco para o botão de fechar
   hud.sheet.innerHTML = '<button class="close" type="button" aria-label="Fechar">✕</button>' + html;
-  hud.panel.hidden = false;
+  hud.panel.hidden = false; syncLoop();
   document.getElementById('panelHint').textContent = touch ? 'toque fora do painel ou no ✕ para fechar' : 'clique fora do painel, ✕ ou Esc para fechar'; // instrução de "algo aberto": canto inferior direito
   hud.sheet.querySelector('.close').focus();
 }
@@ -50,7 +50,7 @@ function openBook(b) { // chamado também pelo clique do mouse em um livro 3D (l
   if (panelOpen) return;
   panelOpen = true; showSheet(bookHtml(b));
 }
-function closePanel() { panelOpen = false; hud.panel.hidden = true; if (mailUi.isOpen) closeMail(); }
+function closePanel() { panelOpen = false; hud.panel.hidden = true; if (mailUi.isOpen) closeMail(); syncLoop(); }
 hud.sheet.addEventListener('click', e => {
   if (e.target.closest('.close')) return closePanel();
   const bk = e.target.closest('[data-book]');
@@ -184,12 +184,24 @@ function updateWorld(dt, now) {
   camera.lookAt(lookNow);
 }
 
-function frame() {
+// ===== 9. Economia de energia: o loop só roda quando alguém pode VER o mundo =====
+// Com um painel (ou a tela dos Correios) aberto, o mundo fica atrás de um fundo escuro e parado: não tem por que calcular gatos, borboletas, pétalas
+// e sombras 60 vezes por segundo. Na aba em segundo plano, idem. Então o loop é PARADO (cancelAnimationFrame) e retomado quando volta a ser útil.
+// Conceito: requestAnimationFrame agenda UM quadro; quem não agenda o próximo, para tudo. O último quadro desenhado continua na tela.
+let rafId = 0;
+function step() {
   const dt = Math.min(clock.getDelta(), 0.05);
   const now = clock.elapsedTime;
   if (phase === 'world') updateWorld(dt, now); else updateIntro(now, dt);
-  // Com a tela das cartas aberta o mundo 3D fica escondido atrás dela: não desenhar poupa a placa de vídeo e deixa a animação da carta fluida
-  if (!mailUi.isOpen) renderer.render(scene, camera);
-  requestAnimationFrame(frame);
+  renderer.render(scene, camera);
 }
-requestAnimationFrame(frame);
+function loop() { step(); rafId = requestAnimationFrame(loop); }
+function syncLoop() { // chame sempre que algo mudar: painel abriu/fechou, aba ficou visível/escondida
+  const hidden = document.hidden, covered = phase === 'world' && (panelOpen || mailUi.isOpen);
+  document.documentElement.classList.toggle('paused', hidden); // aba escondida: pausa também as animações de CSS (a tela dos Correios, aberta, continua animada)
+  if (!hidden && !covered && !rafId) { clock.oldTime = performance.now(); rafId = requestAnimationFrame(loop); } // oldTime: o tempo parado não vira um "pulo" na animação
+  else if ((hidden || covered) && rafId) { cancelAnimationFrame(rafId); rafId = 0; }
+}
+document.addEventListener('visibilitychange', syncLoop);
+window.addEventListener('resize', () => { if (!rafId && !document.hidden) renderer.render(scene, camera); }); // redimensionar apaga o canvas: redesenha uma vez, mesmo parado
+syncLoop();
