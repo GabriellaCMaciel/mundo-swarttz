@@ -61,7 +61,7 @@ function buildPlayCats() {
   mk(new THREE.BoxGeometry(0.12, 0.02, 0.24), lam(0x3f86d8), 0, 0.0, -0.32).rotation.x = 0.2;                               // rabinho
   const wings = [-1, 1].map(s => { const w = new THREE.Group(); w.position.set(s * 0.14, 0.07, 0.02); bird.add(w); mk(new THREE.BoxGeometry(0.34, 0.025, 0.2), lam(0x3f86d8), s * 0.17, 0, 0, w); return { w, s }; });
   bird.scale.setScalar(1.35); bird.position.set(TRUNK.x - 1.5, 7.4, TRUNK.z + 3); g.add(bird); bird.traverse(o => { if (o.isMesh) o.userData.flat = true; });
-  const B = { g: bird, wings, th: 0, mode: 'orbit', t: 0, orbitDur: 4.5, px: bird.position.x, py: bird.position.y, pz: bird.position.z, from: new THREE.Vector3(), toId: 'top', gt: 0, gd: 1, lift: 1, perchId: 'top', kind: 'top', pt: 0, threat: false, lastLow: null };
+  const B = { g: bird, wings, th: 0, mode: 'orbit', t: 0, orbitDur: 6, px: bird.position.x, py: bird.position.y, pz: bird.position.z, from: new THREE.Vector3(), toId: 'top', gt: 0, gd: 1, lift: 1, perchId: 'top', kind: 'top', pt: 0, threat: false, lastLow: null };
 
   PCATS.J = J; PCATS.M = M; PCATS.B = B; PCATS.ready = true;
 }
@@ -234,6 +234,7 @@ const PERCH = {
   seat:   { kind: 'low', dyn: true },                                    // na tábua do balanço (que balança!)
   top:    { kind: 'top', x: 3.0, y: 6.92, z: 2.55 }                      // ponta do galhinho alto
 };
+const ORBIT = { x: -0.8, y: 3.3, z: 1.6, rx: 4.4, rz: 2.6 }; // o "oito" do voo baixo do passarinho
 const _pp = new THREE.Vector3();
 function perchPos(id, out) { // onde está o poleiro AGORA (o assento se mexe junto com o pêndulo: ele gira em volta do pivô a 5,3 de altura)
   const P = PERCH[id];
@@ -258,16 +259,23 @@ function updateMocca(C, J, B, dt, now) {
     headX = -Math.max(0.1, Math.min(0.7, Math.atan2(bp.y - 0.8, Math.hypot(bp.x - p.x, bp.z - p.z) + 0.3)));
   };
   if (C.state === 'follow') { // anda pelo chão sob o passarinho, de olho nele
-    const tx = Math.max(AREA.x0 + 0.5, Math.min(AREA.x1 - 0.5, bp.x - 0.5)), tz = Math.max(AREA.z0 + 0.5, Math.min(AREA.z1 - 0.5, bp.z + 0.8));
-    const d = steer(C, tx, tz, 3.1, dt, 9); amp = d > 0.5 ? 1 : 0; rate = 16; tailUp = -0.2; watchBird();
+    C.hopCool = (C.hopCool || 0) - dt;
+    const tx = Math.max(AREA.x0 + 0.5, Math.min(AREA.x1 - 0.5, bp.x)), tz = Math.max(AREA.z0 + 0.5, Math.min(AREA.z1 - 0.5, bp.z)); // corre exatamente por baixo do passarinho
+    const d = steer(C, tx, tz, 3.6, dt, 10); amp = d > 0.5 ? 1 : 0; rate = 17; tailUp = -0.2; crouch = 0.25; watchBird(); C.tail.rotation.z += Math.sin(now * 16) * 0.1;
+    const dB = Math.hypot(bp.x - p.x, bp.z - p.z);
+    if (!perched && dB < 2.6 && bp.y < 4.6 && C.hopCool <= 0) { C.state = 'hop'; C.t = 0; C.hopCool = rr(2.2, 4); C.from = p.clone(); const hl = Math.max(0.3, Math.min(1.2, dB)), dx = (bp.x - p.x) / (dB || 1), dz = (bp.z - p.z) / (dB || 1); C.to = new THREE.Vector3(p.x + dx * hl, 0, p.z + dz * hl); landOk(C); C.yaw = Math.atan2(dx, dz); }
     if (lowPerch && !B.threat && B.pt > 0.7) { C.state = 'stalk'; C.t = 0; }
     else if (topPerch && !B.threat && B.pt > 0.5) { C.state = 'toTree'; C.t = 0; }
+  } else if (C.state === 'hop') { // salto curto para o alto, de patinhas esticadas, tentando abocanhar o passarinho que passa voando
+    const u = Math.min(1, C.t / 0.55); jumpArc(C, C.from, C.to, 0.95, u); pitch = -0.9 * Math.sin(Math.PI * u); amp = 0; watchBird(); headX = Math.min(headX, -0.5);
+    C.legs[0].rotation.x = C.legs[1].rotation.x = -1.3 * Math.sin(Math.PI * u);
+    if (u >= 1) { C.state = 'follow'; C.t = 0; avoid(C); C.legs[0].rotation.x = C.legs[1].rotation.x = 0; }
   } else if (C.state === 'stalk') { // espreita: vai devagar, baixinho, até o ponto de onde dá para pular
     if (!lowPerch || B.threat) { C.state = 'follow'; C.t = 0; }
     else {
       const px = bp.x, pz = bp.z, dx = p.x - px, dz = p.z - pz, dd = Math.hypot(dx, dz) || 1; // ponto de salto: 1,9 do poleiro, do lado de onde o Mocca vem
       const lx = Math.max(AREA.x0 + 0.3, Math.min(AREA.x1 - 0.2, px + dx / dd * 1.9)), lz = Math.max(AREA.z0 + 0.3, Math.min(AREA.z1 - 0.2, pz + dz / dd * 1.9));
-      const d = steer(C, lx, lz, 2.0, dt, 10); amp = d > 0.4 ? 0.7 : 0; rate = 11; tailUp = -0.05; crouch = 0.45; watchBird();
+      const d = steer(C, lx, lz, 2.0, dt, 10); amp = d > 0.4 ? 0.7 : 0; rate = 11; tailUp = -0.05; crouch = 0.45; watchBird(); C.tail.rotation.z += Math.sin(now * 16) * 0.12; // a pontinha do rabo treme: instinto de caça
       if (d < 0.35 || C.t > 7) { C.state = 'crouchB'; C.t = 0; }
     }
   } else if (C.state === 'crouchB') { // agacha, balança o bumbum e fixa o olhar
@@ -312,7 +320,7 @@ function updateMocca(C, J, B, dt, now) {
   }
   gait(C, amp, rate, dt, now, tailUp, 0.13 * crouch); look(C, headY, headX, dt);
   if (C.state !== 'reach') { C.legs[1].rotation.x *= 0.8; }
-  const flying = C.state === 'leap' || C.state === 'dismount' || C.state === 'pounceB' || C.state === 'climb' || C.state === 'descend' || C.state === 'slip' || C.state === 'reach';
+  const flying = C.state === 'hop' || C.state === 'leap' || C.state === 'dismount' || C.state === 'pounceB' || C.state === 'climb' || C.state === 'descend' || C.state === 'slip' || C.state === 'reach';
   if (flying) { C.g.rotation.set(pitch, yaw, 0); C.pitch = pitch; } else setPose(C, dt, pitch);
 }
 
@@ -327,13 +335,14 @@ function pickLow(B) { // escolhe um poleiro baixo, diferente do último e, de pr
 function birdGlideTo(B, id, dur, lift) { B.from.set(B.px, B.py, B.pz); B.toId = id; B.gt = 0; B.gd = dur; B.lift = lift; B.mode = 'glide'; B.threat = false; }
 function updateBird(B, M, dt, now) {
   B.t += dt;
-  const cx = TRUNK.x - 1.4, cy = 7.2, cz = TRUNK.z + 0.8;
-  const orbit = th => ({ x: cx + Math.cos(th) * 3.4, y: cy + Math.sin(th * 2) * 0.7, z: cz + Math.sin(th) * 2.3 }); // um "oito" preguiçoso em volta da copa
+  // O passarinho voa BAIXO, em oito, por cima de onde o Mocca anda (alturas de 2,2 a 4,4): assim dá para ver o Mocca correndo atrás dele e dando saltos para pegá-lo
+  const cx = ORBIT.x, cy = ORBIT.y, cz = ORBIT.z;
+  const orbit = th => ({ x: cx + Math.cos(th) * ORBIT.rx, y: cy + Math.sin(th * 2) * 1.0, z: cz + Math.sin(th) * ORBIT.rz });
   let nx = B.px, ny = B.py, nz = B.pz, wings = 1, fast = false, lean = 0, face = null;
   if (B.mode === 'orbit') {
     B.th += dt * 0.6; const want = orbit(B.th), k = Math.min(1, 2.4 * dt);
     nx += (want.x - nx) * k; ny += (want.y - ny) * k; nz += (want.z - nz) * k;
-    if (B.t > B.orbitDur) birdGlideTo(B, pickLow(B), 2.1, 1.1);
+    if (B.t > B.orbitDur) birdGlideTo(B, pickLow(B), 2.1, 0.8);
   } else if (B.mode === 'glide') {
     B.gt += dt; const u = Math.min(1, B.gt / B.gd), e = easeSmooth(u); perchPos(B.toId, _pp);
     const side = Math.sin(Math.PI * 2 * u) * 0.55 * (B.toId === 'top' ? 0.4 : 1); // um S no caminho: voo de passarinho nunca é reto
@@ -345,7 +354,7 @@ function updateBird(B, M, dt, now) {
     const pk = Math.max(0, Math.sin(now * 2.7 + 1)); lean = Math.pow(pk, 10) * 0.5; // de vez em quando bica o poleiro
     face = B.kind === 'low' ? Math.atan2(M.g.position.x - nx, M.g.position.z - nz) : Math.sin(now * 0.7) * 0.8 + 0.2; // baixo: vigia o gato; alto: olha em volta
     if (B.kind === 'low' && (B.threat || B.pt > 16)) { birdGlideTo(B, 'top', 1.5, 1.6); B.threat = false; }
-    else if (B.kind === 'top' && (B.threat || B.pt > 14)) { B.mode = 'orbit'; B.t = 0; B.orbitDur = rr(2.8, 4); B.th = Math.atan2(nz - cz, nx - cx); B.threat = false; }
+    else if (B.kind === 'top' && (B.threat || B.pt > 14)) { B.mode = 'orbit'; B.t = 0; B.orbitDur = rr(5, 7); B.th = Math.atan2(nz - cz, nx - cx); B.threat = false; }
   }
   const vx = (nx - B.px) / Math.max(dt, 0.001), vz = (nz - B.pz) / Math.max(dt, 0.001);
   B.px = nx; B.py = ny; B.pz = nz; B.g.position.set(nx, ny + (wings ? Math.sin(now * 9) * 0.04 : 0), nz);
