@@ -205,6 +205,7 @@ function openMail() {
   mailUi.isOpen = true; mailUi.cur = Math.min(mailUi.cur, letters.length - 1);
   abortLetter(); mailUi.root.hidden = false; fit(); layout();
   mailUi.root.focus({ preventScroll: true }); // o foco fica na tela (não em um botão), para Enter abrir a carta
+  document.getElementById('mailKeys').textContent = typeof touch !== 'undefined' && touch ? 'arraste para trocar · toque na carta para abrir' : 'setas, arrastar ou rodinha para trocar · clique ou Enter para abrir · Esc volta';
 }
 function abortLetter() { // para qualquer animação e deixa tudo no estado "fechado" (usado ao abrir e ao fechar a tela)
   cancelAnimationFrame(anim.raf); anim.dir = 0; anim.ts = 0;
