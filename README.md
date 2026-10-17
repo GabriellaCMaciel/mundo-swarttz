@@ -46,7 +46,7 @@ Use um servidor local (por exemplo, a extensão **Live Server** do VS Code) ou p
 
 ## Como editar
 
-- Textos e links: `js/config.js` (terminal da abertura, GitHub, livros da biblioteca, depoimentos).
+- Textos e links: `js/config.js` (terminal da abertura, GitHub, "Sobre" e soft skills, livros da biblioteca, depoimentos). O 3D e a versão simples leem os mesmos dados.
 - Livros da biblioteca: lista `books` em `js/config.js` (título, tipo, status, carga horária, certificado, cor da capa). São 6 livros, bem espaçados num arco no fundo da biblioteca.
 - Zonas (nome, cor, posição, texto do cartão): lista `zones` em `js/zones.js`.
 - Conteúdo dos painéis: objeto `panels` em `js/ui.js`.
@@ -59,6 +59,9 @@ Use um servidor local (por exemplo, a extensão **Live Server** do VS Code) ou p
 - Olhos dos gatos: `buildCat(cor, mascara, { eye: cor })` ou `{ eye: { l: cor, r: cor } }` para olhos de cores diferentes (esquerdo/direito), em `js/world.js`.
 - Gatos brincalhões: estados e velocidades em `js/playcats.js` (`updateJulietta`, `updateMocca`, `updateBird`). Com `prefers-reduced-motion` eles ficam parados.
 - Regra de clique fora: clicar fora de algo que foi aberto (carta, tela dos Correios, painéis) fecha o que foi aberto. Em `js/mail.js` use `e.envHandled` para cliques que o próprio envelope já tratou.
+- Acessibilidade: o site tem uma **versão simples** (texto puro) em `?simples` (e `?3d` volta ao mundo 3D); ela abre sozinha se o aparelho não tiver WebGL. No 3D, a tecla **H** (ou o botão Acessibilidade) abre o menu: ir direto a cada lugar, andar sozinho até lá, reduzir movimento. Clicar/tocar no chão também faz a personagem andar. Leitores de tela recebem avisos (região `#srLive`, função `announce()` em `js/intro.js`).
+- Instruções de controle: ficam sempre no canto superior direito (`.keys`, `.hint`); quando algo abre na tela (painel, Correios, carta) elas vão para o canto inferior direito, discretas (`.panel-hint`, `.mail-keys`).
+- Economia de energia: com um painel/Correios aberto ou a aba em segundo plano o loop de animação é parado (`syncLoop` em `js/ui.js`) e volta sozinho.
 - Tamanho de cada zona: campo `size` da lista `zones` (1 = tamanho original). A casa das cartas tem as medidas e o giro em `CARTAS`, `YARD` e `HOUSE`, no topo de `js/mailbox.js`.
 
 Os textos dos painéis, os depoimentos e as imagens dos selos ainda são provisórios.
