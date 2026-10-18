@@ -12,22 +12,17 @@ const ASSETS = {
 // Link do GitHub mostrado no telefone
 const GITHUB = 'https://github.com/GabriellaCMaciel';
 
-// REDES SOCIAIS: os ícones flutuantes do celular gigante e a lista do painel "Telefone" usam esta lista.
-// url = o link do SEU PERFIL naquela rede. Enquanto estiver '' (vazio), o ícone mostra "em breve" ao ser tocado.
-// Exemplos: LinkedIn 'https://www.linkedin.com/in/seu-perfil' | E-mail 'mailto:voce@email.com' | WhatsApp 'https://wa.me/55DDDNUMERO'
-// handle = o texto pequeno que aparece na lista do painel (seu @ ou nome de usuário).
+// CONTATOS: os ícones flutuantes do celular gigante e a lista do painel "Telefone" usam esta lista.
+// Por enquanto são só os três que importam para quem contrata: GitHub, LinkedIn e e-mail.
+// (Instagram, YouTube, TikTok, WhatsApp e currículo saíram até ficarem prontos; se voltarem, acrescente também o ícone em PH_ICONS, em js/phone.js.)
+// url = o link do perfil. handle = o texto pequeno que aparece na lista do painel.
 const SOCIALS = [
-  { name: 'GitHub',    url: GITHUB, handle: 'GabriellaCMaciel' },
-  { name: 'LinkedIn',  url: 'https://www.linkedin.com/in/gabriellacmaciel/', handle: 'gabriellacmaciel' },
-  { name: 'Instagram', url: 'https://www.instagram.com/gabriellaswarttz/', handle: '@gabriellaswarttz' },
-  { name: 'E-mail',    url: 'mailto:gabriellacunhamaciel@gmail.com', handle: 'gabriellacunhamaciel@gmail.com' },
-  { name: 'WhatsApp',  url: 'https://wa.me/5561981024070', handle: 'chamar no WhatsApp' }, // wa.me/ + 55 (Brasil) + DDD + número, só dígitos
-  { name: 'YouTube',   url: 'https://www.youtube.com/channel/UCdCcbj2feCNZjauq3Kz1mZw', handle: 'meu canal' },
-  { name: 'TikTok',    url: 'https://www.tiktok.com/@gabriella.swarttz', handle: '@gabriella.swarttz' },
-  { name: 'Currículo', url: '', handle: '' }
+  { name: 'GitHub',   url: GITHUB, handle: 'GabriellaCMaciel' },
+  { name: 'LinkedIn', url: 'https://www.linkedin.com/in/gabriellacmaciel/', handle: 'gabriellacmaciel' },
+  { name: 'E-mail',   url: 'mailto:gabriellacunhamaciel@gmail.com', handle: 'gabriellacunhamaciel@gmail.com' }
 ];
 
-// Textos compartilhados pelo painel do mundo 3D (ui.js) e pela versão simples (simple.js): mude aqui e muda nos dois.
+// Textos do painel do mundo 3D (ui.js). A versão simples (simples.html) é uma página estática, sem JavaScript: se mudar o texto aqui, mude lá também.
 const ABOUT = [
   'Sou a Gabriella Swarttz. Estudo Desenvolvimento Web e Mobile, sou monitora no projeto START e estou construindo meu caminho até a engenharia de IA.',
   'Gosto de livros, gatos, pintura, bordado, selos e de tudo que é colorido.'
@@ -43,8 +38,6 @@ const terminalLines = [
   ['quebrando a senha: ********', '#f2b84b'],
   ['ALERTA: INVASAO DETECTADA!', '#ff7a93'],
   ['alvo: conta de Gabriella Swarttz', '#ff7a93'],
-  ['copiando projetos e habilidades', '#f6ecd9'],
-  ['copiando selos, cartas e gatas', '#f6ecd9'],
   ['progresso [##########] 100%', '#37d0c0'],
   ['', '#f6ecd9'],
   ['>>> ACESSO CONCEDIDO <<<', '#ff5fa2']

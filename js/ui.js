@@ -16,7 +16,7 @@ const panels = {
   selos: z => heading(z, 'Imagens provisórias. Cada projeto terá vários selos, com prints dele rodando.') +
     '<div class="stamps">' + [['#ff5fa2', '#7b3fe4'], ['#37d0c0', '#7b3fe4'], ['#f2b84b', '#ff5fa2'], ['#7b3fe4', '#37d0c0'], ['#f08a3c', '#ff5fa2'], ['#b79af5', '#37d0c0']]
       .map((c, i) => '<div class="stamp"><div class="shot" style="background:linear-gradient(135deg,' + c[0] + ',' + c[1] + ')"><span>print do projeto</span></div><b>Projeto ' + (i + 1) + '</b></div>').join('') + '</div>',
-  telefone: z => heading(z, 'Toque numa rede (aqui ou no celular gigante) para abrir o meu perfil.') + // a lista SOCIALS fica em config.js
+  telefone: z => heading(z, 'Toque num contato (aqui ou no celular gigante) para abrir.') + // a lista SOCIALS fica em config.js
     '<div class="links">' + SOCIALS.map(s => s.url
       ? '<a class="link on" href="' + s.url + '"' + (/^mailto:/.test(s.url) ? '' : ' target="_blank" rel="noopener noreferrer"') + '><span>' + s.name + '</span><small>' + (s.handle || 'abrir') + ' ↗</small></a>'
       : '<div class="link off"><span>' + s.name + '</span><small>em breve</small></div>').join('') + '</div>'
@@ -35,7 +35,7 @@ function bookHtml(b) {
 function a11yHtml() {
   return '<h2 id="sheetTitle" style="color:var(--gold)">Acessibilidade e atalhos</h2>' +
     '<p class="sub">Tudo aqui funciona só com teclado, toque ou leitor de tela. Se preferir, a versão simples tem as mesmas informações em texto puro.</p>' +
-    '<p><a class="link on" href="?simples"><span>Abrir a versão simples (sem 3D)</span><small>texto puro ↗</small></a></p>' +
+    '<p><a class="link on" href="simples.html"><span>Abrir a versão simples (sem 3D)</span><small>texto puro ↗</small></a></p>' +
     '<h3 class="az-h">Ir direto para um lugar</h3>' +
     '<ul class="az-list">' + zones.map(z => '<li><span>' + z.name + '</span><span class="az-btns"><button class="btn" type="button" data-az="open:' + z.id + '">Abrir</button><button class="btn" type="button" data-az="walk:' + z.id + '">Ir até lá</button></span></li>').join('') + '</ul>' +
     '<h3 class="az-h">Preferências</h3>' +

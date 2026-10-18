@@ -84,10 +84,10 @@ const MAP_ICONS = {
     const g = x.createLinearGradient(-18, -24, 18, 22); g.addColorStop(0, '#7b3fe4'); g.addColorStop(1, '#ff5fa2'); rrPath(x, -18, -24, 36, 46, 3); x.fillStyle = g; x.fill();
     dot(x, 7, -10, 5, '#ffe08a'); x.fillStyle = '#fff6e2'; x.beginPath(); x.moveTo(-18, 22); x.lineTo(-6, 0); x.lineTo(4, 14); x.lineTo(10, 6); x.lineTo(18, 22); x.closePath(); x.fill();
   },
-  telefone(x) { // celular com bolinhas de redes sociais em volta
+  telefone(x) { // celular com três bolinhas de contato em volta (LinkedIn, e-mail e GitHub)
     rrPath(x, -15, -34, 30, 60, 8); x.fillStyle = '#4254d8'; x.fill(); rrPath(x, -11, -27, 22, 46, 4); x.fillStyle = '#8a60e0'; x.fill();
     rrPath(x, -8, -20, 7, 7, 2); x.fillStyle = '#fff'; x.fill(); rrPath(x, 1, -20, 7, 7, 2); x.fillStyle = '#ff5fa2'; x.fill(); x.fillStyle = 'rgba(255,255,255,.8)'; x.fillRect(-8, -8, 16, 3); x.fillRect(-8, -2, 12, 3);
-    dot(x, -26, -8, 7, '#3d7bff'); dot(x, 26, -16, 7, '#ff6fa5'); dot(x, 27, 12, 6, '#2b1b4d'); dot(x, -24, 14, 5, '#2fd075');
+    dot(x, -26, -8, 7, '#3d7bff'); dot(x, 26, -16, 7, '#8b4cf0'); dot(x, 27, 12, 6, '#2b1b4d');
   },
   cartas(x) { // casinha rosa com caixa de correio na frente
     x.fillStyle = '#f7d9e2'; x.fillRect(-26, -6, 52, 32); x.fillStyle = '#d6527f'; x.beginPath(); x.moveTo(-32, -6); x.lineTo(0, -34); x.lineTo(32, -6); x.closePath(); x.fill();

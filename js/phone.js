@@ -1,5 +1,5 @@
 // O celular gigante da zona Telefone: flutua e vira só um pouquinho, acompanhando por onde a pessoa anda (nunca mostra as costas),
-// e tem ícones de redes sociais (clicáveis: levam ao perfil em js/config.js > SOCIALS) e cartões de vidro flutuando em volta.
+// e tem ícones de contato (GitHub, LinkedIn e e-mail; clicáveis: levam ao perfil em js/config.js > SOCIALS) e cartões de vidro flutuando em volta.
 //
 // CONCEITOS DESTE ARQUIVO
 //  - Hierarquia de grupos: rig (flutua) > yawG (gira para os lados) > tiltG (inclina um pouquinho) > corpo, tela, cartões e ícones.
@@ -66,13 +66,12 @@ function liMark(x, cx, cy, size, color = '#fff') {
   if (!LI_MARK) return;
   x.save(); x.translate(cx - size / 2, cy - size / 2); x.scale(size / 24, size / 24); x.fillStyle = color; x.fill(LI_MARK); x.restore();
 }
-// Marca do Instagram: câmera de contorno (quadrado arredondado + lente + pontinho do flash), desenhada com traços em vez de Path2D, então escala sem borrar.
-function igMark(x, cx, cy, size, color = '#fff') {
+// Marca do e-mail: envelope de contorno (retângulo arredondado + aba em "V"), desenhado com traços em vez de Path2D, então escala sem borrar.
+function mailMark(x, cx, cy, size, color = '#fff') {
   const u = size / 100; // 1 unidade = 1% do tamanho
-  x.save(); x.translate(cx, cy); x.strokeStyle = color; x.fillStyle = color; x.lineWidth = 9 * u; x.lineJoin = 'round';
-  rrPath(x, -42 * u, -42 * u, 84 * u, 84 * u, 24 * u); x.stroke();
-  x.beginPath(); x.arc(0, 0, 19 * u, 0, 6.3); x.stroke();
-  x.beginPath(); x.arc(28 * u, -28 * u, 5.5 * u, 0, 6.3); x.fill();
+  x.save(); x.translate(cx, cy); x.strokeStyle = color; x.lineWidth = 9 * u; x.lineJoin = 'round'; x.lineCap = 'round';
+  rrPath(x, -46 * u, -32 * u, 92 * u, 64 * u, 10 * u); x.stroke();
+  x.beginPath(); x.moveTo(-40 * u, -24 * u); x.lineTo(0, 6 * u); x.lineTo(40 * u, -24 * u); x.stroke();
   x.restore();
 }
 
@@ -93,15 +92,15 @@ function phoneScreenTex() {
     darkGlassRR(x, 30, 500, 262, 236, 34);
     ghMark(x, 161, 596, 104);
     put(x, 'GitHub', 161, 690, 220, 36, 800, PH_FONT, '#fff', 'center'); put(x, 'meus projetos', 161, 726, 240, 30, 700, PH_MONO, 'rgba(255,255,255,0.85)', 'center');
-    const pk = x.createLinearGradient(308, 500, 570, 736); pk.addColorStop(0, '#c9327a'); pk.addColorStop(1, '#b02a68');
+    const pk = x.createLinearGradient(308, 500, 570, 736); pk.addColorStop(0, '#2f62e8'); pk.addColorStop(1, '#2a4fb8'); // azul do LinkedIn (branco sobre ele passa no contraste)
     rrPath(x, 308, 500, 262, 236, 34); x.fillStyle = pk; x.fill(); x.lineWidth = 2.5; x.strokeStyle = 'rgba(255,255,255,0.5)'; x.stroke();
-    igMark(x, 439, 596, 104);
-    put(x, 'Instagram', 439, 690, 220, 36, 800, PH_FONT, '#fff', 'center'); put(x, 'dia a dia', 439, 726, 240, 30, 700, PH_MONO, 'rgba(255,255,255,0.9)', 'center');
-    // lista de redes
+    liMark(x, 439, 596, 96);
+    put(x, 'LinkedIn', 439, 690, 220, 36, 800, PH_FONT, '#fff', 'center'); put(x, 'minha carreira', 439, 726, 240, 30, 700, PH_MONO, 'rgba(255,255,255,0.9)', 'center');
+    // lista de contatos (os mesmos três de SOCIALS em config.js)
     darkGlassRR(x, 30, 770, 540, 290, 34);
-    put(x, 'Redes', 64, 828, 300, 32, 800, PH_FONT, '#fff'); put(x, 'ver tudo', 536, 828, 170, 28, 700, PH_MONO, 'rgba(255,255,255,0.85)', 'right');
-    [['GitHub', 'GabriellaCMaciel', '#2b1b4d'], ['LinkedIn', 'gabriellacmaciel', '#3d7bff'], ['Instagram', '@gabriellaswarttz', '#d6336c']].forEach(([n, s, c], i) => { // (o texto vem dos mesmos @ do SOCIALS em config.js)
-      const y = 860 + i * 72; rrPath(x, 62, y, 50, 50, 14); x.fillStyle = c; x.fill(); if (i === 0) ghMark(x, 87, y + 25, 32); else if (i === 1) liMark(x, 87, y + 25, 30); else igMark(x, 87, y + 25, 32);
+    put(x, 'Contatos', 64, 828, 300, 32, 800, PH_FONT, '#fff');
+    [['GitHub', 'GabriellaCMaciel', '#2b1b4d'], ['LinkedIn', 'gabriellacmaciel', '#3d7bff'], ['E-mail', 'mande uma mensagem', '#8b4cf0']].forEach(([n, s, c], i) => {
+      const y = 860 + i * 72; rrPath(x, 62, y, 50, 50, 14); x.fillStyle = c; x.fill(); if (i === 0) ghMark(x, 87, y + 25, 32); else if (i === 1) liMark(x, 87, y + 25, 30); else mailMark(x, 87, y + 25, 32);
       put(x, n, 128, y + 35, 150, 30, 800, PH_FONT, '#fff'); put(x, s, 536, y + 35, 240, 26, 700, PH_MONO, 'rgba(255,255,255,0.9)', 'right');
     });
     rrPath(x, 220, 1128, 160, 8, 4); x.fillStyle = 'rgba(255,255,255,0.85)'; x.fill();
@@ -111,19 +110,14 @@ function phoneScreenTex() {
 // ---------- ícones ----------
 // cada ícone: nome, cor do corpo, texto da etiqueta, desenho (o fundo gradiente + o símbolo, em 256x256)
 const PH_ICONS = [
-  { n: 'GitHub',    c: 0x35246b, g: ['#4b3a8f', '#251648'], draw: x => ghMark(x, 128, 128, 150) },
-  { n: 'LinkedIn',  c: 0x3d7bff, g: ['#5f9bff', '#2f62e8'], draw: x => liMark(x, 128, 128, 140) },
-  { n: 'Instagram', c: 0xff6fa5, g: ['#ff5fa2', '#ff9a4a'], draw: x => igMark(x, 128, 128, 150) },
-  { n: 'E-mail',    c: 0x8b4cf0, g: ['#a870ff', '#6a35d8'], draw: x => { x.strokeStyle = '#fff'; x.lineWidth = 13; x.lineJoin = 'round'; rrPath(x, 52, 78, 152, 100, 14); x.stroke(); x.beginPath(); x.moveTo(60, 90); x.lineTo(128, 142); x.lineTo(196, 90); x.stroke(); } },
-  { n: 'WhatsApp',  c: 0x2fd075, g: ['#4fe390', '#1fb35c'], draw: x => { x.fillStyle = '#fff'; x.beginPath(); x.arc(128, 122, 68, 0, 6.3); x.fill(); x.beginPath(); x.moveTo(78, 168); x.lineTo(62, 212); x.lineTo(108, 190); x.closePath(); x.fill(); x.fillStyle = '#1fb35c'; [100, 128, 156].forEach(a => { x.beginPath(); x.arc(a, 122, 10, 0, 6.3); x.fill(); }); } },
-  { n: 'YouTube',   c: 0xff4455, g: ['#ff6677', '#e12a3c'], draw: x => { x.fillStyle = '#fff'; rrPath(x, 48, 80, 160, 96, 28); x.fill(); x.fillStyle = '#e12a3c'; x.beginPath(); x.moveTo(110, 104); x.lineTo(110, 152); x.lineTo(154, 128); x.closePath(); x.fill(); } },
-  { n: 'TikTok',    c: 0x2a1f4a, g: ['#3b2d66', '#16102b'], draw: x => { x.font = '800 150px ' + PH_FONT; x.textAlign = 'center'; x.fillStyle = '#37d0c0'; x.fillText('♪', 120, 170); x.fillStyle = '#ff5fa2'; x.fillText('♪', 136, 178); x.fillStyle = '#fff'; x.fillText('♪', 128, 174); } },
-  { n: 'Currículo', c: 0xf2b84b, g: ['#ffd070', '#f29a2e'], draw: x => { x.fillStyle = '#fff'; x.beginPath(); x.moveTo(78, 52); x.lineTo(150, 52); x.lineTo(182, 84); x.lineTo(182, 204); x.lineTo(78, 204); x.closePath(); x.fill(); x.fillStyle = '#f29a2e'; [112, 138, 164].forEach(y => x.fillRect(96, y, 70, 9)); } }
+  { n: 'GitHub',   c: 0x35246b, g: ['#4b3a8f', '#251648'], draw: x => ghMark(x, 128, 128, 150) },
+  { n: 'LinkedIn', c: 0x3d7bff, g: ['#5f9bff', '#2f62e8'], draw: x => liMark(x, 128, 128, 140) },
+  { n: 'E-mail',   c: 0x8b4cf0, g: ['#a870ff', '#6a35d8'], draw: x => mailMark(x, 128, 128, 150) }
 ];
-// posição de cada ícone em volta do celular [x, y, z] (relativo ao centro dele), tamanho e fase da animação
+// posição de cada ícone em volta do celular [x, y, z, tamanho] (relativo ao centro dele). Com só três contatos, cada ícone ganhou tamanho (era ~0,85, agora ~1,2): é o destaque da zona.
 // (ficam todos abaixo de ~9 unidades de altura no mundo: a câmera enxerga um pouco mais que isso, o que passar do topo seria cortado)
-const PH_SPOTS = [[-3.1, 0.7, 0.5, 0.85], [-2.6, 1.8, 0.8, 0.8], [2.9, -1.7, 0.8, 0.95], [2.5, 2.4, 0.8, 0.9], [3.5, 1.45, 0.5, 0.8], [-2.9, -2.4, 0.6, 0.85], [-3.9, -0.3, 0.5, 0.7], [3.9, -0.35, 0.5, 0.65]];
-// ordem dos ícones em PH_ICONS: GitHub, LinkedIn, Instagram, E-mail, WhatsApp, YouTube, TikTok, Currículo
+const PH_SPOTS = [[-3.2, 1.9, 0.6, 1.2], [3.5, 2.0, 0.6, 1.2], [3.3, -1.9, 0.8, 1.15]];
+// ordem dos ícones em PH_ICONS e dos lugares em PH_SPOTS: GitHub, LinkedIn, E-mail
 
 function iconLabel(text, parent) { // etiqueta de vidro embaixo do ícone: a largura se ajusta ao texto, então nada é cortado
   const c = document.createElement('canvas'), x = c.getContext('2d'), size = 54;
@@ -197,7 +191,7 @@ function buildPhone(g) {
   const chat = card(2.2, 1.1, 230, (x, w, h) => {
     const cg = x.createLinearGradient(0, 0, w, h); cg.addColorStop(0, '#d63a55'); cg.addColorStop(1, '#b82a68');
     rrPath(x, 4, 4, w - 8, h - 8, 38); x.fillStyle = cg; x.fill(); x.lineWidth = 2.5; x.strokeStyle = 'rgba(255,255,255,0.6)'; x.stroke();
-    put(x, 'Vamos conversar?', 36, 118, w - 60, 56, 800, PH_FONT, '#fff'); put(x, 'me chama nas redes', 36, 184, w - 60, 38, 700, PH_MONO, 'rgba(255,255,255,0.95)'); // sem botão "abrir (E)": o cartão é só para ler
+    put(x, 'Vamos conversar?', 36, 118, w - 60, 56, 800, PH_FONT, '#fff'); put(x, 'por e-mail ou LinkedIn', 36, 184, w - 60, 38, 700, PH_MONO, 'rgba(255,255,255,0.95)'); // sem botão "abrir (E)": o cartão é só para ler
   }, 0.8, T); chat.position.set(-2.25, -1.0, 0.8);
 
   const nav = card(3.2, 0.66, 230, (x, w, h) => {
