@@ -4,15 +4,36 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>Gabriella Swarttz | Portfólio</title>
-  <meta name="description" content="Portfólio 3D interativo de Gabriella Swarttz: projetos, habilidades, formação, depoimentos e contatos.">
+  <meta name="description" content="Portfólio 3D interativo de Gabriella Swarttz, dev em formação em Web e Mobile: projeto, formação, depoimentos e contatos (GitHub, LinkedIn e e-mail).">
+  <meta name="theme-color" content="#0b0613">
+  <link rel="canonical" href="https://gabriellacmaciel.github.io/mundo-swarttz/">
+
+  <!-- Cartão que aparece quando o link é colado no LinkedIn, WhatsApp, Slack etc. (a imagem precisa de endereço completo) -->
+  <meta property="og:type" content="website">
+  <meta property="og:locale" content="pt_BR">
+  <meta property="og:site_name" content="Gabriella Swarttz">
+  <meta property="og:title" content="Gabriella Swarttz | Portfólio">
+  <meta property="og:description" content="Portfólio 3D interativo de uma dev em formação em Web e Mobile. Abra o notebook e explore o mundo.">
+  <meta property="og:url" content="https://gabriellacmaciel.github.io/mundo-swarttz/">
+  <meta property="og:image" content="https://gabriellacmaciel.github.io/mundo-swarttz/assets/og-image.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="Gabriella Swarttz, portfólio. Ao lado do nome, uma gata de óculos digitando, com GS na camisa.">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Gabriella Swarttz | Portfólio">
+  <meta name="twitter:description" content="Portfólio 3D interativo de uma dev em formação em Web e Mobile. Abra o notebook e explore o mundo.">
+  <meta name="twitter:image" content="https://gabriellacmaciel.github.io/mundo-swarttz/assets/og-image.png">
+
+  <link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32.png">
+  <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Syne:wght@600;800&family=JetBrains+Mono:wght@400;700&family=Caveat:wght@500;700&family=Nunito:wght@600;700;800&display=swap">
-  <link rel="stylesheet" href="css/style.css?v=20261017g">
-  <link rel="stylesheet" href="css/guide.css?v=20261017g">
+  <link rel="stylesheet" href="css/style.css?v=20261017j">
+  <link rel="stylesheet" href="css/guide.css?v=20261017j">
 </head>
 <body>
-<a class="skip-link" id="toSimple" href="?simples">Abrir a versão simples (sem 3D, para leitor de tela e teclado)</a>
+<a class="skip-link" id="toSimple" href="simples.html">Abrir a versão simples (sem 3D, para leitor de tela e teclado)</a>
 <p class="vh" id="srLive" role="status" aria-live="polite" aria-atomic="true"></p>
 <canvas id="stage" role="img" aria-label="Mundo 3D interativo do portfólio de Gabriella Swarttz. Para ler sem o 3D, use o link da versão simples no início da página; no mundo, a tecla H abre o menu de acessibilidade."></canvas>
 <div class="hud">
@@ -31,6 +52,7 @@
 <div class="guide" id="guide" hidden role="dialog" aria-modal="true" aria-label="Como jogar: instruções do mundo"></div>
 <div class="flash" id="flash"></div>
 <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
+<noscript><p style="position:fixed;inset:auto 16px 16px 16px;z-index:50;margin:0;padding:14px 16px;background:#f6ecd9;color:#2a1745;font:700 18px/1.5 system-ui,sans-serif">Este portfólio em 3D precisa de JavaScript. <a href="simples.html" style="color:#4b2a9a">Abrir a versão simples</a>, que funciona sem ele.</p></noscript>
 <div class="mail" id="mail" hidden role="dialog" aria-modal="true" aria-labelledby="mailTitle">
   <div class="mail-petals" aria-hidden="true"></div>
   <button class="close mail-close" type="button" aria-label="Fechar">✕</button>
@@ -48,6 +70,6 @@
   <!-- O "?v=..." força o navegador a baixar a versão nova (cache). Troque o valor a cada atualização: aqui, no CSS e no boot.js (ele repassa o mesmo valor aos outros arquivos). -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
   <!-- boot.js decide entre o mundo 3D e a versão simples (texto puro) e carrega os demais arquivos, em ordem: veja js/boot.js. -->
-  <script src="js/boot.js?v=20261017g"></script>
+  <script src="js/boot.js?v=20261017j"></script>
 </body>
 </html>
