@@ -13,8 +13,10 @@ Você abre o notebook, "hackeia" o perfil e entra num mundo com zonas para explo
 ## Estrutura
 
 ```
-index.html        página e elementos da interface
-css/style.css     estilos (cores, painéis, joystick)
+index.html        o mundo 3D: página, elementos da interface e as tags de compartilhamento (og:image, favicon)
+simples.html      a versão simples: página de portfólio comum em HTML puro, sem JavaScript, na estética do mundo
+css/style.css     estilos do mundo 3D (cores, painéis, joystick)
+css/simples.css   estilos da versão simples (cores e fontes iguais às do mundo)
 js/config.js      conteúdo editável: imagens, link do GitHub, texto do terminal, livros da biblioteca, depoimentos
 js/intro.js       renderizador, câmera e a abertura do notebook
 js/garden.js      ajudantes de jardim: flores, arbustos, árvores, postes, luzinhas e borboletas (usados no mundo todo)
@@ -30,18 +32,17 @@ js/yardcats.js    a Mel (no telhado, rosna se outro gato chega perto) e os filho
 js/phone.js       o celular gigante da zona Telefone: flutua, gira devagar para os lados seguindo a pessoa, com ícones de redes e cartões de vidro
 js/guide.js       o livro de instruções (2D) que abre ao entrar no mundo: 3 páginas com o hacker animado andando, correndo, pulando e interagindo (estilos em css/guide.css)
 js/pick.js        toque/clique nas coisas do mundo: ícones do celular abrem os perfis, zonas abrem o painel
-js/boot.js        porta de entrada: escolhe entre o mundo 3D e a versão simples e carrega os outros arquivos em ordem
-js/simple.js      a versão simples (texto puro, acessível): mesmas informações do 3D, para leitor de tela, teclado e aparelhos sem WebGL
+js/boot.js        porta de entrada: manda para simples.html (escolha salva, ?simples ou aparelho sem WebGL) ou carrega o mundo 3D, com os arquivos em ordem
 js/mail.js        a tela das cartas: carrossel de envelopes e a carta dobrada em três (animação por linha do tempo, reversível)
 js/zones.js       cenários e etiquetas das outras zonas (sem círculos: tudo faz parte do mesmo mundo)
 js/trails.js      as trilhas (curvas invisíveis) que ligam o ponto de partida a cada lugar; só guiam a decoração e os postes de luz
 js/worldmap.js    o mapa redondo com o mesmo chão bordado do mundo (mapinha fixo no canto + versão ampliada) com um X vermelho no lugar onde a pessoa está agora
 js/decor.js       decoração do mundo inteiro: flores, árvores floridas, postes e fios de luz ligando as zonas
 js/ui.js          painéis, controles e o loop principal
-assets/           logos (SVG, versões para fundo escuro e claro) e foto
+assets/           logos (SVG, versões para fundo escuro e claro), foto, og-image.png (cartão de compartilhamento 1200x630), favicon-32.png e apple-touch-icon.png
 ```
 
-Os arquivos JS dependem uns dos outros, então a ordem das tags `<script>` no `index.html` importa.
+Os arquivos JS do mundo 3D dependem uns dos outros, então a ordem da lista em `js/boot.js` importa.
 
 ## Como rodar
 
@@ -49,12 +50,12 @@ Use um servidor local (por exemplo, a extensão **Live Server** do VS Code) ou p
 
 ## Como editar
 
-- Textos e links: `js/config.js` (terminal da abertura, GitHub, "Sobre" e soft skills, livros da biblioteca, depoimentos). O 3D e a versão simples leem os mesmos dados.
+- Textos e links: `js/config.js` (terminal da abertura, GitHub, "Sobre" e soft skills, livros da biblioteca, depoimentos). O mundo 3D lê esses dados; a versão simples (`simples.html`) é HTML estático, então textos que mudarem aqui precisam ser mudados lá também.
 - Livros da biblioteca: lista `books` em `js/config.js` (título, tipo, status, carga horária, certificado, cor da capa). São 6 livros, bem espaçados num arco no fundo da biblioteca.
 - Zonas (nome, cor, posição, texto do cartão): lista `zones` em `js/zones.js`.
 - Conteúdo dos painéis: objeto `panels` em `js/ui.js`.
 - Velocidade do personagem e tamanho do mundo: `SPEED` e `WORLD_LIMIT` em `js/ui.js` (a muralha de árvores da borda fica em `buildForestWall`, `js/decor.js`).
-- Links das redes sociais: lista `SOCIALS` em `js/config.js` (cole o link do seu perfil em `url`; vazio = "em breve").
+- Links das redes sociais: lista `SOCIALS` em `js/config.js`. Por enquanto são só GitHub, LinkedIn e e-mail; para voltar com outra rede, acrescente a entrada em `SOCIALS`, o ícone em `PH_ICONS` (`js/phone.js`) e um ponto em `PH_SPOTS`.
 - Gatos: gato com mais de uma cor tem as cores PINTADAS no corpo (`coatTex` e `coatMat` em `js/world.js`), nunca esferas coladas por cima, que viram "caroços". Vale para todos os gatos, inclusive os próximos.
 - Logo: `assets/logo-escuro.svg` (para fundo escuro) e `assets/logo-claro.svg` (para fundo claro); o caminho fica em `ASSETS` (`js/config.js`). Se a proporção mudar, ajuste o tamanho nos `drawImage` de `intro.js`, `zones.js` e `phone.js`.
 - Acessibilidade: texto precisa de contraste WCAG AA (4,5:1; 3:1 para texto grande). Ao criar cartões ou cores novos, confira antes.
@@ -69,7 +70,7 @@ Use um servidor local (por exemplo, a extensão **Live Server** do VS Code) ou p
 - Peixes: as manchas de cor são pintadas na textura do corpo (`makeFish`, `js/pond.js`), igual ao pelo dos gatos.
 - Gatos brincalhões: estados e velocidades em `js/playcats.js` (`updateJulietta`, `updateMocca`, `updateBird`). Com `prefers-reduced-motion` eles ficam parados.
 - Regra de clique fora: clicar fora de algo que foi aberto (carta, tela dos Correios, painéis) fecha o que foi aberto. Em `js/mail.js` use `e.envHandled` para cliques que o próprio envelope já tratou.
-- Acessibilidade: o site tem uma **versão simples** (texto puro) em `?simples` (e `?3d` volta ao mundo 3D); ela abre sozinha se o aparelho não tiver WebGL. No 3D, a tecla **H** (ou o botão Acessibilidade) abre o menu: ir direto a cada lugar, andar sozinho até lá, reduzir movimento. Clicar/tocar no chão também faz a personagem andar. Leitores de tela recebem avisos (região `#srLive`, função `announce()` em `js/intro.js`).
+- Acessibilidade: o site tem uma **versão simples** (texto puro) em `simples.html` (`?simples` abre e lembra a escolha; `?3d` volta ao mundo 3D); ela abre sozinha, com um aviso, se o aparelho não tiver WebGL. No 3D, a tecla **H** (ou o botão Acessibilidade) abre o menu: ir direto a cada lugar, andar sozinho até lá, reduzir movimento. Clicar/tocar no chão também faz a personagem andar. Leitores de tela recebem avisos (região `#srLive`, função `announce()` em `js/intro.js`).
 - Dicas na tela: o aviso da abertura (`.hint`) fica embaixo, no centro. Quando algo abre (painel, Correios, carta), a dica de fechar fica no canto inferior direito (`.panel-hint`, `.mail-keys`). As instruções de movimento ficam só no livro (`js/guide.js`) e no menu de acessibilidade.
 - Economia de energia: com um painel/Correios aberto ou a aba em segundo plano o loop de animação é parado (`syncLoop` em `js/ui.js`) e volta sozinho.
 - Tamanho de cada zona: campo `size` da lista `zones` (1 = tamanho original). A casa das cartas tem as medidas e o giro em `CARTAS`, `YARD` e `HOUSE`, no topo de `js/mailbox.js`.
