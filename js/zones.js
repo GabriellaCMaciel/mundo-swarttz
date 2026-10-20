@@ -81,7 +81,7 @@ const zones = [
   { id: 'biblioteca', name: 'Biblioteca', color: 0x37d0c0, pos: [0, 0, -54], r: 12.5, labelY: 13, glow: 0.05, lightI: 0.5, lightD: 20,
     text: 'Os livros que brilham são cursos, certificações e a graduação. Chegue perto de um e abra.' },
   // Cinema drive-in: cada filme na tela gigante (e cada carrinho estacionado) é um projeto. rot gira a frente da tela para o lado de onde a personagem chega.
-  { id: 'cinema', name: 'Cinema drive-in', color: 0xf2b84b, pos: [34, 0, -22], rot: -0.7, r: 12.5, labelY: 12.8, glow: 0.08, lightI: 0.8, lightD: 26, text: 'Cada filme é um projeto meu: a tela gigante passa um por vez e cada carrinho é um deles.' },
+  { id: 'cinema', name: 'Cinema drive-in', color: 0xf2b84b, pos: [34, 0, -22], rot: -0.7, r: 16, labelY: 13.4, glow: 0.08, lightI: 0.8, lightD: 26, text: 'Cada filme é um projeto meu. Na bilheteria você escolhe qual passa na tela gigante.' },
   { id: 'telefone', name: 'Telefone', color: 0x7b3fe4, pos: [27, 0, 31], size: 1.35, labelY: 0.5, labelZ: 2.0, text: 'GitHub, LinkedIn e e-mail, a um toque.' },
   // Cartas: a posição é a da caixa de correio. A casa e o quintal ficam atrás dela, girados (rot) para não encararem a câmera (veja mailbox.js)
   { id: 'cartas', name: 'Cartas', color: 0xff7eb6, pos: [CARTAS.x, 0, CARTAS.z], rot: CARTAS.rot, r: 7, labelY: 5.4, glow: 0, lightI: 0.22, lightD: 12, text: 'Cartas de depoimento que a Gabriella recebeu. Abra a caixinha de correio para ler.' }

@@ -13,8 +13,8 @@ const panels = {
   biblioteca: z => heading(z, 'Cada livro que brilha nas estantes é uma formação. Escolha um aqui ou clique nele no mundo.') +
     '<div class="shelf">' + books.map(b => '<button class="bk" type="button" data-book="' + b.id + '" style="border-left-color:' + hex(b.color) + '"><span>' + b.title +
       '<small>' + b.kind + ' · ' + b.org + '</small></span></button>').join('') + '</div>',
-  cinema: z => heading(z, 'Cada filme em cartaz é um projeto meu, e cada carrinho estacionado é um deles. Escolha um para passar na tela gigante.') +
-    '<div class="reels">' + films.map((f, i) => '<article class="reel" style="border-left-color:' + hex(f.color) + '"><h3>' + f.title + '</h3>' +
+  cinema: z => heading(z, 'Cada filme em cartaz é um projeto meu. Escolha um para passar na tela gigante (na bilheteria você também escolhe andando até lá).') +
+    '<div class="reels">' + films.map((f, i) => '<article class="reel" style="border-left-color:' + hex(f.color) + '">' + (f.shots && f.shots[0] ? '<img class="reel-shot" src="' + f.shots[0] + '" alt="Print do projeto ' + f.title + '" loading="lazy">' : '') + '<h3>' + f.title + '</h3>' +
       '<p class="reel-meta"><span class="pill">' + f.status + '</span> ' + f.year + '</p><p>' + f.text + '</p>' +
       '<div class="chips">' + f.stack.map(t => '<span class="chip" style="cursor:default">' + t + '</span>').join('') + '</div>' +
       '<div class="reel-acts"><button class="btn" type="button" data-film="' + i + '">Passar na tela</button>' +
@@ -97,8 +97,8 @@ hud.sheet.addEventListener('click', e => {
     if (act === 'open') openPanel(z); else walkToZone(z);
     return;
   }
-  const fm = e.target.closest('[data-film]'); // botão "Passar na tela" do cinema: o filme escolhido fica 25 s na tela gigante
-  if (fm) { cinemaShow(+fm.dataset.film, 25); announce('Passando na tela do cinema: ' + films[+fm.dataset.film].title + '.'); showToast('Na tela: ' + films[+fm.dataset.film].title); return; }
+  const fm = e.target.closest('[data-film]'); // botão "Passar na tela" do cinema
+  if (fm) { cinemaSelect(+fm.dataset.film); showToast('Na tela: ' + films[+fm.dataset.film].title); return; } // escolhe o filme (telão, cartazes e bilheteria mudam juntos)
   const bk = e.target.closest('[data-book]');
   if (bk) return showSheet(bookHtml(books.find(b => b.id === bk.dataset.book)));
   if (e.target.closest('[data-back]')) return showSheet(panels.biblioteca(zones.find(z => z.id === 'biblioteca')));
@@ -143,6 +143,7 @@ window.addEventListener('keydown', e => {
   else if (e.code === 'KeyH' && !panelOpen) openA11y();
   else if (e.code === 'Space' && !onControl) { e.preventDefault(); jump(); }
   else if (e.code === 'KeyR' && !e.repeat && !panelOpen) setRun(!runLock);
+  else if ((e.code === 'BracketLeft' || e.code === 'BracketRight') && !panelOpen && CIN.near) cinemaStep(e.code === 'BracketLeft' ? -1 : 1); // [ e ] trocam o filme perto da bilheteria
 });
 window.addEventListener('keyup', e => { keys[e.code] = false; if (e.key === 'Meta' || e.key === 'Control' || e.key === 'Alt') resetInput(); });
 window.addEventListener('blur', resetInput);                                  // a janela perdeu o foco

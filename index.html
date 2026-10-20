@@ -31,8 +31,8 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Syne:wght@600;800&family=JetBrains+Mono:wght@400;700&family=Caveat:wght@500;700&family=Nunito:wght@600;700;800&display=swap">
-  <link rel="stylesheet" href="css/style.css?v=20261020a">
-  <link rel="stylesheet" href="css/guide.css?v=20261020a">
+  <link rel="stylesheet" href="css/style.css?v=20261020b">
+  <link rel="stylesheet" href="css/guide.css?v=20261020b">
 </head>
 <body>
 <a class="skip-link" id="toSimple" href="simples.html">Abrir a versão simples (sem 3D, para leitor de tela e teclado)</a>
@@ -43,6 +43,7 @@
   <div class="brand" id="brand" hidden>Gabriella Swarttz</div>
   <button class="btn" id="skip" type="button">pular intro</button>
   <div class="card" id="card" hidden><h2 id="cardTitle"></h2><p id="cardText"></p><button class="btn" id="open" type="button">abrir (E)</button></div>
+  <div class="cinsel" id="cinSel" role="group" aria-label="Bilheteria do cinema: escolher o filme" hidden><button class="btn cin-arrow" id="cinPrev" type="button" aria-label="Filme anterior">◀</button><div class="cin-mid"><b id="cinTitle"></b><span id="cinMeta"></span><small id="cinKeys">teclas [ e ] trocam o filme</small></div><button class="btn cin-arrow" id="cinNext" type="button" aria-label="Próximo filme">▶</button><button class="btn cin-info" id="cinInfo" type="button">detalhes</button></div>
   <div class="hint" id="hint">toque ou aperte uma tecla para abrir o notebook</div>
   <button class="minimap" id="minimap" type="button" aria-expanded="false" aria-label="Mapa do mundo, com um X onde você está. Aperte para ampliar e ver os nomes dos lugares." title="Mapa (M)" hidden><canvas id="mmCanvas" aria-hidden="true"></canvas></button>
   <button class="ibtn a11y-btn" id="a11yBtn" type="button" aria-haspopup="dialog" aria-label="Acessibilidade" data-tip="Acessibilidade" hidden><svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="7.3" r="1.5" fill="currentColor" stroke="none"/><path d="M6.8 9.8 H17.2 M12 9.8 V13.4 M12 13.4 L9.4 18 M12 13.4 L14.6 18"/></svg></button>
@@ -72,6 +73,6 @@
   <!-- O "?v=..." força o navegador a baixar a versão nova (cache). Troque o valor a cada atualização: aqui, no CSS e no boot.js (ele repassa o mesmo valor aos outros arquivos). -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
   <!-- boot.js decide entre o mundo 3D e a versão simples (texto puro) e carrega os demais arquivos, em ordem: veja js/boot.js. -->
-  <script src="js/boot.js?v=20261020a"></script>
+  <script src="js/boot.js?v=20261020b"></script>
 </body>
 </html>
