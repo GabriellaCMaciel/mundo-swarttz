@@ -111,7 +111,10 @@ function buildZones() {
     const g = new THREE.Group(); g.position.set(z.pos[0], z.pos[1], z.pos[2]); g.rotation.y = z.rot || 0; world.add(g); // rot: giro em radianos (negativo = vira a frente para a esquerda)
     const S = z.size || 1; // ampliação do cenário (as zonas pequenas ficaram 35% maiores)
     const R = z.r || 5.5 * S; // raio de "alcance" da zona (só conta para o cartão e a trilha: não existe mais nenhum círculo desenhado no chão)
-    const light = new THREE.PointLight(z.color, z.lightI || 0.9, z.lightD || 14 * S); light.position.set(0, 5 * S, 3 * S); g.add(light);
+    // A luz da zona NÃO é mais uma luz de verdade em cada zona: ela vira só um "molde" (cor, força, alcance, posição). Quem acende luz de verdade é o
+    // pequeno grupo de luzes reaproveitadas lá embaixo (updateZoneLights).
+    g.updateMatrixWorld(true);
+    const light = { intensity: z.lightI || 0.9, range: z.lightD || 14 * S, pos: new THREE.Vector3(0, 5 * S, 3 * S).applyMatrix4(g.matrixWorld) };
     const aura = glowSprite(z.color, R * 2.2, z.glow || 0.22); aura.position.set(0, 2.6 * S, 0.5); g.add(aura);
     // Para ampliar um cenário inteiro basta colocá-lo dentro de um grupo com scale (as luzes e a etiqueta ficam de fora, no tamanho certo)
     const stage = S === 1 ? g : new THREE.Group();
@@ -122,6 +125,7 @@ function buildZones() {
     g.userData.zoneId = z.id; z.group = g; // o clique (js/pick.js) descobre a zona subindo pelos pais até achar este id
     z.built = true; z.light = light; z.label = label; z.r = R;
   });
+  initZoneLights();
   const lk = makeLabel('Kiara', 0xf08a3c, 0.55); lk.position.y = 2.3; kiara.add(lk);
   const lm = makeLabel('Maria Marta', 0xf6ecd9, 0.6); lm.position.y = 2.3; maria.add(lm);
   catLabels.push([lk, kiara], [lm, maria]);
@@ -136,7 +140,30 @@ Promise.race([
 
 let activeZone = null, activeBook = null; // zona e livro (da biblioteca) mais perto da personagem
 const tmpV = new THREE.Vector3();
+// ---------- luzes reaproveitadas ----------
+// Conceito (desempenho): no three.js cada luz de ponto é calculada em TODO vértice/pixel de TODA peça do mundo, mesmo as bem longe da luz. Com uma luz em
+// cada uma das zonas eram 9 luzes por peça, e o site engasgava em computadores mais simples. Só as luzes das zonas mais PERTO da personagem precisam
+// existir de verdade (as outras estão fora do alcance e não iluminariam nada). Então temos só 3 luzes de verdade, que passam a servir as zonas mais
+// próximas, com a força subindo e descendo devagar (fade) para não haver "pulo" de luz. O número de luzes nunca muda, então o three.js não recompila nada.
+const ZL = { slots: [], n: 4, want: 3, last: 0 };
+function initZoneLights() {
+  for (let i = 0; i < ZL.n; i++) { const l = new THREE.PointLight(0xffffff, 0, 14); l.userData = { zone: null, k: 0 }; world.add(l); ZL.slots.push(l); }
+}
+function updateZoneLights(now) {
+  const dt = Math.min(0.1, Math.max(0, now - ZL.last)); ZL.last = now;
+  const px = player.position.x, pz = player.position.z;
+  const rank = zones.filter(z => z.built).map(z => ({ z, d: Math.hypot(px - z.light.pos.x, pz - z.light.pos.z) - z.light.range })).sort((a, b) => a.d - b.d).slice(0, ZL.want).map(r => r.z);
+  ZL.slots.forEach(l => { const u = l.userData; if (u.zone && !rank.includes(u.zone)) u.drop = true; }); // quem saiu do ranking começa a apagar
+  rank.forEach(z => { if (ZL.slots.some(l => l.userData.zone === z && !l.userData.drop)) return; // já tem luz
+    const free = ZL.slots.find(l => !l.userData.zone); if (!free) return; // sem luz livre agora: espera uma terminar de apagar
+    Object.assign(free.userData, { zone: z, drop: false, k: 0 }); free.color.setHex(z.color); free.position.copy(z.light.pos); free.distance = z.light.range; });
+  ZL.slots.forEach(l => { const u = l.userData; if (!u.zone) { l.intensity = 0; return; }
+    u.k += ((u.drop ? 0 : 1) - u.k) * Math.min(1, dt * 5); l.intensity = u.zone.light.intensity * u.k; // k: 0 apagada, 1 acesa
+    if (u.drop && u.k < 0.01) { u.zone = null; u.drop = false; l.intensity = 0; } });
+}
+
 function checkZones(now) {
+  updateZoneLights(now);
   let found = null;
   for (const z of zones) {
     if (!z.built) continue;
@@ -144,7 +171,7 @@ function checkZones(now) {
     const near = d < z.r + 0.7;
     z.label.getWorldPosition(tmpV); // a etiqueta some quando está longe do personagem ou colada na câmera
     z.label.material.opacity = Math.max(0, Math.min(1, 1.7 - d / 18, (camera.position.distanceTo(tmpV) - 9) / 6));
-    z.light.intensity = (z.lightI || 0.9) * (near ? 2.1 : 1);
+    z.light.intensity = (z.lightI || 0.9) * (near ? 2.1 : 1); // o molde; a luz de verdade copia isto em updateZoneLights
     if (near) found = z;
   }
   catLabels.forEach(([lab, cat]) => {
