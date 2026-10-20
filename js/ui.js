@@ -13,9 +13,14 @@ const panels = {
   biblioteca: z => heading(z, 'Cada livro que brilha nas estantes é uma formação. Escolha um aqui ou clique nele no mundo.') +
     '<div class="shelf">' + books.map(b => '<button class="bk" type="button" data-book="' + b.id + '" style="border-left-color:' + hex(b.color) + '"><span>' + b.title +
       '<small>' + b.kind + ' · ' + b.org + '</small></span></button>').join('') + '</div>',
-  selos: z => heading(z, 'Imagens provisórias. Cada projeto terá vários selos, com prints dele rodando.') +
-    '<div class="stamps">' + [['#ff5fa2', '#7b3fe4'], ['#37d0c0', '#7b3fe4'], ['#f2b84b', '#ff5fa2'], ['#7b3fe4', '#37d0c0'], ['#f08a3c', '#ff5fa2'], ['#b79af5', '#37d0c0']]
-      .map((c, i) => '<div class="stamp"><div class="shot" style="background:linear-gradient(135deg,' + c[0] + ',' + c[1] + ')"><span>print do projeto</span></div><b>Projeto ' + (i + 1) + '</b></div>').join('') + '</div>',
+  cinema: z => heading(z, 'Cada filme em cartaz é um projeto meu, e cada carrinho estacionado é um deles. Escolha um para passar na tela gigante.') +
+    '<div class="reels">' + films.map((f, i) => '<article class="reel" style="border-left-color:' + hex(f.color) + '"><h3>' + f.title + '</h3>' +
+      '<p class="reel-meta"><span class="pill">' + f.status + '</span> ' + f.year + '</p><p>' + f.text + '</p>' +
+      '<div class="chips">' + f.stack.map(t => '<span class="chip" style="cursor:default">' + t + '</span>').join('') + '</div>' +
+      '<div class="reel-acts"><button class="btn" type="button" data-film="' + i + '">Passar na tela</button>' +
+      (f.url ? '<a class="link on" href="' + f.url + '" target="_blank" rel="noopener noreferrer"><span>Ver rodando</span><small>↗</small></a>' : '') +
+      (f.repo ? '<a class="link on" href="' + f.repo + '" target="_blank" rel="noopener noreferrer"><span>Código</span><small>GitHub ↗</small></a>' : '') +
+      (!f.url && !f.repo ? '<span class="link off"><span>links</span><small>em breve</small></span>' : '') + '</div></article>').join('') + '</div>',
   telefone: z => heading(z, 'Toque num contato (aqui ou no celular gigante) para abrir.') + // a lista SOCIALS fica em config.js
     '<div class="links">' + SOCIALS.map(s => s.url
       ? '<a class="link on" href="' + s.url + '"' + (/^mailto:/.test(s.url) ? '' : ' target="_blank" rel="noopener noreferrer"') + '><span>' + s.name + '</span><small>' + (s.handle || 'abrir') + ' ↗</small></a>'
@@ -92,6 +97,8 @@ hud.sheet.addEventListener('click', e => {
     if (act === 'open') openPanel(z); else walkToZone(z);
     return;
   }
+  const fm = e.target.closest('[data-film]'); // botão "Passar na tela" do cinema: o filme escolhido fica 25 s na tela gigante
+  if (fm) { cinemaShow(+fm.dataset.film, 25); announce('Passando na tela do cinema: ' + films[+fm.dataset.film].title + '.'); showToast('Na tela: ' + films[+fm.dataset.film].title); return; }
   const bk = e.target.closest('[data-book]');
   if (bk) return showSheet(bookHtml(books.find(b => b.id === bk.dataset.book)));
   if (e.target.closest('[data-back]')) return showSheet(panels.biblioteca(zones.find(z => z.id === 'biblioteca')));
@@ -269,12 +276,9 @@ function updateWorld(dt, now) {
   maria.userData.head.rotation.x = Math.sin(now * 1.5) * 0.15;
   maria.userData.tail.rotation.z = Math.sin(now * 1.6) * 0.25;
 
-  // 5) selos flutuando, vaga-lumes, faíscas e zonas reagindo
+  // 5) vaga-lumes, faíscas, o filme na tela do cinema e as zonas reagindo
+  updateCinema(now, dt);
   if (!calm) {
-    floaters.forEach(s => {
-      s.position.y = s.userData.y0 + Math.sin(now * 1.5 + s.userData.i) * 0.15;
-      s.rotation.y = Math.sin(now * 0.8 + s.userData.i) * 0.25;
-    });
     updateMotes(now);
   }
   updateSparks(dt);

@@ -2,7 +2,7 @@
 
 Portfólio 3D interativo de **Gabriella Swarttz**, feito com HTML, CSS, JavaScript e [Three.js](https://threejs.org/).
 
-Você abre o notebook, "hackeia" o perfil e entra num mundo com zonas para explorar: Sobre, Ateliê, Biblioteca, Álbum de selos, Telefone e Cartas. As gatas Kiara, Maria Marta, Zé Porempa, Mel e os três filhotes (Bangula, Ônix e Cat Noir) moram por lá.
+Você abre o notebook, "hackeia" o perfil e entra num mundo com zonas para explorar: Sobre, Ateliê, Biblioteca, Cinema drive-in (os projetos), Telefone e Cartas. As gatas Kiara, Maria Marta, Zé Porempa, Mel e os três filhotes (Bangula, Ônix e Cat Noir) moram por lá.
 
 ## Como usar
 
@@ -17,7 +17,7 @@ index.html        o mundo 3D: página, elementos da interface e as tags de compa
 simples.html      a versão simples: página de portfólio comum em HTML puro, sem JavaScript, na estética do mundo
 css/style.css     estilos do mundo 3D (cores, painéis, joystick)
 css/simples.css   estilos da versão simples (cores e fontes iguais às do mundo)
-js/config.js      conteúdo editável: imagens, link do GitHub, texto do terminal, livros da biblioteca, depoimentos
+js/config.js      conteúdo editável: imagens, link do GitHub, texto do terminal, filmes do cinema (projetos), livros da biblioteca, depoimentos
 js/intro.js       renderizador, câmera e a abertura do notebook
 js/garden.js      ajudantes de jardim: flores, arbustos, árvores, postes, luzinhas e borboletas (usados no mundo todo)
 js/world.js       chão, luzes, céu, personagem e gatas
@@ -30,6 +30,7 @@ js/playcats.js    Maria Julietta e o Mocca brincando perto do balanço: ela caç
 js/mailbox.js     a zona Cartas em 3D: caixa de correio rosa, casinha inclinada e quintal com cerca completa e portão
 js/yardcats.js    a Mel (no telhado, rosna se outro gato chega perto) e os filhotes brincando de lutinha no quintal
 js/phone.js       o celular gigante da zona Telefone: flutua, gira devagar para os lados seguindo a pessoa, com ícones de redes e cartões de vidro
+js/cinema.js      o cinema drive-in da zona de projetos: tela gigante que passa um "filme" (projeto) por vez, 6 carrinhos nas vagas, cabine do projetor com feixe de luz, bilheteria e letreiro
 js/guide.js       o livro de instruções (2D) que abre ao entrar no mundo: 3 páginas com o hacker animado andando, correndo, pulando e interagindo (estilos em css/guide.css)
 js/pick.js        toque/clique nas coisas do mundo: ícones do celular abrem os perfis, zonas abrem o painel
 js/boot.js        porta de entrada: manda para simples.html (escolha salva, ?simples ou aparelho sem WebGL) ou carrega o mundo 3D, com os arquivos em ordem
@@ -51,6 +52,7 @@ Use um servidor local (por exemplo, a extensão **Live Server** do VS Code) ou p
 ## Como editar
 
 - Textos e links: `js/config.js` (terminal da abertura, GitHub, "Sobre" e soft skills, livros da biblioteca, depoimentos). O mundo 3D lê esses dados; a versão simples (`simples.html`) é HTML estático, então textos que mudarem aqui precisam ser mudados lá também.
+- Projetos (cinema drive-in): lista `films` em `js/config.js` (título, frase, status, tecnologias, descrição, cores do cartaz, placa do carrinho, `url` do projeto rodando e `repo` do código). Cada filme vira uma vez na tela gigante (a cada ~5,5 s; fixo com "reduzir movimento") e um carrinho no estacionamento. No painel, o botão "Passar na tela" segura o filme escolhido por 25 s. O desenho do cartaz está em `drawFilm`, `js/cinema.js`. Os dados de status e links são provisórios: confira e ajuste.
 - Livros da biblioteca: lista `books` em `js/config.js` (título, tipo, status, carga horária, certificado, cor da capa). São 6 livros, bem espaçados num arco no fundo da biblioteca.
 - Zonas (nome, cor, posição, texto do cartão): lista `zones` em `js/zones.js`.
 - Conteúdo dos painéis: objeto `panels` em `js/ui.js`.
@@ -75,4 +77,4 @@ Use um servidor local (por exemplo, a extensão **Live Server** do VS Code) ou p
 - Economia de energia: com um painel/Correios aberto ou a aba em segundo plano o loop de animação é parado (`syncLoop` em `js/ui.js`) e volta sozinho.
 - Tamanho de cada zona: campo `size` da lista `zones` (1 = tamanho original). A casa das cartas tem as medidas e o giro em `CARTAS`, `YARD` e `HOUSE`, no topo de `js/mailbox.js`.
 
-Os textos dos painéis, os depoimentos e as imagens dos selos ainda são provisórios.
+Os textos dos painéis ainda são provisórios.

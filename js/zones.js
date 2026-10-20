@@ -2,7 +2,6 @@
 'use strict';
 
 // ===== 4. As zonas (cada uma é uma parte do portfólio) =====
-const floaters = []; // objetos que flutuam devagar (os selos)
 const hex = c => '#' + c.toString(16).padStart(6, '0');
 const bookColors = [0xff5fa2, 0xf2b84b, 0x37d0c0, 0x7b3fe4, 0xf08a3c, 0xb79af5];
 const brushColors = ['#ff5fa2', '#f2b84b', '#37d0c0', '#7b3fe4', '#f08a3c', '#b79af5'];
@@ -17,20 +16,6 @@ function paintingTex() {
       x.bezierCurveTo(Math.random() * w, Math.random() * h, Math.random() * w, Math.random() * h, Math.random() * w, Math.random() * h); x.stroke();
     }
     x.globalAlpha = 1; x.strokeStyle = '#2a1745'; x.lineWidth = 8; x.strokeRect(4, 4, w - 8, h - 8);
-  });
-}
-// Imagem provisória de projeto (um "print" desenhado): troque depois pelas imagens reais
-function placeholderTex(c1, c2, label) {
-  return canvasTex(256, 330, (x, w, h) => {
-    const g = x.createLinearGradient(0, 0, w, h); g.addColorStop(0, hex(c1)); g.addColorStop(1, hex(c2));
-    x.fillStyle = g; x.fillRect(0, 0, w, h);
-    x.fillStyle = 'rgba(246,236,217,0.94)'; x.fillRect(22, 40, w - 44, h - 120);
-    x.fillStyle = hex(c2); x.fillRect(22, 40, w - 44, 22);
-    ['#ff5fa2', '#f2b84b', '#37d0c0'].forEach((c, i) => { x.fillStyle = c; x.beginPath(); x.arc(38 + i * 16, 51, 4, 0, 6.3); x.fill(); });
-    x.fillStyle = hex(c1); x.fillRect(38, 82, 90, 12); x.fillRect(38, 104, 150, 8); x.fillRect(38, 120, 120, 8); x.fillRect(38, 150, w - 76, 70);
-    x.fillStyle = 'rgba(11,6,19,0.84)'; x.fillRect(16, h - 70, w - 32, 56); // faixa escura atrás do texto: ele precisa de contraste sobre qualquer degradê
-    x.fillStyle = '#f6ecd9'; x.font = '700 20px "JetBrains Mono", monospace'; x.textAlign = 'center';
-    x.fillText(label, w / 2, h - 44); x.font = '400 13px "JetBrains Mono", monospace'; x.fillText('print do projeto', w / 2, h - 22);
   });
 }
 // Cada função abaixo monta o "cenário" de uma zona. Mexa nas cores e tamanhos à vontade.
@@ -83,21 +68,7 @@ const props = {
     });
   },
   biblioteca(g) { buildLibrary(g); }, // o cenário grande fica em js/library.js
-  selos(g) { // selos flutuantes: cada um será um projeto (imagens provisórias)
-    const pairs = [[0xff5fa2, 0x7b3fe4], [0x37d0c0, 0x7b3fe4], [0xf2b84b, 0xff5fa2], [0x7b3fe4, 0x37d0c0]];
-    pairs.forEach(([c1, c2], i) => {
-      const s = new THREE.Group();
-      box(1.5, 1.9, 0.06, 0xf6ecd9, 0, 0, 0, s);
-      const shot = new THREE.Mesh(new THREE.PlaneGeometry(1.2, 1.55), new THREE.MeshBasicMaterial({ map: placeholderTex(c1, c2, 'projeto ' + (i + 1)) })); shot.position.z = 0.04; s.add(shot);
-      const perf = []; // os "furinhos" do selo: 30 quadradinhos escuros viram um único objeto
-      for (let k = 0; k < 7; k++) { const px = -0.65 + k * 0.2167; perf.push({ x: px, y: 0.95, z: 0, sx: 0.1, sy: 0.1, sz: 0.07, c: 0x1a0f2e }, { x: px, y: -0.95, z: 0, sx: 0.1, sy: 0.1, sz: 0.07, c: 0x1a0f2e }); }
-      for (let k = 0; k < 8; k++) { const py = -0.8 + k * 0.2286; perf.push({ x: 0.75, y: py, z: 0, sx: 0.1, sy: 0.1, sz: 0.07, c: 0x1a0f2e }, { x: -0.75, y: py, z: 0, sx: 0.1, sy: 0.1, sz: 0.07, c: 0x1a0f2e }); }
-      s.add(instanced(new THREE.BoxGeometry(1, 1, 1), lam(0xffffff), perf));
-      s.position.set(-2.4 + i * 1.6, 2.4 + (i % 2) * 0.5, 0);
-      s.userData = { y0: s.position.y, i };
-      g.add(s); floaters.push(s);
-    });
-  },
+  cinema(g) { buildCinema(g); }, // o cinema drive-in (tela, carrinhos e projetor) fica em js/cinema.js
   telefone(g) { buildPhone(g); }, // o celular gigante flutuante, com ícones e cartões de vidro (js/phone.js)
   cartas(g) { buildMailbox(g); } // a casinha e a caixa de correio rosa (js/mailbox.js)
 };
@@ -109,7 +80,8 @@ const zones = [
   { id: 'atelie', name: 'Ateliê', color: 0xff5fa2, pos: [-33, 0, -20], size: 1.35, text: 'As soft skills viram obras: pintura, bordado e cores.' },
   { id: 'biblioteca', name: 'Biblioteca', color: 0x37d0c0, pos: [0, 0, -54], r: 12.5, labelY: 13, glow: 0.05, lightI: 0.5, lightD: 20,
     text: 'Os livros que brilham são cursos, certificações e a graduação. Chegue perto de um e abra.' },
-  { id: 'selos', name: 'Álbum de selos', color: 0xf2b84b, pos: [33, 0, -20], size: 1.35, text: 'Cada projeto vira selos com prints dele rodando.' },
+  // Cinema drive-in: cada filme na tela gigante (e cada carrinho estacionado) é um projeto. rot gira a frente da tela para o lado de onde a personagem chega.
+  { id: 'cinema', name: 'Cinema drive-in', color: 0xf2b84b, pos: [34, 0, -22], rot: -0.7, r: 12.5, labelY: 12.8, glow: 0.08, lightI: 0.8, lightD: 26, text: 'Cada filme é um projeto meu: a tela gigante passa um por vez e cada carrinho é um deles.' },
   { id: 'telefone', name: 'Telefone', color: 0x7b3fe4, pos: [27, 0, 31], size: 1.35, labelY: 0.5, labelZ: 2.0, text: 'GitHub, LinkedIn e e-mail, a um toque.' },
   // Cartas: a posição é a da caixa de correio. A casa e o quintal ficam atrás dela, girados (rot) para não encararem a câmera (veja mailbox.js)
   { id: 'cartas', name: 'Cartas', color: 0xff7eb6, pos: [CARTAS.x, 0, CARTAS.z], rot: CARTAS.rot, r: 7, labelY: 5.4, glow: 0, lightI: 0.22, lightD: 12, text: 'Cartas de depoimento que a Gabriella recebeu. Abra a caixinha de correio para ler.' }

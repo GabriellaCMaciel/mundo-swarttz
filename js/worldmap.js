@@ -19,10 +19,10 @@ const mapPt = (x, z, S) => [S * (MAP_CX + x * MAP_K), S * (MAP_CY + z * MAP_K)];
 
 // os lugares que aparecem no mapa: x, z no mundo; ic = qual desenho; lab = de que lado fica o nome (u = em cima, d = embaixo, l, r)
 function mapPlaces() {
-  const zp = id => { const z = zones.find(o => o.id === id); return { x: z.pos[0], z: z.pos[2], name: id === 'selos' ? 'Selos' : z.name }; };
+  const zp = id => { const z = zones.find(o => o.id === id); return { x: z.pos[0], z: z.pos[2], name: id === 'cinema' ? 'Cinema' : z.name }; };
   return [
     { ...zp('sobre'), ic: 'sobre', lab: 'r', dx: 20 }, { ...zp('atelie'), ic: 'atelie', lab: 'l' }, { ...zp('biblioteca'), ic: 'biblioteca', lab: 'u' },
-    { ...zp('selos'), ic: 'selos', lab: 'u' }, { ...zp('telefone'), ic: 'telefone', lab: 'd' }, { ...zp('cartas'), ic: 'cartas', lab: 'd' },
+    { ...zp('cinema'), ic: 'cinema', lab: 'u' }, { ...zp('telefone'), ic: 'telefone', lab: 'd' }, { ...zp('cartas'), ic: 'cartas', lab: 'd' },
     { x: POND.x, z: POND.z, name: 'Lagoa', ic: 'lagoa', lab: 'r', dx: 18 }, { x: CHERRY.x, z: CHERRY.z, name: 'Cerejeira', ic: 'cerejeira', lab: 'u' },
     { x: SWING.x, z: SWING.z, name: 'Balanço', ic: 'balanco', lab: 'u', ox: 26 }, { x: TRAIL_START.x, z: TRAIL_START.z, name: 'Início', ic: 'inicio', lab: 'd', dy: 26 }
   ];
@@ -77,12 +77,12 @@ const MAP_ICONS = {
     x.beginPath(); x.moveTo(0, -8); x.lineTo(32, -10); x.lineTo(30, -38); x.quadraticCurveTo(14, -42, 0, -32); x.closePath(); x.fill();
     x.strokeStyle = '#f0a8c0'; x.lineWidth = 2.5; [[-26, -30], [-26, -23], [-26, -16]].forEach(([a, b]) => { x.beginPath(); x.moveTo(a, b); x.quadraticCurveTo(-14, b - 4, -4, b + 1); x.moveTo(-a, b); x.quadraticCurveTo(14, b - 4, 4, b + 1); x.stroke(); });
   },
-  selos(x) { // um selo postal com a borda picotada
-    x.fillStyle = '#fff6e2'; rrPath(x, -26, -32, 52, 62, 3); x.fill();
-    for (let i = 0; i < 7; i++) { const px = -22 + i * 7.3; dot(x, px, -32, 3.2, '#b48fd8'); dot(x, px, 30, 3.2, '#b48fd8'); }
-    for (let i = 0; i < 8; i++) { const py = -26 + i * 7.6; dot(x, -26, py, 3.2, '#b48fd8'); dot(x, 26, py, 3.2, '#b48fd8'); }
-    const g = x.createLinearGradient(-18, -24, 18, 22); g.addColorStop(0, '#7b3fe4'); g.addColorStop(1, '#ff5fa2'); rrPath(x, -18, -24, 36, 46, 3); x.fillStyle = g; x.fill();
-    dot(x, 7, -10, 5, '#ffe08a'); x.fillStyle = '#fff6e2'; x.beginPath(); x.moveTo(-18, 22); x.lineTo(-6, 0); x.lineTo(4, 14); x.lineTo(10, 6); x.lineTo(18, 22); x.closePath(); x.fill();
+  cinema(x) { // a tela do drive-in (com um filme rosa) em cima de uma lanchonete, e um carrinho estacionado na frente
+    x.fillStyle = '#6a3fa8'; rrPath(x, -30, 6, 60, 22, 3); x.fill(); x.fillStyle = '#ffd98a'; x.fillRect(-22, 13, 9, 8); x.fillRect(-4, 13, 9, 8); x.fillRect(14, 13, 9, 8); // lanchonete com janelinhas acesas
+    x.fillStyle = '#2a1745'; rrPath(x, -32, -34, 64, 38, 4); x.fill(); // moldura da tela
+    const g = x.createLinearGradient(-28, -30, 28, 0); g.addColorStop(0, '#ff5fa2'); g.addColorStop(1, '#f2b84b'); x.fillStyle = g; rrPath(x, -28, -30, 56, 30, 2); x.fill();
+    x.fillStyle = '#fff6e2'; x.beginPath(); x.moveTo(-8, -22); x.lineTo(-8, -8); x.lineTo(6, -15); x.closePath(); x.fill(); // botão de "play": é um filme
+    rrPath(x, -16, 26, 32, 10, 4); x.fillStyle = '#37d0c0'; x.fill(); rrPath(x, -10, 20, 20, 9, 3); x.fillStyle = '#37d0c0'; x.fill(); dot(x, -9, 37, 3.5, '#2a1745'); dot(x, 9, 37, 3.5, '#2a1745');
   },
   telefone(x) { // celular com três bolinhas de contato em volta (LinkedIn, e-mail e GitHub)
     rrPath(x, -15, -34, 30, 60, 8); x.fillStyle = '#4254d8'; x.fill(); rrPath(x, -11, -27, 22, 46, 4); x.fillStyle = '#8a60e0'; x.fill();
