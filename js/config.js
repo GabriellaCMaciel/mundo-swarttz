@@ -120,12 +120,7 @@ const books = [
   { id: 'matera', short: 'MATERA', kind: 'Bootcamp', title: 'Bootcamp Teste de Software', org: 'Instituto Matera',
     status: 'Concluído', period: '17 de março a 3 de abril de 2025', hours: '24 horas, online', cert: 'Emitido em abril de 2025', color: 0x6bb7ff,
     text: 'Curso online de 24 horas, de segunda a quinta-feira, sobre teste de software, promovido pelo Instituto Matera.',
-    topics: ['Teste de software'] }
-];
-
-// EM ESPERA (temporário): livros que ainda não têm comprovante para mostrar. NÃO aparecem no site nem na biblioteca 3D.
-// Para trazer de volta, é só mover o livro para dentro da lista `books` acima (a biblioteca 3D e a conquista se ajustam sozinhas).
-const booksEmEspera = [
+    topics: ['Teste de software'] },
   { id: 'toefl', short: 'TOEFL', kind: 'Inglês · B1', title: 'TOEFL ITP Level 2', org: 'Mastertest Educational',
     status: 'Concluído', period: 'Teste feito em 13 de outubro de 2026', cert: 'Declaração da Mastertest Educational', color: 0x8fd45a,
     text: 'Meu nível de inglês é B1 (intermediário): fui classificada com 91,48% no teste de nivelamento.',
