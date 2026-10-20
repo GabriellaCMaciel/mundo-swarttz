@@ -51,13 +51,14 @@ function buildDecor() {
     } else veg.groundBush(x, z, 0.5 + rnd() * 0.5, 6, dom);
   }
 
-  // Postes de luz: um GUIA do caminho, não um enfeite espalhado. Dois lados de cada trilha, em pares alinhados e com o mesmo espaçamento.
+  // Postes de luz: um GUIA do caminho, não um enfeite espalhado. Um poste de CADA LADO da trilha, em pares alinhados e com o mesmo espaçamento.
+  // (as trilhas agora têm curvas suaves, então os pares seguem a estrada sem ficar tortos nem retos demais)
   // Para não virar ruído visual, um poste só é aceito se:
   //  - não estiver em cima de uma zona, da lagoa, da cerejeira, do balanço ou do quintal (usa a mesma lista "spots" da vegetação);
   //  - não estiver em cima de OUTRA trilha (perto do início as trilhas se cruzam e antes os postes se amontoavam ali);
   //  - não ficar muito perto de outro poste já colocado (distância mínima), o que também desfaz o aperto nas curvas fechadas.
   // Os fios de luzinhas só ligam postes vizinhos da mesma fileira; se um poste foi recusado, a fileira "quebra" e o fio recomeça depois.
-  const LAMP_STEP = 10, LAMP_SIDE = 2.7, LAMP_MIN = 5.5, LAMP_H = 3.2;
+  const LAMP_STEP = 9, LAMP_SIDE = 3.1, LAMP_MIN = 3.5, LAMP_H = 3.2;
   const lampSpots = spots.map((sp, i) => i < zones.length ? { x: sp.x, z: sp.z, r: zr(zones[i]) * 0.95 } : sp); // perto das zonas os postes vão até a entrada do cenário
   const placed = [];
   TRAILS.filter(tr => tr.zone).forEach(tr => {

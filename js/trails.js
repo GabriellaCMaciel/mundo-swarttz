@@ -54,8 +54,8 @@ function distToTrails(x, z) { // distância até a trilha mais próxima (para a 
 const TRAILS = [];
 zones.forEach((z, i) => {
   const dx = z.pos[0] - TRAIL_START.x, dz = z.pos[2] - TRAIL_START.z, d = Math.hypot(dx, dz), stop = Math.min(d - 1, trailZoneR(z) * 0.62); // para na frente do cenário
-  const tr = makeTrail(TRAIL_START, { x: z.pos[0] - dx / d * stop, z: z.pos[2] - dz / d * stop }, 100 + i * 17, Math.min(6.5, d * 0.1), 2.9);
+  const tr = makeTrail(TRAIL_START, { x: z.pos[0] - dx / d * stop, z: z.pos[2] - dz / d * stop }, 100 + i * 17, Math.min(2.4, d * 0.04), 2.9); // curva suave: só o bastante para não parecer régua (antes até 6,5, e as trilhas se cruzavam)
   tr.zone = z; TRAILS.push(tr);
 });
-TRAILS.push(makeTrail({ x: -9, z: -43 }, { x: POND.x + 8.5, z: POND.z + 1 }, 301, 4, 2.3)); // biblioteca > lagoa e cerejeira
-TRAILS.push(makeTrail({ x: 9, z: -43 }, { x: SWING.x - 8.5, z: SWING.z + 1 }, 302, 4, 2.3)); // biblioteca > balanço
+TRAILS.push(makeTrail({ x: -9, z: -43 }, { x: POND.x + 8.5, z: POND.z + 1 }, 301, 2, 2.3)); // biblioteca > lagoa e cerejeira
+TRAILS.push(makeTrail({ x: 9, z: -43 }, { x: SWING.x - 8.5, z: SWING.z + 1 }, 302, 2, 2.3)); // biblioteca > balanço
