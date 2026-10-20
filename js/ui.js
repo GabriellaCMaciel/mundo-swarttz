@@ -329,7 +329,9 @@ function step() {
   if (phase === 'world') { updateWorld(dt, now); perfStep(raw, now); } else updateIntro(now, dt);
   renderer.render(scene, camera);
 }
-function loop() { step(); rafId = requestAnimationFrame(loop); }
+// try/catch: se UM quadro der erro (um bug num bichinho, por exemplo), o erro vai para o console e o mundo CONTINUA no quadro seguinte. Sem isto, uma exceção
+// aqui impedia de agendar o próximo quadro e o mundo inteiro congelava.
+function loop() { try { step(); } catch (err) { if (!loop.warned) { loop.warned = true; console.error('Erro no quadro (o mundo continua):', err); } } rafId = requestAnimationFrame(loop); }
 function syncLoop() { // chame sempre que algo mudar: painel abriu/fechou, aba ficou visível/escondida
   stampNext(); // se havia um selo esperando uma janela fechar, ele aparece agora
   const hidden = document.hidden, covered = phase === 'world' && (panelOpen || mailUi.isOpen || guideOpen);

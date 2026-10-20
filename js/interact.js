@@ -46,13 +46,14 @@ function hop(o) { INTER.hops.push({ o, t: 0 }); }
 
 // ---------- a lista do que dá para tocar ----------
 // pos(v) coloca em v o ponto do mundo (centro da coisa) | r = raio da área de clique | disc = círculo no chão (lagoa) | mark = false: sem estrelinha
-const objPos = (get, dy = 0.8) => v => { const o = get(); if (!o) return v.set(0, -99, 0); o.getWorldPosition(v); v.y += dy; return v; };
+const objPos = (get, dy = 0.8) => v => { const o = get(); if (!o || !o.getWorldPosition) return v.set(0, -99, 0); // sem objeto (ou algo que não é um objeto 3D): fica "escondido" lá embaixo, nunca quebra o quadro
+  o.getWorldPosition(v); v.y += dy; return v; };
 function buildInteracts() {
   const L = INTER.list;
   const pet = (id, name, get, dy, says, stampFn, opts = {}) => L.push(Object.assign({ id, name, pos: objPos(get, dy), r: 1.15, reach: 20, says, hop: true, hearts: true, done: stampFn, getObj: get }, opts));
   pet('kiara', 'Kiara', () => kiara, 0.75, ['prrrr ♥', 'miau!', 'mrrrau ♥'], () => stampGrant('kiara'));
   pet('maria', 'Maria Marta', () => maria, 0.75, ['miau.', 'prrr…', 'mrrp!'], () => stampGrant('maria'));
-  pet('mel', 'Mel', () => yardCats.mel && yardCats.mel.g, 0.5, ['rrrrr!', 'hmpf.', 'tsc!'], () => stampGrant('mel'), { hop: false, hearts: false, r: 1.5 });
+  pet('mel', 'Mel', () => yardCats.mel && yardCats.mel.cat, 1.0, ['rrrrr!', 'hmpf.', 'tsc!'], () => stampGrant('mel'), { hop: false, hearts: false, r: 1.5 });
   (yardCats.kittens || []).forEach(k => pet('kit-' + k.name, k.name, () => k.g, 0.5, ['miau!', 'miii!', 'prr!'], () => { if (stampMark('filhotes', k.name) >= 3) stampGrant('filhotes'); }, { hop: false, r: 1.0 }));
   if (PCATS.ready) {
     pet('jul', 'Maria Julietta', () => PCATS.J.g, 0.6, ['miau!', 'brincar!', 'prr!'], () => { if (stampMark('turma', 'jul') >= 3) stampGrant('turma'); }, { hop: false, r: 1.0 });
