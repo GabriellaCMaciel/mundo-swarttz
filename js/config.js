@@ -60,9 +60,9 @@ const letters = [
 //  - Os CARTAZES na parede do cinema mostram as informações do filme (título, frase, status e tecnologias).
 //  - O TELÃO passa as IMAGENS do projeto (lista `shots`: prints dele rodando, em assets/filmes/, de preferência 16:9, ex. 1280x720).
 //  - Na BILHETERIA o visitante escolhe o filme; o telão, os cartazes e o ingresso mudam juntos.
-// title = nome (cabe no cartaz: até ~22 letras) | tagline = frase curta (até ~60 letras) | status = "em cartaz" (pronto), "em produção" ou "em breve"
+// title = nome (cabe no cartaz: até ~22 letras) | tagline = frase curta (até ~60 letras) | status = "em cartaz" (pronto), "em produção" ou "lançamento previsto" (futuro)
 // stack = tecnologias (as 4 primeiras vão para o cartaz) | text = descrição do painel | color/color2 = as duas cores do cartaz | plate = placa do carrinho (até 7 letras)
-// shots = prints para o telão (sem prints, o telão mostra "em breve") | url = projeto rodando (ou '') | repo = código no GitHub (só se o repositório for PÚBLICO, senão '')
+// shots = prints para o telão (sem prints, o telão mostra o status, ex. "lançamento previsto") | url = projeto rodando (ou '') | repo = código no GitHub (só se o repositório for PÚBLICO, senão '')
 const films = [
   { id: 'mundo', title: 'Mundo Swarttz', tagline: 'Este portfólio: um mundo 3D para explorar', status: 'em cartaz', year: 2026, plate: 'MUNDO',
     stack: ['Three.js', 'JavaScript', 'Canvas 2D'], color: 0x7b3fe4, color2: 0xff5fa2,
@@ -84,15 +84,10 @@ const films = [
     text: 'Calculadora que mostra quanto um freelancer brasileiro precisa cobrar por hora, por dia e por projeto, com as regras de MEI, autônomo e Simples Nacional de 2026.',
     shots: ['assets/filmes/preco-1.jpg', 'assets/filmes/preco-2.jpg', 'assets/filmes/preco-3.jpg'],
     url: '', repo: '' },
-  { id: 'sala3d', title: 'Sala de Aula 3D', tagline: 'Homenagem ao professor, com a turma toda dentro', status: 'em breve', year: 2026, plate: 'SALA3D',
-    stack: ['Three.js', 'JavaScript'], color: 0xf08a3c, color2: 0xff5fa2,
-    text: 'Homenagem da turma de Web e Mobile ao professor: a sala de aula em 3D, com os lugares dos alunos e personagens para conversar.',
-    shots: [], url: '', repo: '' },
-  { id: 'painel', title: 'Swartz Progress', tagline: 'Meu painel de aprendizados, entregas e conquistas', status: 'em cartaz', year: 2026, plate: 'PAINEL',
+  { id: 'painel', title: 'Swartz Progress', tagline: 'Meu painel de aprendizados, entregas e conquistas', status: 'lançamento previsto', year: 2026, plate: 'PAINEL',
     stack: ['HTML', 'CSS', 'JavaScript', 'GitHub API'], color: 0xb79af5, color2: 0x37d0c0,
-    text: 'Painel próprio para registrar o que aprendo, o que entrego e o que conquisto: o formulário fica no próprio site e grava os registros direto no GitHub.',
-    shots: ['assets/filmes/painel-1.jpg', 'assets/filmes/painel-2.jpg'],
-    url: '', repo: 'https://github.com/GabriellaCMaciel/swarttz-progress-panel' }
+    text: 'Painel próprio, ainda em desenvolvimento, para registrar o que aprendo, o que entrego e o que conquisto. Lançamento previsto: em breve.',
+    shots: [], url: '', repo: '' }
 ];
 
 // Os livros da biblioteca: cada um vira um livro brilhante nas estantes (a ordem é da esquerda para a direita).

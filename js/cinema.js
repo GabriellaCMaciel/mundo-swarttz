@@ -68,12 +68,13 @@ const cinImgs = i => (CIN.imgs[i] || []).filter(im => im._ok); // imagens do fil
 // ---------- o telão ----------
 function drawScreen() {
   const f = films[CIN.idx], x = CIN.cx, W = CIN.cv.width, H = CIN.cv.height, list = cinImgs(CIN.idx);
-  if (!list.length) { // sem prints ainda: "em breve", no estilo do cartaz
+  if (!list.length) { // sem prints (projeto ainda não lançado): mostra o status, no estilo do cartaz
     const g = x.createLinearGradient(0, 0, W, H); g.addColorStop(0, filmHex(f.color)); g.addColorStop(1, filmHex(f.color2));
     x.fillStyle = g; x.fillRect(0, 0, W, H); cinStitch(x, W, H, 64, 0.12);
     x.fillStyle = 'rgba(11,6,19,0.8)'; cinRR(x, W * 0.18, H * 0.16, W * 0.64, H * 0.68, 36); x.fill();
     cinClapper(x, W / 2, H * 0.36, 1.7);
-    x.textAlign = 'center'; x.textBaseline = 'alphabetic'; x.fillStyle = '#f2b84b'; x.font = '800 118px Syne, system-ui, sans-serif'; x.fillText('EM BREVE', W / 2, H * 0.68);
+    x.textAlign = 'center'; x.textBaseline = 'alphabetic'; x.fillStyle = '#f2b84b';
+    const lab = f.status.toUpperCase(); cinFit(x, lab, W * 0.56, 118, 40, '800', 'Syne, system-ui, sans-serif'); x.fillText(lab, W / 2, H * 0.68); // o status inteiro (ex. LANÇAMENTO PREVISTO), medido para caber
     x.fillStyle = '#f6ecd9'; cinFit(x, f.title, W * 0.56, 60, 30, '800', 'Syne, system-ui, sans-serif'); x.fillText(f.title, W / 2, H * 0.78);
     CIN.cur = null;
   } else {
