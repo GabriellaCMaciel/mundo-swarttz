@@ -6,11 +6,11 @@ const world = new THREE.Group();
 world.visible = false;
 scene.add(world);
 const touch = window.matchMedia('(pointer: coarse)').matches;
-const WORLD_FOG = 0x2a1250;
+const WORLD_FOG = 0x3a1a6a;
 const RUN = { mul: 1 }; // quanto a personagem está mais rápida que o normal (1 = andando, ~1,8 = correndo); a Kiara usa isso para acompanhar (js/kiara.js)
 const skyTex = canvasTex(8, 256, (x, w, h) => {
   const g = x.createLinearGradient(0, 0, 0, h);
-  g.addColorStop(0, '#12062a'); g.addColorStop(0.55, '#2a1250'); g.addColorStop(1, '#2a1250');
+  g.addColorStop(0, '#12062a'); g.addColorStop(0.55, '#3a1a6a'); g.addColorStop(1, '#3a1a6a');
   x.fillStyle = g; x.fillRect(0, 0, w, h);
 });
 
@@ -25,9 +25,10 @@ world.add(sun, sun.target);
 
 // Chão: retalhos de tecido costurados com fio de bordado dourado e pontos-cruz rosa
 const patchTex = canvasTex(512, 512, (x, w, h) => {
-  const cols = ['#2a1745', '#33195a', '#241538', '#3a2060', '#2d1a4d', '#1f1033'], n = 4, s = w / n;
+  // tons de roxo mais CLAROS que antes (eram #1f1033 a #3a2060): o chão escuro demais escondia a personagem e os objetos escuros; assim há mais contraste (acessibilidade)
+  const cols = ['#4a2f80', '#573595', '#432a74', '#603ca3', '#4f3187', '#3b2468'], n = 4, s = w / n;
   for (let i = 0; i < n; i++) for (let j = 0; j < n; j++) { x.fillStyle = cols[(i * 3 + j * 5 + ((i * j) % 2)) % cols.length]; x.fillRect(i * s, j * s, s, s); }
-  x.strokeStyle = 'rgba(242,184,75,0.36)'; x.lineWidth = 2.5; x.setLineDash([14, 10]);
+  x.strokeStyle = 'rgba(242,184,75,0.42)'; x.lineWidth = 2.5; x.setLineDash([14, 10]);
   for (let k = 0; k < n; k++) { x.beginPath(); x.moveTo(k * s + 0.5, 0); x.lineTo(k * s + 0.5, h); x.stroke(); x.beginPath(); x.moveTo(0, k * s + 0.5); x.lineTo(w, k * s + 0.5); x.stroke(); }
   x.setLineDash([]); x.strokeStyle = 'rgba(255,95,162,0.38)'; x.lineWidth = 3;
   for (let i = 0; i < n; i++) for (let j = 0; j < n; j++) {
