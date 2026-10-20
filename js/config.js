@@ -96,14 +96,14 @@ const films = [
 // Os livros da biblioteca: cada um vira um livro brilhante nas estantes (a ordem é da esquerda para a direita).
 // short = nome curto na capa | kind = tipo | status, period, hours e cert = linhas do painel | topics = assuntos | color = cor da capa.
 // period, hours e cert são opcionais: se faltarem, a linha some do painel (assim nunca aparece "a preencher" nem "sem certificado" para o visitante).
-// As horas e os assuntos do EFG vêm da página oficial do curso em efg.org.br (1440 h; a matriz com as disciplinas não é pública).
+// As horas do EFG vêm da página oficial do curso (efg.org.br); os assuntos saem dos componentes que ela já cursou (lista dela, 20/10/2026).
 // Se o número de livros mudar, a biblioteca 3D (js/library.js) reparte o arco sozinha e a conquista "Estante Completa" passa a exigir todos.
 // As horas das trilhas da Alura vêm da página oficial de cada carreira (conferido em 20/10/2026).
 const books = [
   { id: 'efg', short: 'EFG', kind: 'Curso técnico', title: 'Técnico em Desenvolvimento Web e Mobile', org: 'Escola do Futuro de Goiás',
     status: 'Em andamento', period: 'Fevereiro de 2026 a agosto de 2027', hours: '1440 horas', color: 0x7b3fe4,
     text: 'Formação técnica em desenvolvimento de sites e aplicativos para web e celular, com projetos em equipe e simulações de mercado.',
-    topics: ['Desenvolvimento Web', 'Desenvolvimento Mobile', 'Desenvolvimento de sistemas', 'Requisitos e funcionalidades', 'Programação', 'Testes de programas e aplicativos', 'Manutenção e suporte técnico', 'Documentação de sistemas', 'Ferramentas de desenvolvimento'] },
+    topics: ['Python', 'JavaScript', 'Lógica de programação', 'Programação orientada a objetos', 'Desenvolvimento Web', 'Desenvolvimento Mobile', 'Design de páginas web', 'Multimídia', 'Sistemas de computação', 'Matemática discreta'] },
   { id: 'grad', short: 'GRAD', kind: 'Graduação', title: 'Bacharelado em Engenharia de Software', org: 'Gran Faculdade',
     status: 'Em andamento', period: 'Novembro de 2025 a novembro de 2029', color: 0xf08a3c,
     text: 'Graduação em Engenharia de Software: o caminho para projetar, construir e manter sistemas com método e qualidade.',
