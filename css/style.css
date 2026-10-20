@@ -181,7 +181,7 @@ body{margin:0;background:var(--ink);color:var(--paper);font-family:var(--font-di
 /* Toque e telas pequenas: cartão de informações compacto (título e botão na mesma linha), alvos de toque maiores */
 .toast{position:fixed;left:50%;bottom:calc(var(--sb) + 150px);transform:translateX(-50%);max-width:calc(100% - 32px);box-sizing:border-box;padding:10px 16px;font:700 13px var(--font-mono);color:var(--ink);background:var(--gold);box-shadow:0 6px 24px rgba(0,0,0,.5);z-index:60;text-align:center;pointer-events:none}
 @media (max-width:640px),(pointer:coarse){
-  .card{width:min(270px,calc(100% - var(--sl) - var(--sr)));padding:8px 10px;gap:4px 8px;grid-template-columns:1fr auto;align-items:center;top:calc(var(--st) + 22px)}
+  .card{width:min(270px,calc(100% - var(--sl) - var(--sr) - 104px)); /* deixa livre o canto dos botões ? e acessibilidade (2 × 44 px + folga) */ padding:8px 10px;gap:4px 8px;grid-template-columns:1fr auto;align-items:center;top:calc(var(--st) + 22px)}
   .card h2{grid-column:1;font-size:15px;line-height:1.2}
   .card p{grid-column:1 / -1;grid-row:2;font-size:11px;line-height:1.35}
   .card .btn{grid-column:2;grid-row:1;min-height:34px;padding:.4em .9em;font-size:11px}
