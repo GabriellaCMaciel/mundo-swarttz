@@ -200,6 +200,7 @@ function setMailHint(reading) {
 }
 function openEnvelope() { // clicou no envelope do meio
   if (mailUi.state !== 'closed' || !letters.length) return;
+  stampGrant('cartas'); // ler uma carta rende o selo do Correio
   setMailHint(true);
   mailUi.envs[mailUi.cur].querySelector('.env-bob').style.animationPlayState = 'paused'; // o balanço do envelope para (a carta não "sai" de algo que balança)
   prepLetter(); anim.ts = 0; renderLetter(0);

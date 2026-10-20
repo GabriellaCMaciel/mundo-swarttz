@@ -141,3 +141,7 @@ kbd{display:inline-block;min-width:26px;box-sizing:border-box;padding:3px 9px;ma
   .guide .g-caps{height:auto}.guide .g-caps span{position:static;display:block;opacity:1}
   .guide .g-pic{opacity:1}.guide .s-act .g-key,.guide .s-act .g-win{opacity:1;transform:none}
 }
+
+/* página dos selos: quatro selos de exemplo em grade */
+.g-stamps{display:grid;grid-template-columns:repeat(2,minmax(0,110px));gap:18px;justify-content:center;margin-bottom:8px}
+.g-st{display:block;transform:rotate(var(--r,-3deg))}.g-st:nth-child(2){--r:3deg}.g-st:nth-child(3){--r:2deg}.g-st:nth-child(4){--r:-2deg}

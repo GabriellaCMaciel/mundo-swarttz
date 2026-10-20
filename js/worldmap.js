@@ -152,7 +152,7 @@ function mapPick() { // escolhe/recria a base certa e acerta o tamanho do canvas
   WMAP.lx = 1e9; WMAP.pl = -1;
 }
 function setMapOpen(on) {
-  if (!WMAP.ready) return; WMAP.open = on; WMAP.btn.setAttribute('aria-expanded', on ? 'true' : 'false'); WMAP.btn.classList.toggle('big', on);
+  if (!WMAP.ready) return; WMAP.open = on; if (on) stampGrant('mapa'); WMAP.btn.setAttribute('aria-expanded', on ? 'true' : 'false'); WMAP.btn.classList.toggle('big', on);
   WMAP.btn.setAttribute('aria-label', on ? 'Mapa do mundo, ampliado. Aperte para diminuir.' : 'Mapa do mundo, com um X onde você está. Aperte para ampliar e ver os nomes dos lugares.');
   mapPick(); updateWorldMap(clock.elapsedTime, true); if (!rafId) renderer.render(scene, camera);
 }

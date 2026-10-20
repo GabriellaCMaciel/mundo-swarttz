@@ -161,7 +161,7 @@ function cinemaSelect(i, quiet) {
   CIN.glow.material.color.setHex(films[i].color);
   const car = CIN.cars[i]; if (car) CIN.spot.position.set(car.position.x, 2.5, car.position.z);
   CIN.posters.forEach((p, k) => { p.frame.material.color.setHex(k === i ? 0xffd98a : 0x3a2060); p.mesh.material.color.setScalar(k === i ? 1 : 0.62); p.lit.visible = k === i; });
-  cinHud(); if (!quiet) announce('Em exibição no cinema: ' + films[i].title + '. ' + films[i].tagline + '. ' + films[i].status + '.');
+  cinHud(); if (!quiet) stampGrant('cinema'); if (!quiet) announce('Em exibição no cinema: ' + films[i].title + '. ' + films[i].tagline + '. ' + films[i].status + '.');
 }
 const cinemaStep = d => cinemaSelect(CIN.idx + d);
 

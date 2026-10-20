@@ -43,6 +43,8 @@ body{margin:0;background:var(--ink);color:var(--paper);font-family:var(--font-di
 .ibtn:hover::after,.ibtn:focus-visible::after{opacity:1;transform:none}
 .a11y-btn{right:var(--sr);top:var(--st)}
 .help-btn{right:calc(var(--sr) + 54px);top:var(--st)}
+.stamps-btn{right:calc(var(--sr) + 108px);top:var(--st)}
+.stamps-btn .badge{position:absolute;right:-6px;bottom:-6px;min-width:20px;padding:1px 5px;border-radius:99px;background:var(--gold);color:var(--ink);font:800 11px/1.5 var(--font-body);text-align:center;box-sizing:border-box}
 .minimap{right:var(--sr);top:calc(var(--st) + 60px);padding:0;margin:0;border:3px solid #fff6e2;border-radius:50%;background:#2a1745;box-shadow:0 6px 22px rgba(0,0,0,.45);cursor:pointer;overflow:hidden;line-height:0;touch-action:manipulation}
 .minimap:focus-visible{outline:3px solid var(--gold);outline-offset:3px}
 .minimap canvas{display:block}
@@ -220,3 +222,35 @@ html.paused *,html.paused *::before,html.paused *::after{animation-play-state:pa
 .az-check input{width:22px;height:22px;margin:0;flex:none;accent-color:var(--gold)}
 .az-keys{margin:0;padding-left:1.2em;font:400 13px/1.7 var(--font-mono)}
 .az-keys li{margin-bottom:6px}
+
+/* ===== Selos (álbum e aviso), balõezinhos e nome da coisa sob o cursor ===== */
+.stamp-svg{display:block;width:100%;height:auto;filter:drop-shadow(0 6px 10px rgba(0,0,0,.45))}
+.st-prog{display:flex;align-items:center;gap:16px;margin:0 0 30px}
+.st-prog b{flex:none;font:800 17px var(--font-body);color:var(--gold)}
+.st-bar{flex:1;height:12px;border-radius:99px;background:rgba(183,154,245,.2);overflow:hidden}
+.st-bar i{display:block;height:100%;border-radius:99px;background:linear-gradient(90deg,var(--gold),var(--pink));transition:width .5s}
+.st-grid{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:30px 24px}
+.st-card{display:grid;grid-template-rows:auto auto 1fr;gap:6px;text-align:center}
+.st-card .st-art{position:relative;width:min(150px,100%);margin:0 auto 8px}
+.st-card h3{margin:0;font:800 19px/1.25 var(--font-body);color:var(--paper)}
+.st-card p{margin:0;font:600 15px/1.5 var(--font-body);color:#d9ccf0;max-width:none}
+.st-hint{color:var(--lilac)}
+.st-card.lock .stamp-svg{filter:grayscale(1) brightness(.5) contrast(.9) drop-shadow(0 4px 8px rgba(0,0,0,.4))}
+.st-card.lock h3{color:#b9a9d6}
+.st-q{position:absolute;inset:0;display:grid;place-items:center;padding-bottom:18%;font:800 44px var(--font-body);color:rgba(246,236,217,.75)}
+.st-foot{margin-top:38px;padding-top:24px;border-top:1px solid rgba(183,154,245,.25);display:flex;justify-content:flex-end}
+.btn.ghost{background:transparent;border-color:rgba(183,154,245,.6);color:var(--lilac)}
+.sheet .btn{font:800 15px var(--font-body);letter-spacing:.01em;text-transform:none;padding:.8em 1.4em;min-height:46px;border-radius:12px}
+.stamp-toast{position:fixed;left:50%;top:calc(var(--st) + 14px);z-index:70;display:flex;align-items:center;gap:18px;width:min(460px,calc(100% - 28px));box-sizing:border-box;padding:14px 22px 14px 16px;border-radius:20px;border:2px solid var(--gold);background:linear-gradient(135deg,#2a1745,#150a26);box-shadow:0 18px 50px rgba(0,0,0,.6),0 0 40px rgba(242,184,75,.25);color:var(--paper);font-family:var(--font-body);text-align:left;cursor:pointer;transform:translate(-50%,-140%);opacity:0}
+.stamp-toast.in{animation:stIn .55s cubic-bezier(.2,1.2,.3,1) forwards}
+.stamp-toast.out{animation:stOut .4s ease-in forwards}
+@keyframes stIn{from{transform:translate(-50%,-140%) rotate(-3deg);opacity:0}to{transform:translate(-50%,0);opacity:1}}
+@keyframes stOut{to{transform:translate(-50%,-140%);opacity:0}}
+.stamp-toast .st-art{flex:none;width:78px;animation:stPop .7s .25s cubic-bezier(.2,1.6,.3,1) both}
+@keyframes stPop{from{transform:scale(.4) rotate(-14deg)}to{transform:scale(1) rotate(0)}}
+.st-txt{display:grid;gap:3px;min-width:0}
+.st-txt small{font:800 13px var(--font-body);letter-spacing:.14em;text-transform:uppercase;color:var(--gold)}
+.st-txt b{font:800 21px/1.2 var(--font-body)}
+.st-txt span{font:600 15px/1.45 var(--font-body);color:#e6d9ff}
+@media (prefers-reduced-motion:reduce){.stamp-toast.in,.stamp-toast.out,.stamp-toast .st-art{animation:none;transform:translate(-50%,0);opacity:1}.stamp-toast.out{opacity:0}.st-bar i{transition:none}}
+@media (max-width:520px){.st-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:26px 16px}.st-card .st-art{width:min(128px,100%)}.st-card h3{font-size:17px}.st-card p{font-size:14px}}

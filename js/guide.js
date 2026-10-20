@@ -85,6 +85,15 @@ const PAGES = [
       { anim: () => guideScene('act', ['Chegue perto e aperte ' + hl('E'), 'Ou ' + hl('clique') + ' / ' + hl('toque') + ' na coisa', 'O painel se abre: é só ler'],
           [kbd('E'), PIC_CLICK, '<span class="ib">' + ICON_ACC + '</span>']),
         extra: '<button class="g-accbtn" type="button" data-act="acc">' + ICON_ACC + '<span>Mais ajuda: ' + hl('Acessibilidade') + '</span></button>' }
+    ] },
+  { title: 'Selos',
+    halves: [
+      { text: '<h2><span class="n">7</span>Colecione selos</h2><p class="lead">Explorar e brincar rende selos de coleção.</p>' +
+        '<ul class="g-list"><li>Visite os lugares, ' + hl('faça carinho') + ' nas gatas e nos filhotes, sacuda a cerejeira, dê ração aos peixes…</li>' +
+        '<li>O ' + hl('álbum') + ' fica no botão de selo, no canto de cima. O que você ganha ' + hl('fica salvo') + ' neste navegador.</li></ul>' +
+        '<p class="g-tip">Uma ' + hl('estrelinha dourada') + ' aparece perto do que ainda não foi tocado.</p>' },
+      { anim: () => '<div class="g-stamps" aria-hidden="true">' + ['kiara', 'cerejeira', 'cinema', 'mundo'].map(id => '<span class="g-st">' + stampSvg(STAMPS.find(o => o.id === id)) + '</span>').join('') + '</div>',
+        extra: '<button class="g-accbtn" type="button" data-act="stamps"><span>Abrir o ' + hl('álbum de selos') + '</span></button>' }
     ] }
 ];
 
@@ -121,7 +130,7 @@ function openGuide() {
       if (e.target === GD.el) return closeGuide();                                  // clicar fora do livro fecha
       const b = e.target.closest('[data-act]'); if (!b) return; const a = b.dataset.act;
       if (a === 'close') closeGuide(); else if (a === 'next') guidePage(GD.page + 1); else if (a === 'prev') guidePage(GD.page - 1);
-      else if (a === 'go') guidePage(+b.dataset.i); else if (a === 'acc') { closeGuide(); openA11y(); }
+      else if (a === 'go') guidePage(+b.dataset.i); else if (a === 'acc') { closeGuide(); openA11y(); } else if (a === 'stamps') { closeGuide(); openStamps(); }
     });
   }
   GD.last = document.activeElement; GD.el.classList.toggle('calm', !!calm);

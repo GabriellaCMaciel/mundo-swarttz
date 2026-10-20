@@ -48,6 +48,7 @@ function pickZone(ev) { // zona cujo cenário está sob o dedo/mouse e perto da 
   return null;
 }
 function openSocial(s) {
+  stampGrant('telefone');
   if (!s.url) return showToast(s.name + ': link em breve');
   if (/^mailto:/.test(s.url)) location.href = s.url; else window.open(s.url, '_blank', 'noopener,noreferrer');
   showToast('Abrindo ' + s.name + '…');
