@@ -17,12 +17,18 @@ function announce(msg) { const el = document.getElementById('srLive'); if (!el) 
 
 let renderer;
 try {
-  renderer = new THREE.WebGLRenderer({ canvas: $('stage'), antialias: true });
+  // antialias (suavizar serrilhado, MSAA) custa caro; em telas de alta densidade (2x ou mais: celulares, Macs) os pixels já são tão pequenos que o serrilhado
+  // quase não aparece, então lá desligamos. Nas telas comuns (1x a 1,5x) ele continua ligado.
+  renderer = new THREE.WebGLRenderer({ canvas: $('stage'), antialias: (window.devicePixelRatio || 1) < 2, powerPreference: 'high-performance' }); // high-performance: em notebooks com 2 placas de vídeo, pede a mais forte
 } catch (err) {
   document.body.insertAdjacentHTML('beforeend', '<p class="fail">Este navegador não conseguiu abrir o 3D. Tente em outro aparelho ou navegador.</p>');
   throw err;
 }
-renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+// Resolução ADAPTATIVA: começa na resolução cheia da tela (até 2x) e, se o aparelho não der conta (quadros demorando), baixa um pouquinho a resolução
+// interna do desenho até voltar a ficar fluido; se sobrar fôlego, sobe de novo. O 3D continua nítido, só trabalha menos. Veja perfStep() em ui.js.
+const PERF = { max: Math.min(window.devicePixelRatio || 1, 2), dpr: Math.min(window.devicePixelRatio || 1, 2), sum: 0, n: 0, lastDrop: 0, bounced: false, good: 0 };
+PERF.min = Math.min(PERF.max, 1); // nunca abaixo de 1 pixel de desenho por pixel de CSS (a resolução "normal" de qualquer tela)
+renderer.setPixelRatio(PERF.dpr);
 renderer.shadowMap.enabled = true;               // sombras suaves no mundo
 renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 

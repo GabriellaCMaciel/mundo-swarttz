@@ -308,10 +308,25 @@ function updateWorld(dt, now) {
 // e sombras 60 vezes por segundo. Na aba em segundo plano, idem. Então o loop é PARADO (cancelAnimationFrame) e retomado quando volta a ser útil.
 // Conceito: requestAnimationFrame agenda UM quadro; quem não agenda o próximo, para tudo. O último quadro desenhado continua na tela.
 let rafId = 0;
+// Mede o tempo REAL de cada quadro e ajusta a resolução (PERF, em intro.js). Janelas de ~0,7 s: se a média passar de 24 ms (menos de ~42 quadros/s),
+// baixa 0,25 de resolução; se ficar uma boa folga (≤ 18,5 ms) por ~4 s e já faz um tempo da última queda, tenta subir 0,25. Se subir e piorar de
+// novo, guarda esse nível como o teto (para não ficar subindo e descendo, o que se notaria).
+function perfStep(raw, now) {
+  if (raw > 0.25) { PERF.sum = 0; PERF.n = 0; return; } // quadro enorme (aba voltou, painel fechou): não conta
+  PERF.sum += raw; if (++PERF.n < 40) return;
+  const avg = PERF.sum / PERF.n; PERF.sum = 0; PERF.n = 0;
+  if (avg > 0.024 && PERF.dpr > PERF.min + 0.01) {
+    if (PERF.raised && now - PERF.raised < 8) PERF.max = Math.max(PERF.min, PERF.dpr - 0.25); // subiu há pouco e piorou: este nível passa a ser o teto
+    setDpr(Math.max(PERF.min, PERF.dpr - 0.25)); PERF.lastDrop = now; PERF.good = 0; PERF.raised = 0;
+  } else if (avg <= 0.0185 && PERF.dpr < PERF.max - 0.01) {
+    if (++PERF.good >= 6 && now - PERF.lastDrop > 10) { setDpr(Math.min(PERF.max, PERF.dpr + 0.25)); PERF.good = 0; PERF.raised = now; }
+  } else PERF.good = 0;
+}
+function setDpr(v) { PERF.dpr = v; renderer.setPixelRatio(v); resize(); }
 function step() {
-  const dt = Math.min(clock.getDelta(), 0.05);
+  const raw = clock.getDelta(), dt = Math.min(raw, 0.05);
   const now = clock.elapsedTime;
-  if (phase === 'world') updateWorld(dt, now); else updateIntro(now, dt);
+  if (phase === 'world') { updateWorld(dt, now); perfStep(raw, now); } else updateIntro(now, dt);
   renderer.render(scene, camera);
 }
 function loop() { step(); rafId = requestAnimationFrame(loop); }
