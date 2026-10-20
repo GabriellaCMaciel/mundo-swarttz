@@ -51,15 +51,30 @@ function buildDecor() {
     } else veg.groundBush(x, z, 0.5 + rnd() * 0.5, 6, dom);
   }
 
-  // Postes de luz dos dois lados de cada trilha (acompanhando as curvas), ligados por fios de luzinhas: assim as zonas ficam "interligadas"
+  // Postes de luz: um GUIA do caminho, não um enfeite espalhado. Dois lados de cada trilha, em pares alinhados e com o mesmo espaçamento.
+  // Para não virar ruído visual, um poste só é aceito se:
+  //  - não estiver em cima de uma zona, da lagoa, da cerejeira, do balanço ou do quintal (usa a mesma lista "spots" da vegetação);
+  //  - não estiver em cima de OUTRA trilha (perto do início as trilhas se cruzam e antes os postes se amontoavam ali);
+  //  - não ficar muito perto de outro poste já colocado (distância mínima), o que também desfaz o aperto nas curvas fechadas.
+  // Os fios de luzinhas só ligam postes vizinhos da mesma fileira; se um poste foi recusado, a fileira "quebra" e o fio recomeça depois.
+  const LAMP_STEP = 10, LAMP_SIDE = 2.7, LAMP_MIN = 5.5, LAMP_H = 3.2;
+  const lampSpots = spots.map((sp, i) => i < zones.length ? { x: sp.x, z: sp.z, r: zr(zones[i]) * 0.95 } : sp); // perto das zonas os postes vão até a entrada do cenário
+  const placed = [];
   TRAILS.filter(tr => tr.zone).forEach(tr => {
+    const others = TRAILS.filter(o => o !== tr);
+    const onOther = (x, z) => others.some(o => { const P = o.pts; for (let i = 1; i < P.length; i++) {
+      const ax = P[i - 1].x, az = P[i - 1].z, bx = P[i].x - ax, bz = P[i].z - az, k = Math.max(0, Math.min(1, ((x - ax) * bx + (z - az) * bz) / (bx * bx + bz * bz || 1)));
+      if (Math.hypot(x - ax - bx * k, z - az - bz * k) < o.width / 2 + 0.7) return true; } return false; });
     [-1, 1].forEach(side => {
       let prev = null;
-      for (let s = 9; s < tr.len - 1; s += 8.5) {
-        const q = trailAt(tr, s), x = q.x + q.nx * side * 3.1, zz = q.z + q.nz * side * 3.1, h = 3.2;
-        veg.post(x, zz, h); lampPos.push(x, h + 0.2, zz);
-        if (prev) lights.swag(prev, { x, y: h, z: zz }, 0.9, 16);
-        prev = { x, y: h, z: zz };
+      for (let s = 9; s < tr.len - 2; s += LAMP_STEP) {
+        const q = trailAt(tr, s), x = q.x + q.nx * side * LAMP_SIDE, zz = q.z + q.nz * side * LAMP_SIDE;
+        const ok = !lampSpots.some(sp => Math.hypot(x - sp.x, zz - sp.z) < sp.r) && !onOther(x, zz) && !placed.some(pp => Math.hypot(x - pp.x, zz - pp.z) < LAMP_MIN);
+        if (!ok) { prev = null; continue; }
+        placed.push({ x, z: zz });
+        veg.post(x, zz, LAMP_H); lampPos.push(x, LAMP_H + 0.2, zz);
+        if (prev) lights.swag(prev, { x, y: LAMP_H, z: zz }, 0.9, 16);
+        prev = { x, y: LAMP_H, z: zz };
       }
     });
   });
