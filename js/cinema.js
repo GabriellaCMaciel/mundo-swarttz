@@ -47,10 +47,6 @@ function cinTitle(x, text, maxW, maxLines, px, min, family) {
   }
   x.font = '800 ' + min + 'px ' + family; return { size: min, lines: cinWrap(x, text, maxW) };
 }
-function cinCover(x, im, a) { // desenha a imagem preenchendo todo o canvas (sem esticar), com opacidade a
-  const W = x.canvas.width, H = x.canvas.height, s = Math.max(W / im.width, H / im.height);
-  x.globalAlpha = a; x.drawImage(im, (W - im.width * s) / 2, (H - im.height * s) / 2, im.width * s, im.height * s); x.globalAlpha = 1;
-}
 function cinStitch(x, W, H, step, alpha) { // pontos-cruz bordados de fundo, como no chão do mundo
   x.strokeStyle = 'rgba(255,255,255,' + alpha + ')'; x.lineWidth = 3;
   for (let a = step / 2; a < W; a += step) for (let b = step / 2; b < H; b += step) { x.beginPath(); x.moveTo(a - 6, b - 6); x.lineTo(a + 6, b + 6); x.moveTo(a + 6, b - 6); x.lineTo(a - 6, b + 6); x.stroke(); }
@@ -66,9 +62,21 @@ function cinClapper(x, cx, cy, s) { // claquete (o símbolo do cinema), usada on
 const cinImgs = i => (CIN.imgs[i] || []).filter(im => im._ok); // imagens do filme i que já terminaram de carregar
 
 // ---------- o telão ----------
+// Conceito (desempenho): enviar um canvas de 1280x720 para a placa de vídeo é CARO (≈3,5 MB por envio). Antes, durante cada transição de print isso
+// acontecia a cada quadro e o site engasgava. Agora cada print vira uma textura que sobe UMA vez só, e a transição (fade) é só mudar a opacidade de
+// uma segunda camada na placa de vídeo: zero desenho e zero envio por quadro. O visual é o mesmo.
+function cinImgTex(im) { // textura do print, criada uma vez e guardada na própria imagem
+  if (!im._tex) { const t = new THREE.Texture(im); t.anisotropy = 4; t.needsUpdate = true; im._tex = t; }
+  const t = im._tex, pa = CIN.sw / CIN.sh, ia = im.width / im.height; // "cover": preenche o telão sem esticar (corta o excesso), igual ao antigo cinCover
+  if (ia > pa) { t.repeat.set(pa / ia, 1); t.offset.set((1 - pa / ia) / 2, 0); } else { t.repeat.set(1, ia / pa); t.offset.set(0, (1 - ia / pa) / 2); }
+  return t;
+}
+function cinWarm(im) { // sobe a textura para a placa de vídeo num momento calmo, para a troca de slide não dar um tranco
+  if (im && !im._warm && typeof renderer !== 'undefined') { im._warm = true; renderer.initTexture(cinImgTex(im)); }
+}
 function drawScreen() {
   const f = films[CIN.idx], x = CIN.cx, W = CIN.cv.width, H = CIN.cv.height, list = cinImgs(CIN.idx);
-  if (!list.length) { // sem prints (projeto ainda não lançado): mostra o status, no estilo do cartaz
+  if (!list.length) { // sem prints (projeto ainda não lançado): mostra o status, no estilo do cartaz (desenhado uma vez, quando o filme é escolhido)
     const g = x.createLinearGradient(0, 0, W, H); g.addColorStop(0, filmHex(f.color)); g.addColorStop(1, filmHex(f.color2));
     x.fillStyle = g; x.fillRect(0, 0, W, H); cinStitch(x, W, H, 64, 0.12);
     x.fillStyle = 'rgba(11,6,19,0.8)'; cinRR(x, W * 0.18, H * 0.16, W * 0.64, H * 0.68, 36); x.fill();
@@ -76,14 +84,14 @@ function drawScreen() {
     x.textAlign = 'center'; x.textBaseline = 'alphabetic'; x.fillStyle = '#f2b84b';
     const lab = f.status.toUpperCase(); cinFit(x, lab, W * 0.56, 118, 40, '800', 'Syne, system-ui, sans-serif'); x.fillText(lab, W / 2, H * 0.68); // o status inteiro (ex. LANÇAMENTO PREVISTO), medido para caber
     x.fillStyle = '#f6ecd9'; cinFit(x, f.title, W * 0.56, 60, 30, '800', 'Syne, system-ui, sans-serif'); x.fillText(f.title, W / 2, H * 0.78);
+    CIN.tex.needsUpdate = true; CIN.mat.map = CIN.tex; CIN.matB.visible = false;
     CIN.cur = null;
   } else {
     const cur = list[CIN.si % list.length];
-    x.fillStyle = '#000'; x.fillRect(0, 0, W, H);
-    if (CIN.fade < 1 && CIN.prev) { cinCover(x, CIN.prev, 1); cinCover(x, cur, CIN.fade); } else cinCover(x, cur, 1);
+    if (CIN.fade < 1 && CIN.prev && CIN.prev._ok) { CIN.mat.map = cinImgTex(CIN.prev); CIN.matB.map = cinImgTex(cur); CIN.matB.opacity = CIN.fade; CIN.matB.visible = true; } // camada de baixo: o print anterior; de cima: o novo, aparecendo
+    else { CIN.mat.map = cinImgTex(cur); CIN.matB.visible = false; }
     CIN.cur = cur;
   }
-  CIN.tex.needsUpdate = true;
 }
 
 // ---------- os cartazes ("em cartaz"): as informações do filme ----------
@@ -283,6 +291,8 @@ function buildCinema(g) {
   CIN.tex = new THREE.CanvasTexture(CIN.cv); CIN.tex.anisotropy = 4;
   CIN.mat = new THREE.MeshBasicMaterial({ map: CIN.tex });
   const screen = new THREE.Mesh(new THREE.PlaneGeometry(W, H), CIN.mat); screen.position.set(0, SY, SZ + 0.2); g.add(screen);
+  CIN.matB = new THREE.MeshBasicMaterial({ map: CIN.tex, transparent: true, depthWrite: false }); CIN.matB.visible = false; // 2ª camada, só para a transição
+  const screenB = new THREE.Mesh(new THREE.PlaneGeometry(W, H), CIN.matB); screenB.position.set(0, SY, SZ + 0.21); screenB.renderOrder = 2; g.add(screenB); CIN.screenB = screenB;
   box(W + 0.8, H + 0.8, 0.4, 0x1a0f2e, 0, SY, SZ - 0.05, g);                                   // moldura escura
   box(W + 1.1, 0.16, 0.5, 0xf2b84b, 0, SY + H / 2 + 0.46, SZ, g); box(W + 1.1, 0.16, 0.5, 0xf2b84b, 0, SY - H / 2 - 0.46, SZ, g); // frisos dourados
   [-1, 1].forEach(s => box(0.16, H + 1.1, 0.5, 0xf2b84b, s * (W / 2 + 0.46), SY, SZ, g));
@@ -364,14 +374,14 @@ function updateCinema(now, dt) {
   if (!CIN.built) return;
   const pl = typeof player !== 'undefined' ? player.position : null;
   if (pl && Math.hypot(pl.x - CIN.zone.pos[0], pl.z - CIN.zone.pos[2]) > 75) return; // longe do cinema, nada é atualizado (economiza)
-  if (CIN.fade < 1) { CIN.fade = Math.min(1, CIN.fade + dt / 0.7); drawScreen(); }
+  if (CIN.fade < 1) { CIN.fade = Math.min(1, CIN.fade + dt / 0.7); if (CIN.fade >= 1) drawScreen(); else CIN.matB.opacity = CIN.fade; } // só a opacidade muda por quadro; no fim, a camada de baixo assume
   const list = cinImgs(CIN.idx);
   if (!calm && list.length > 1) { // passa os prints do projeto, um a um
-    CIN.slideT += dt;
+    CIN.slideT += dt; if (CIN.slideT > 1.2) cinWarm(list[(CIN.si + 1) % list.length]); // com o slide já na tela, prepara o próximo
     if (CIN.slideT >= CIN.SLIDE) { CIN.slideT = 0; CIN.prev = CIN.cur; CIN.si = (CIN.si + 1) % list.length; CIN.fade = 0; drawScreen(); }
   }
   CIN.flash = Math.max(0, CIN.flash - dt * 2.6);
-  CIN.mat.color.setScalar(Math.max(0.12, 0.95 + (calm ? 0 : Math.sin(now * 23) * 0.03) - CIN.flash * 0.75));
+  const lum = Math.max(0.12, 0.95 + (calm ? 0 : Math.sin(now * 23) * 0.03) - CIN.flash * 0.75); CIN.mat.color.setScalar(lum); CIN.matB.color.setScalar(lum);
   CIN.spot.material.opacity = calm ? 0.7 : 0.55 + Math.sin(now * 3) * 0.2;
   // ingresso saindo do guichê (0 = escondido dentro; 1 = em cima do balcão)
   CIN.ticketT = Math.min(1, CIN.ticketT + dt / 0.7); const e = 1 - Math.pow(1 - CIN.ticketT, 3);
