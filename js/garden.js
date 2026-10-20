@@ -83,11 +83,15 @@ function instanced(geo, material, items) {
   const c = new THREE.Vector3(); items.forEach(it => c.add(new THREE.Vector3(it.x, it.y, it.z))); c.divideScalar(Math.max(1, items.length));
   let rad = 1; items.forEach(it => { rad = Math.max(rad, Math.hypot(it.x - c.x, it.y - c.y, it.z - c.z) + Math.max(it.sx, it.sy || 0, it.sz || 0) + 0.5); });
   mesh.geometry = mesh.geometry.clone(); mesh.geometry.boundingSphere = new THREE.Sphere(c, rad);
+  // Conceito (desempenho): no three.js r128 todo InstancedMesh nasce com frustumCulled = false, ou seja, ele é desenhado MESMO fora da tela (atrás da
+  // câmera, nas laterais). Aqui ligamos o corte de volta: com a esfera acima, o lote só vai para a placa de vídeo se estiver no campo de visão.
+  mesh.frustumCulled = true;
   return mesh;
 }
 
 // Todos os "quadradinhos" de vegetação ficam nesta lista: os que estão muito longe da câmera (já escondidos pela névoa) não são desenhados.
 const vegChunks = [];
+const LOD_DIST = 62;  // a partir daqui os arbustos usam a versão com menos triângulos (20 em vez de 80 por bolinha)
 const CULL_DIST = 100; // distância (em unidades do mundo) a partir da qual um lote de plantas deixa de ser desenhado
 const _cv = new THREE.Vector3();
 let _cullTick = 0;
@@ -95,7 +99,10 @@ function cullFar() {
   if (++_cullTick % 6) return; // basta conferir de vez em quando
   vegChunks.forEach(c => {
     _cv.copy(c.m.geometry.boundingSphere.center); c.parent.localToWorld(_cv);
-    c.m.visible = Math.hypot(_cv.x - camera.position.x, _cv.z - camera.position.z) < CULL_DIST + c.m.geometry.boundingSphere.radius;
+    const d = Math.hypot(_cv.x - camera.position.x, _cv.z - camera.position.z), rad = c.m.geometry.boundingSphere.radius;
+    const on = d < (c.maxD || CULL_DIST) + rad;                      // dentro do alcance de desenho (as florzinhas somem antes: de longe viram menos de 2 pixels)
+    const far = d > LOD_DIST + rad;                                  // longe: o arbusto usa a versão simples (já está dentro da névoa)
+    if (c.lo) { c.m.visible = on && !far; c.lo.visible = on && far; } else c.m.visible = on;
   });
 }
 
@@ -138,13 +145,26 @@ class VegBatch {
   addTo(parent) {
     const mats = { b: lam(0xffffff), f: lam(0xffffff, { emissive: 0x2a1020 }), l: lam(0xffffff), t: lam(0xffffff) };
     const geos = { b: new THREE.IcosahedronGeometry(1, 1), f: new THREE.OctahedronGeometry(1, 0), l: new THREE.IcosahedronGeometry(1, 0), t: new THREE.CylinderGeometry(1, 1.2, 1, 6) };
+    const geoLo = new THREE.IcosahedronGeometry(1, 0);
+    { const P = geoLo.attributes.position, N = geoLo.attributes.normal, v = new THREE.Vector3(); // normais "suaves" (como na versão detalhada): sem isso a bolinha simples ficaria facetada e a troca de versão daria para notar
+      for (let i = 0; i < P.count; i++) { v.fromBufferAttribute(P, i).normalize(); N.setXYZ(i, v.x, v.y, v.z); } N.needsUpdate = true; }
     const cells = new Map();
     const put = (kind, items) => items.forEach(it => {
       const key = Math.floor(it.x / 18) + ',' + Math.floor(it.z / 18) + kind;
       let c = cells.get(key); if (!c) cells.set(key, c = { kind, items: [] }); c.items.push(it);
     });
     put('b', this.bushes); put('f', this.flowers); put('l', this.leaves); put('t', this.trunks);
-    cells.forEach(c => { const m = instanced(geos[c.kind], mats[c.kind], c.items); parent.add(m); vegChunks.push({ m, parent }); });
+    cells.forEach(c => {
+      const m = instanced(geos[c.kind], mats[c.kind], c.items); parent.add(m);
+      const chunk = { m, parent };
+      if (c.kind === 'b') { // versão simples do mesmo lote: divide as MESMAS posições e cores (buffers compartilhados), só muda a malha
+        const lo = new THREE.InstancedMesh(geoLo, mats.b, m.count); lo.count = m.count; lo.instanceMatrix = m.instanceMatrix; lo.instanceColor = m.instanceColor;
+        lo.geometry = geoLo.clone(); lo.geometry.boundingSphere = m.geometry.boundingSphere; lo.frustumCulled = true; lo.visible = false; lo.userData.flat = true;
+        parent.add(lo); chunk.lo = lo;
+      }
+      if (c.kind === 'f') chunk.maxD = 72;
+      vegChunks.push(chunk);
+    });
   }
 }
 
