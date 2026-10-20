@@ -31,8 +31,10 @@ js/mailbox.js     a zona Cartas em 3D: caixa de correio rosa, casinha inclinada 
 js/yardcats.js    a Mel (no telhado, rosna se outro gato chega perto) e os filhotes brincando de lutinha no quintal
 js/phone.js       o celular gigante da zona Telefone: flutua, gira devagar para os lados seguindo a pessoa, com ícones de redes e cartões de vidro
 js/cinema.js      o cinema drive-in da zona de projetos: telão (16:9) que passa os prints do projeto em exibição, cartazes "em cartaz" com as informações de cada filme, 6 carrinhos nas vagas, cabine do projetor com feixe de luz, bilheteria com letreiro LED, ingresso e setas para escolher o filme, e o letreiro DRIVE-IN
-js/guide.js       o livro de instruções (2D) que abre ao entrar no mundo: 3 páginas com o hacker animado andando, correndo, pulando e interagindo (estilos em css/guide.css)
+js/guide.js       o livro de instruções (2D) que abre ao entrar no mundo: 5 páginas (andar, correr e pular, interagir, nos lugares, selos). Tudo o que antes era dica na tela mora aqui
 js/pick.js        toque/clique nas coisas do mundo: ícones do celular abrem os perfis, zonas abrem o painel
+js/interact.js    o sistema de interações: tudo que dá para clicar/tocar (gatas, filhotes, Zé Porempa, lagoa, cerejeira, balanço) reage com balão de fala, corações etc.; tecla F interage com o mais perto
+js/stamps.js      os selos colecionáveis: lista STAMPS (arte em SVG, nome, descrição, pista), álbum, aviso ao ganhar e salvamento no navegador (localStorage)
 js/boot.js        porta de entrada: manda para simples.html (escolha salva, ?simples ou aparelho sem WebGL) ou carrega o mundo 3D, com os arquivos em ordem
 js/mail.js        a tela das cartas: carrossel de envelopes e a carta dobrada em três (animação por linha do tempo, reversível)
 js/zones.js       cenários e etiquetas das outras zonas (sem círculos: tudo faz parte do mesmo mundo)
@@ -73,8 +75,12 @@ Use um servidor local (por exemplo, a extensão **Live Server** do VS Code) ou p
 - Gatos brincalhões: estados e velocidades em `js/playcats.js` (`updateJulietta`, `updateMocca`, `updateBird`). Com `prefers-reduced-motion` eles ficam parados.
 - Regra de clique fora: clicar fora de algo que foi aberto (carta, tela dos Correios, painéis) fecha o que foi aberto. Em `js/mail.js` use `e.envHandled` para cliques que o próprio envelope já tratou.
 - Acessibilidade: o site tem uma **versão simples** (texto puro) em `simples.html` (`?simples` abre e lembra a escolha; `?3d` volta ao mundo 3D); ela abre sozinha, com um aviso, se o aparelho não tiver WebGL. No 3D, a tecla **H** (ou o botão Acessibilidade) abre o menu: ir direto a cada lugar, andar sozinho até lá, reduzir movimento. Clicar/tocar no chão também faz a personagem andar. Leitores de tela recebem avisos (região `#srLive`, função `announce()` em `js/intro.js`).
-- Dicas na tela: o aviso da abertura (`.hint`) fica embaixo, no centro. Quando algo abre (painel, Correios, carta), a dica de fechar fica no canto inferior direito (`.panel-hint`, `.mail-keys`). As instruções de movimento ficam só no livro (`js/guide.js`) e no menu de acessibilidade.
+- Dicas na tela: não há mais dicas de controle espalhadas ("abrir (E)", "clique fora…"): o tutorial (`js/guide.js`) explica tudo. Só o aviso da abertura (`.hint`) continua. Textos de leitura das janelas usam a fonte Nunito (`--font-body`), com bastante espaço em volta.
 - Economia de energia: com um painel/Correios aberto ou a aba em segundo plano o loop de animação é parado (`syncLoop` em `js/ui.js`) e volta sozinho.
 - Tamanho de cada zona: campo `size` da lista `zones` (1 = tamanho original). A casa das cartas tem as medidas e o giro em `CARTAS`, `YARD` e `HOUSE`, no topo de `js/mailbox.js`.
 
-Os textos dos painéis ainda são provisórios.
+
+
+- Interações: cada coisa clicável é um item de `INTERACTS` em `js/interact.js` (`buildInteracts`): nome, onde está (`pos`), raio do clique (`r`) e o que acontece. O clique é testado pela distância do "raio" até um ponto, não pelas malhas 3D.
+- Selos: para criar um, acrescente um item em `STAMPS` (`js/stamps.js`) e chame `stampGrant('id')` onde a conquista acontece. O progresso fica em `localStorage` (`swarttz-selos`). O botão "Zerar coleção" do álbum recomeça tudo (útil para demonstrar).
+- Chão: as cores dos retalhos estão em `patchTex` (`js/world.js`); foram clareadas para dar mais contraste com a personagem e os objetos escuros.
