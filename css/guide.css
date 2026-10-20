@@ -8,7 +8,7 @@
 .g-spread{display:grid;grid-template-columns:1fr 1fr;height:100%;position:relative}
 .g-spread::before{content:"";position:absolute;left:50%;top:0;bottom:0;width:36px;margin-left:-18px;background:linear-gradient(90deg,transparent,rgba(0,0,0,.34),transparent);pointer-events:none;z-index:2} /* a sombra da lombada, no meio do livro */
 .g-spread::after{content:"";position:absolute;left:50%;top:22px;bottom:22px;border-left:2px dashed rgba(242,184,75,.4);pointer-events:none;z-index:2}
-.g-half{box-sizing:border-box;padding:40px 48px 24px;overflow:auto;display:flex;flex-direction:column;justify-content:center;gap:12px;min-height:0}
+.g-half{min-width:0;overflow-wrap:break-word;box-sizing:border-box;padding:40px 48px 24px;overflow:auto;display:flex;flex-direction:column;justify-content:center;gap:12px;min-height:0}
 .g-half.left{padding-right:52px}.g-half.right{padding-left:52px}
 
 /* texto */
@@ -121,7 +121,7 @@ kbd{display:inline-block;min-width:26px;box-sizing:border-box;padding:3px 9px;ma
 /* celular em pé: as metades empilham e a página rola */
 @media (max-width:760px){
   .g-book{height:100%;border-radius:14px}
-  .g-spread{grid-template-columns:1fr;grid-auto-rows:max-content;height:auto;min-height:100%;align-content:start}
+  .g-spread{grid-template-columns:minmax(0,1fr);grid-auto-rows:max-content;height:auto;min-height:100%;align-content:start} /* minmax(0,1fr): a coluna nunca fica mais larga que a página (senão o texto passa da borda) */
   .g-spread::before,.g-spread::after{display:none}
   .g-half,.g-half.left,.g-half.right{padding:16px 18px 20px;justify-content:flex-start;overflow:visible;min-height:auto}
   .g-scene{height:170px;--j1:-34px;--j2:-40px}.g-half.both .g-scene{height:150px;--j1:-26px;--j2:-30px}

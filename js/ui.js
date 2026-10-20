@@ -23,7 +23,7 @@ const panels = {
       (!f.url && !f.repo ? '<span class="link off"><span>links</span><small>em breve</small></span>' : '') + '</div></article>').join('') + '</div>',
   telefone: z => heading(z, 'Onde me encontrar na internet.') + // a lista SOCIALS fica em config.js
     '<div class="links">' + SOCIALS.map(s => s.url
-      ? '<a class="link on" href="' + s.url + '"' + (/^mailto:/.test(s.url) ? '' : ' target="_blank" rel="noopener noreferrer"') + '><span>' + s.name + '</span><small>' + (s.handle || 'abrir') + ' ↗</small></a>'
+      ? '<a class="link on" href="' + s.url + '"' + (/^mailto:/.test(s.url) ? '' : ' target="_blank" rel="noopener noreferrer"') + '><span class="nm">' + s.name + '</span><small>' + (s.handle || 'abrir') + ' ↗</small></a>'
       : '<div class="link off"><span>' + s.name + '</span><small>em breve</small></div>').join('') + '</div>'
 };
 // O painel de um livro da biblioteca: curso, certificação ou graduação
