@@ -85,7 +85,7 @@ const zones = [
   { id: 'telefone', name: 'Telefone', color: 0x7b3fe4, pos: [27, 0, 31], size: 1.35, labelY: 0.5, labelZ: 2.0, text: 'GitHub, LinkedIn e e-mail, a um toque.' },
   // Cartas: a posição é a da caixa de correio. A casa e o quintal ficam atrás dela, girados (rot) para não encararem a câmera (veja mailbox.js)
   { id: 'cartas', name: 'Cartas', color: 0xff7eb6, pos: [CARTAS.x, 0, CARTAS.z], rot: CARTAS.rot, r: 7, labelY: 5.4, glow: 0, lightI: 0.22, lightD: 12, text: 'Cartas de depoimento que a Gabriella recebeu. Abra a caixinha de correio para ler.' }
-];
+].filter(z => z.id !== 'atelie' || ATELIE_ATIVO); // o Ateliê só entra no mundo se ATELIE_ATIVO (config.js) for true
 
 // Etiqueta flutuante: desenhada num canvas 2D e usada como "sprite" (imagem que sempre encara a câmera)
 function makeLabel(text, color, scale = 1) {

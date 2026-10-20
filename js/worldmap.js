@@ -21,7 +21,7 @@ const mapPt = (x, z, S) => [S * (MAP_CX + x * MAP_K), S * (MAP_CY + z * MAP_K)];
 function mapPlaces() {
   const zp = id => { const z = zones.find(o => o.id === id); return { x: z.pos[0], z: z.pos[2], name: id === 'cinema' ? 'Cinema' : z.name }; };
   return [
-    { ...zp('sobre'), ic: 'sobre', lab: 'r', dx: 20 }, { ...zp('atelie'), ic: 'atelie', lab: 'l' }, { ...zp('biblioteca'), ic: 'biblioteca', lab: 'u' },
+    { ...zp('sobre'), ic: 'sobre', lab: 'r', dx: 20 }, ...(ATELIE_ATIVO ? [{ ...zp('atelie'), ic: 'atelie', lab: 'l' }] : []), { ...zp('biblioteca'), ic: 'biblioteca', lab: 'u' },
     { ...zp('cinema'), ic: 'cinema', lab: 'u' }, { ...zp('telefone'), ic: 'telefone', lab: 'd' }, { ...zp('cartas'), ic: 'cartas', lab: 'd' },
     { x: POND.x, z: POND.z, name: 'Lagoa', ic: 'lagoa', lab: 'r', dx: 18 }, { x: CHERRY.x, z: CHERRY.z, name: 'Cerejeira', ic: 'cerejeira', lab: 'u' },
     { x: SWING.x, z: SWING.z, name: 'Balanço', ic: 'balanco', lab: 'u', ox: 26 }, { x: TRAIL_START.x, z: TRAIL_START.z, name: 'Início', ic: 'inicio', lab: 'd', dy: 26 }

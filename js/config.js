@@ -27,6 +27,9 @@ const ABOUT = [
   'Sou a Gabriella Swarttz. Estudo Desenvolvimento Web e Mobile, sou monitora no projeto START e estou construindo meu caminho até a engenharia de IA.',
   'Gosto de livros, gatos, pintura, bordado, selos e de tudo que é colorido.'
 ];
+// Interruptor do Ateliê (soft skills). false = o Ateliê fica FORA do mundo por enquanto: some o cenário, o cartão, o painel, o ícone do mapa e o selo "Mãos à Obra".
+// Para trazê-lo de volta, é só trocar para true (nada foi apagado).
+const ATELIE_ATIVO = false;
 const SOFT_SKILLS = ['Didática', 'Criatividade', 'Comunicação', 'Trabalho em equipe', 'Resiliência', 'Organização'];
 
 // O roteiro do "hack" da abertura (o notebook invadindo a conta da Gabriella). Cada linha: [texto, cor]. Mantenha cada linha com até ~36 letras (a logo aparece à direita no final).
@@ -66,7 +69,7 @@ const letters = [
 const films = [
   { id: 'mundo', title: 'Mundo Swarttz', tagline: 'Este portfólio: um mundo 3D para explorar', status: 'em cartaz', year: 2026, plate: 'MUNDO',
     stack: ['Three.js', 'JavaScript', 'Canvas 2D'], color: 0x7b3fe4, color2: 0xff5fa2,
-    text: 'O portfólio que você está explorando: um mundo 3D bordado à mão, com biblioteca, ateliê, gatas, cartas e uma versão simples em texto para leitores de tela.',
+    text: 'O portfólio que você está explorando: um mundo 3D bordado à mão, com biblioteca, gatas, cartas e uma versão simples em texto para leitores de tela.',
     shots: ['assets/filmes/mundo-1.jpg', 'assets/filmes/mundo-2.jpg', 'assets/filmes/mundo-3.jpg', 'assets/filmes/mundo-4.jpg'],
     url: 'https://gabriellacmaciel.github.io/mundo-swarttz/', repo: 'https://github.com/GabriellaCMaciel/mundo-swarttz' },
   { id: 'jc', title: 'JC Resolve', tagline: 'Manutenção residencial com loja e agendamento online', status: 'em produção', year: 2026, plate: 'JC',

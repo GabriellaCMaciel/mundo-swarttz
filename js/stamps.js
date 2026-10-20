@@ -67,7 +67,7 @@ const STAMPS = [
   { id: 'cartas', name: 'Correio Elegante', desc: 'Você abriu uma carta que a Gabriella recebeu.', hint: 'Abra uma carta na caixa de correio.', c1: '#ff7eb6', c2: '#b8477f',
     art: '<rect x="10" y="20" width="72" height="46" rx="4" fill="#fff6e2" stroke="#7a3a5a" stroke-width="2"/><path d="M10 22 L46 48 L82 22" fill="#f3dfe8" stroke="#7a3a5a" stroke-width="2" stroke-linejoin="round"/>' +
       '<path d="M46 56 C28 44 34 32 42 34 C45 35 46 38 46 40 C46 38 47 35 50 34 C58 32 64 44 46 56Z" fill="#ff4d6d"/><path d="M10 66 L34 44 M82 66 L58 44" stroke="#7a3a5a" stroke-width="1.6" opacity=".6"/>' + sparkle(80, 12, 5) },
-  { id: 'mundo', name: 'Volta ao Mundo', desc: 'Você conheceu todos os cantos: Sobre, Ateliê, Biblioteca, Cinema, Telefone e Cartas.', hint: 'Visite os 6 lugares do mundo.', c1: '#2f8f6b', c2: '#1b3a5a',
+  { id: 'mundo', name: 'Volta ao Mundo', desc: 'Você conheceu todos os cantos: Sobre, ' + (ATELIE_ATIVO ? 'Ateliê, ' : '') + 'Biblioteca, Cinema, Telefone e Cartas.', hint: 'Visite os ' + (ATELIE_ATIVO ? 6 : 5) + ' lugares do mundo.', c1: '#2f8f6b', c2: '#1b3a5a',
     art: '<circle cx="46" cy="41" r="32" fill="#f6ecd9" stroke="#f2b84b" stroke-width="3"/><circle cx="46" cy="41" r="25" fill="none" stroke="#3a2060" stroke-width="1.2" stroke-dasharray="2 4"/>' +
       '<path d="M46 12 L53 41 H39Z" fill="#ff4d6d"/><path d="M46 70 L53 41 H39Z" fill="#2a1745"/><circle cx="46" cy="41" r="3.5" fill="#f2b84b"/>' +
       '<path d="M46 6 V12 M46 70 V76 M10 41 H16 M76 41 H82" stroke="#f2b84b" stroke-width="3" stroke-linecap="round"/>' },
@@ -110,6 +110,7 @@ const STAMPS = [
     art: '<circle cx="46" cy="41" r="34" fill="none" stroke="#7a4a1e" stroke-width="2" stroke-dasharray="3 5"/><path d="M46 8 L55 31 L80 32 L60 48 L67 72 L46 58 L25 72 L32 48 L12 32 L37 31Z" fill="#fff6e2" stroke="#7a4a1e" stroke-width="2.4" stroke-linejoin="round"/>' +
       '<path d="M46 22 L51 35 L65 36 L54 45 L58 59 L46 51 L34 59 L38 45 L27 36 L41 35Z" fill="#f2b84b"/>' }
 ];
+if (!ATELIE_ATIVO) STAMPS.splice(STAMPS.findIndex(x => x.id === 'atelie'), 1); // sem Ateliê no mundo, o selo dele também fica de fora
 
 // ---------- o selo inteiro: moldura de correio com bordinha dentada + janela com o desenho ----------
 function stampSvg(s) {
@@ -147,14 +148,14 @@ function stampBook(id) {
   stampGrant('biblioteca');
   if (typeof books !== 'undefined' && stampMark('livros', id) >= books.length) stampGrant('estante');
 }
-const ZONE_STAMPS = ['sobre', 'atelie', 'biblioteca', 'cinema', 'telefone', 'cartas'];
+const ZONE_STAMPS = ['sobre', 'atelie', 'biblioteca', 'cinema', 'telefone', 'cartas'].filter(z => z !== 'atelie' || ATELIE_ATIVO);
 function stampGrant(id) {
   if (!SEL.ready || SEL.got[id]) return false;
   const s = STAMPS.find(o => o.id === id); if (!s) return false;
   SEL.got[id] = Date.now(); stampsSave(); stampsBadge();
   SEL.queue.push(s); stampNext();
   announce('Novo selo: ' + s.name + '. ' + s.desc);
-  if (ZONE_STAMPS.includes(id) && ZONE_STAMPS.every(z => SEL.got[z])) stampGrant('mundo'); // conheceu os 6 cantos
+  if (ZONE_STAMPS.includes(id) && ZONE_STAMPS.every(z => SEL.got[z])) stampGrant('mundo'); // conheceu todos os cantos
   if (id !== 'colecao' && STAMPS.every(o => o.id === 'colecao' || SEL.got[o.id])) stampGrant('colecao'); // o último de todos
   return true;
 }

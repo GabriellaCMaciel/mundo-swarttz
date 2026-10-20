@@ -2,7 +2,7 @@
 
 Portfólio 3D interativo de **Gabriella Swarttz**, feito com HTML, CSS, JavaScript e [Three.js](https://threejs.org/).
 
-Você abre o notebook, "hackeia" o perfil e entra num mundo com zonas para explorar: Sobre, Ateliê, Biblioteca, Cinema drive-in (os projetos), Telefone e Cartas. As gatas Kiara, Maria Marta, Zé Porempa, Mel e os três filhotes (Bangula, Ônix e Cat Noir) moram por lá.
+Você abre o notebook, "hackeia" o perfil e entra num mundo com zonas para explorar: Sobre, Biblioteca, Cinema drive-in (os projetos), Telefone e Cartas. As gatas Kiara, Maria Marta, Zé Porempa, Mel e os três filhotes (Bangula, Ônix e Cat Noir) moram por lá.
 
 ## Como usar
 
@@ -85,3 +85,7 @@ Use um servidor local (por exemplo, a extensão **Live Server** do VS Code) ou p
 - Selos: para criar um, acrescente um item em `STAMPS` (`js/stamps.js`) e chame `stampGrant('id')` onde a conquista acontece. O progresso fica em `localStorage` (`swarttz-selos`). O botão "Zerar coleção" do álbum recomeça tudo (útil para demonstrar).
 - Chão: as cores dos retalhos estão em `patchTex` (`js/world.js`); foram clareadas para dar mais contraste com a personagem e os objetos escuros.
 - Desempenho: o que mantém o mundo fluido (não desfaça sem medir): (1) `instanced()` em `js/garden.js` liga o corte por campo de visão (`frustumCulled`) e os arbustos têm uma versão simples de longe (LOD); (2) o telão do cinema usa uma textura por print e a transição é só opacidade (`js/cinema.js`), sem redesenhar canvas por quadro; (3) só 3 luzes de ponto de verdade, reaproveitadas pelas zonas mais próximas (`updateZoneLights` em `js/zones.js`); (4) resolução adaptativa (`perfStep` em `js/ui.js`) e `powerPreference: 'high-performance'`; MSAA desligado em telas 2x ou mais (`js/intro.js`).
+
+
+## Ateliê (temporariamente fora)
+O Ateliê (soft skills) está desligado por enquanto. Para trazê-lo de volta, troque `ATELIE_ATIVO` para `true` em `js/config.js`: cenário, cartão, painel, ícone do mapa e o selo "Mãos à Obra" voltam juntos.
