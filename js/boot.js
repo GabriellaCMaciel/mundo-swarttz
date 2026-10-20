@@ -38,5 +38,5 @@
   if (!simple && (!webglOK() || typeof THREE === 'undefined')) { simple = true; aviso = true; } // sem WebGL, ou o Three.js (CDN) não carregou
   if (simple) { location.replace('simples.html' + (aviso ? '#aviso' : '')); return; }
   window.SWARTTZ_MODE = '3d';
-  load(['config', 'intro', 'garden', 'world', 'cherry', 'library', 'pond', 'kiara', 'mailbox', 'yardcats', 'phone', 'cinema', 'zones', 'trails', 'worldmap', 'decor', 'swing', 'playcats', 'mail', 'guide', 'ui', 'pick']);
+  load(['config', 'intro', 'garden', 'world', 'cherry', 'library', 'pond', 'kiara', 'mailbox', 'yardcats', 'phone', 'cinema', 'zones', 'trails', 'worldmap', 'decor', 'swing', 'playcats', 'mail', 'guide', 'stamps', 'ui', 'pick', 'interact']);
 })();

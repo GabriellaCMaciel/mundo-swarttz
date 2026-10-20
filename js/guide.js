@@ -78,9 +78,9 @@ const PAGES = [
   { title: 'Interagir',
     halves: [
       { text: '<h2><span class="n">4</span>Interagir</h2><p class="lead">Chegou perto de um lugar? Aparece um cartão com o nome dele.</p>' +
-        '<ul class="g-list"><li><span class="k">Teclado</span>aperte ' + kbd('E') + ' ou ' + kbd('Enter') + '</li>' +
-        '<li><span class="k">Mouse ou toque</span>' + hl('clique ou toque') + ' na coisa, ou no botão ' + hl('abrir') + '</li>' +
-        '<li><span class="k">Fechar</span>' + kbd('Esc') + ', o ' + hl('✕') + ' ou um clique fora</li></ul>' +
+        '<ul class="g-list"><li><span class="k">Abrir um lugar</span>aperte ' + kbd('E') + ' ou ' + kbd('Enter') + ', ou ' + hl('clique no cartão') + ' (no celular, ' + hl('toque') + ')</li>' +
+        '<li><span class="k">Bichinhos e coisas</span>' + hl('clique ou toque') + ' neles, ou aperte ' + kbd('F') + ' perto de um</li>' +
+        '<li><span class="k">Fechar</span>' + kbd('Esc') + ', o ' + hl('✕') + ' ou um clique fora da janela</li></ul>' +
         '<p class="g-tip">Também vale: ' + kbd('M') + ' abre o ' + hl('mapa') + ' e ' + kbd('H') + ' abre a ' + hl('acessibilidade') + '.</p>' },
       { anim: () => guideScene('act', ['Chegue perto e aperte ' + hl('E'), 'Ou ' + hl('clique') + ' / ' + hl('toque') + ' na coisa', 'O painel se abre: é só ler'],
           [kbd('E'), PIC_CLICK, '<span class="ib">' + ICON_ACC + '</span>']),

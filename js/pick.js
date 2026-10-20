@@ -58,6 +58,7 @@ renderer.domElement.addEventListener('click', e => {
   if (phase !== 'world' || panelOpen || mailUi.isOpen) return; // o clique em livros da biblioteca é tratado em library.js (vem antes e abre o painel)
   const s = pickIcon(e); if (s) return openSocial(s);
   const cin = pickCinema(e); if (cin) return cin(); // cartaz, carrinho ou seta da bilheteria: escolhe o filme
+  const inter = pickInteract(e); if (inter) return interactDo(inter); // bichinhos, lagoa, árvore, balanço (js/interact.js)
   const z = pickZone(e); if (z) return openPanel(z);
   // clicou no chão: a personagem anda até lá (ajuda quem não consegue segurar teclas). O raio atravessa a tela até encontrar o plano y = 0.
   pickSetup(e); const hit = pickRay.ray.intersectPlane(groundPlane, pickHit); if (hit) walkTo(hit.x, hit.z);
@@ -66,5 +67,6 @@ let pickMoveT = 0;
 renderer.domElement.addEventListener('pointermove', e => { // mouse: cursor de "mãozinha" sobre o que é clicável (no máximo ~8 vezes por segundo)
   if (e.pointerType === 'touch' || phase !== 'world' || panelOpen) return;
   const now = performance.now(); if (now - pickMoveT < 120) return; pickMoveT = now;
-  renderer.domElement.style.cursor = (pickIcon(e) || pickCinema(e) || pickZone(e) || hoverBook) ? 'pointer' : '';
+  const ih = pickInteract(e); interactTip(ih, e); // só o nome da coisa, perto do cursor
+  renderer.domElement.style.cursor = (pickIcon(e) || pickCinema(e) || ih || pickZone(e) || hoverBook) ? 'pointer' : '';
 });

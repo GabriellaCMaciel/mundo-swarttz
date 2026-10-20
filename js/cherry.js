@@ -13,7 +13,7 @@ const CHERRY = { x: POND.x - POND.r - 4.6, z: POND.z + 0.6, h: 7.4 };
 const BENCH_SPOT = { x: POND.x - POND.r - 1.9, z: POND.z + 1.4 };
 
 const PETAL_PINKS = [0xffc2da, 0xffb0cf, 0xffd0e2, 0xffe3ee, 0xf7a1c7]; // tons de rosa (sem branco puro, para a copa não estourar de luz)
-const cherryState = { fall: null, items: [], wind: 1, ready: false, tmp: new THREE.Object3D() };
+const cherryState = { fall: null, items: [], wind: 1, ready: false, tmp: new THREE.Object3D(), burst: 0, clock: 0, last: 0 }; // burst: 1 logo depois de sacudir a árvore e vai a 0 devagar
 
 // Galho/tronco como um TUBO liso que acompanha uma curva (CatmullRomCurve3) e vai afinando.
 // Antes era uma fila de cilindros retos: nas curvas sobravam "cunhas" vazias entre eles. No tubo não existe emenda.
@@ -104,9 +104,12 @@ function updateCherry(now) {
   S.parent.localToWorld(_cp.copy(S.center));
   const near = Math.hypot(_cp.x - camera.position.x, _cp.z - camera.position.z) < 70;
   S.fall.visible = near && !calm; if (!near || calm) return; // longe da câmera (ou com "reduzir movimento" ligado no sistema) não anima nada: as pétalas do chão continuam lá
-  const d = S.tmp, wind = 0.75 + 0.25 * Math.sin(now * 0.4) + 0.12 * Math.sin(now * 1.3); // rajadas: forte, fraco, forte...
+  // SACUDIR A ÁRVORE (js/interact.js): enquanto "burst" é maior que 0 o relógio das pétalas anda mais rápido e o vento sopra mais forte.
+  // Usamos um relógio próprio (S.clock) para a aceleração não dar "pulos": ele só soma o tempo que passou vezes um fator.
+  const step = S.last ? Math.min(0.1, now - S.last) : 0; S.last = now; S.burst = Math.max(0, S.burst - step / 4.5); S.clock += step * (1 + S.burst * 4);
+  const clk = S.clock, d = S.tmp, wind = (0.75 + 0.25 * Math.sin(now * 0.4) + 0.12 * Math.sin(now * 1.3)) * (1 + S.burst * 1.6); // rajadas: forte, fraco, forte...
   S.items.forEach((p, i) => {
-    const t = (now / p.dur + p.ph) % 1; // 0 = soltou, 1 = pousou
+    const t = (clk / p.dur + p.ph) % 1; // 0 = soltou, 1 = pousou (clk = relógio das pétalas)
     const e = t * t * 0.35 + t * 0.65; // cai um pouco mais rápido perto do fim (aceleração leve)
     const y = p.y0 + (p.ground - p.y0) * e + Math.sin(t * 6.283 * p.sw * 3 + i) * 0.12; // desce + balança de leve
     const x = p.x0 + p.drift * wind * t + Math.sin(t * 6.283 * p.sw * 2 + i * 1.7) * 0.5; // empurrada pelo vento (+x) e zigue-zague

@@ -252,5 +252,6 @@ html.paused *,html.paused *::before,html.paused *::after{animation-play-state:pa
 .st-txt small{font:800 13px var(--font-body);letter-spacing:.14em;text-transform:uppercase;color:var(--gold)}
 .st-txt b{font:800 21px/1.2 var(--font-body)}
 .st-txt span{font:600 15px/1.45 var(--font-body);color:#e6d9ff}
+.itip{position:fixed;z-index:60;pointer-events:none;padding:.35em .8em;border-radius:99px;background:rgba(14,7,26,.92);border:1px solid var(--gold);color:var(--paper);font:800 14px var(--font-body);white-space:nowrap}
 @media (prefers-reduced-motion:reduce){.stamp-toast.in,.stamp-toast.out,.stamp-toast .st-art{animation:none;transform:translate(-50%,0);opacity:1}.stamp-toast.out{opacity:0}.st-bar i{transition:none}}
 @media (max-width:520px){.st-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:26px 16px}.st-card .st-art{width:min(128px,100%)}.st-card h3{font-size:17px}.st-card p{font-size:14px}}

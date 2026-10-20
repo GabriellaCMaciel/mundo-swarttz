@@ -5,7 +5,7 @@
 // (anéis e gotas são criados uma vez só e reaproveitados, para não pesar).
 'use strict';
 
-const pondLife = { ready: false, P: null, fish: [], rings: [], drops: [], ze: null, pawX: 0, pawZ: 0, nextRipple: 0 };
+const pondLife = { food: null, ready: false, P: null, fish: [], rings: [], drops: [], ze: null, pawX: 0, pawZ: 0, nextRipple: 0 };
 const wrapA = a => Math.atan2(Math.sin(a), Math.cos(a)); // deixa um ângulo entre -π e π (para girar pelo lado mais curto)
 const randIn = (a, b) => a + Math.random() * (b - a);
 
@@ -98,7 +98,9 @@ function updatePondLife(now, dt) {
 
   // ----- peixes: cada um vira devagar na direção do seu ponto-alvo e nada para a frente -----
   pondLife.fish.forEach(f => {
-    if (now > f.tNext || Math.hypot(f.tx - f.x, f.tz - f.z) < 0.5) { newWaypoint(f, P, ze); f.tNext = now + randIn(2.5, 5); }
+    if (pondLife.food && clock.elapsedTime < pondLife.food.until) { // RAÇÃO (js/interact.js): todo mundo nada até onde caiu a comidinha e fica ciscando por ali
+      f.tx = pondLife.food.x + randIn(-0.5, 0.5); f.tz = pondLife.food.z + randIn(-0.5, 0.5); f.tNext = now + 0.6; f.flee = 0;
+    } else if (now > f.tNext || Math.hypot(f.tx - f.x, f.tz - f.z) < 0.5) { newWaypoint(f, P, ze); f.tNext = now + randIn(2.5, 5); }
     f.flee = Math.max(0, f.flee - dt);
     const want = Math.atan2(f.tx - f.x, f.tz - f.z), turn = (f.flee > 0 ? 7 : 2.4) * dt;
     f.h += Math.max(-turn, Math.min(turn, wrapA(want - f.h)));

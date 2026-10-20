@@ -47,7 +47,7 @@ function a11yHtml() {
     '<label class="az-check"><input type="checkbox" id="azCalm"' + (calm ? ' checked' : '') + '> Reduzir movimento (gatos, borboletas, pétalas e luzes ficam parados)</label>' +
     '<label class="az-check"><input type="checkbox" id="azRun"' + (runLock ? ' checked' : '') + '> Correr sempre (sem precisar segurar Shift)</label>' +
     '<h3 class="az-h">Como se mover</h3>' +
-    '<ul class="az-keys"><li><b>Teclado:</b> WASD ou setas para andar, Shift para correr (R liga e desliga o "correr sempre"), Espaço para pular, E ou Enter para abrir, Esc para fechar, H para esta ajuda.</li>' +
+    '<ul class="az-keys"><li><b>Teclado:</b> WASD ou setas para andar, Shift para correr (R liga e desliga o "correr sempre"), Espaço para pular, E ou Enter para abrir um lugar, F para interagir com o bichinho ou a coisa mais perto, Esc para fechar, H para esta ajuda.</li>' +
     '<li><b>Mapa:</b> fica no canto superior direito, com um X onde você está. Aperte M (ou toque nele) para ampliar e ver os nomes.</li><li><b>Mouse ou toque:</b> clique ou toque no chão para andar até lá sozinho; toque num lugar para abrir. No celular há o joystick e os botões "correr" e "pular" (também aparecem no computador, para quem usa só o mouse).</li>' +
     '<li><b>Selos:</b> o botão de selo, no canto superior direito, abre o álbum. Explorar e interagir com os bichinhos rende selos, que ficam salvos neste navegador.</li><li><b>Instruções:</b> o botão "?" no canto superior direito reabre o livro com o passo a passo (andar, correr, pular e interagir).</li>' +
     '<li><b>Sem segurar nada:</b> use "Ir até lá" acima: a personagem anda sozinha.</li></ul>';
@@ -145,6 +145,7 @@ window.addEventListener('keydown', e => {
   else if (e.code === 'KeyM' && !panelOpen && !onControl) setMapOpen(!WMAP.open);
   else if ((e.code === 'KeyE' || e.code === 'Enter') && !panelOpen && activeZone && !onControl) openPanel(activeZone);
   else if (e.code === 'KeyH' && !panelOpen) openA11y();
+  else if (e.code === 'KeyF' && !panelOpen && !onControl && !e.repeat) { const r = interactNearest(); if (r) interactDo(r); } // F: interage com o bichinho ou a coisa mais perto
   else if (e.code === 'Space' && !onControl) { e.preventDefault(); jump(); }
   else if (e.code === 'KeyR' && !e.repeat && !panelOpen) setRun(!runLock);
   else if ((e.code === 'BracketLeft' || e.code === 'BracketRight') && !panelOpen && CIN.near) cinemaStep(e.code === 'BracketLeft' ? -1 : 1); // [ e ] trocam o filme perto da bilheteria
@@ -282,7 +283,7 @@ function updateWorld(dt, now) {
   maria.userData.tail.rotation.z = Math.sin(now * 1.6) * 0.25;
 
   // 5) vaga-lumes, faíscas, o filme na tela do cinema e as zonas reagindo
-  updateCinema(now, dt);
+  updateCinema(now, dt); updateInteract(now, dt);
   if (!calm) {
     updateMotes(now);
   }

@@ -5,7 +5,7 @@
 // e Group (tudo que está dentro do grupo anda junto com ele).
 'use strict';
 
-const swing = { pivot: null, g: null, bf: [] }; // g = grupo do balanço e bf = as borboletas dele (usados por playcats.js)
+const swing = { pivot: null, g: null, bf: [], kick: 0, last: 0 }; // g = grupo do balanço e bf = as borboletas dele (usados por playcats.js)
 
 function knitTex() { // textura de tricô: fileirinhas de "V" em bege
   return canvasTex(128, 128, (x, w) => {
@@ -149,6 +149,8 @@ buildSwing();
 
 function updateSwing(now) { // pêndulo suave: a tábua vai e vem, e gira um tiquinho
   if (!swing.pivot) return;
-  swing.pivot.rotation.x = Math.sin(now * 0.95) * 0.08 + Math.sin(now * 0.37) * 0.02;
+  // EMPURRÃO (js/interact.js): "kick" vai de 1 a 0 aos poucos e soma amplitude ao pêndulo, então o balanço balança mais e vai se acalmando.
+  const step = swing.last ? Math.min(0.1, now - swing.last) : 0; swing.last = now; swing.kick = Math.max(0, swing.kick - step / 6);
+  swing.pivot.rotation.x = Math.sin(now * 0.95) * (0.08 + swing.kick * 0.34) + Math.sin(now * 0.37) * 0.02;
   swing.pivot.rotation.z = Math.sin(now * 0.6 + 1) * 0.012;
 }
