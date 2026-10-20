@@ -46,7 +46,9 @@ function buildDecor() {
     if (roll < 0.34) { veg.groundBush(x, z, 0.6 + rnd() * 0.7, 9, dom); if (ok % 6 === 0) centers.push([x, z]); }
     else if (roll < 0.7) { for (let k = 0; k < 4; k++) veg.groundBush(x + (rnd() - 0.5) * 2, z + (rnd() - 0.5) * 2, 0.2 + rnd() * 0.14, 4, FLOWER_COLS[(rnd() * 6) | 0]); }
     else if (roll < 0.86 && nearness(x, z) > 7 && !noTree(x, z)) { // árvores só um pouco mais longe das construções
-      const h = 4.6 + rnd() * 2.6, cr = veg.tree(x, z, h, rnd() < 0.5);
+      // árvores do MEIO do mapa ficam menores (50% no centro, crescendo até o tamanho normal a 40 unidades dele): assim não tapam a visão de quem anda por ali
+      const mid = 0.5 + 0.5 * Math.min(1, Math.hypot(x, z + 8) / 40);
+      const h = (4.6 + rnd() * 2.6) * mid, cr = veg.tree(x, z, h, rnd() < 0.5);
       if (rnd() < 0.7) for (let k = 0; k < 12; k++) { const u = rnd() * 6.283, v = rnd() * 3.14; lights.add(x + Math.cos(u) * Math.sin(v) * cr * 1.05, h * 0.72 + Math.cos(v) * cr * 0.8, z + Math.sin(u) * Math.sin(v) * cr * 1.05); }
     } else veg.groundBush(x, z, 0.5 + rnd() * 0.5, 6, dom);
   }
