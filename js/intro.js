@@ -7,7 +7,7 @@
 const $ = id => document.getElementById(id);
 const hud = {
   hint: $('hint'), skip: $('skip'), brand: $('brand'), title: $('title'), card: $('card'),
-  cardTitle: $('cardTitle'), cardText: $('cardText'), open: $('open'), joy: $('joy'),
+  cardTitle: $('cardTitle'), cardText: $('cardText'), joy: $('joy'),
   knob: $('knob'), acts: $('acts'), btnRun: $('btnRun'), btnJump: $('btnJump'), flash: $('flash'), panel: $('panel'), sheet: $('sheet')
 };
 

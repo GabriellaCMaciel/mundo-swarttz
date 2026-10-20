@@ -191,13 +191,8 @@ function finishClose() { // a carta voltou para dentro do envelope e a aba fecho
   mailUi.root.focus({ preventScroll: true });
 }
 
-// Instrução de controles da tela das cartas (canto inferior direito): uma para escolher a carta e outra para a carta aberta
-function setMailHint(reading) {
-  const t = typeof touch !== 'undefined' && touch;
-  document.getElementById('mailKeys').textContent = reading
-    ? (t ? 'toque fora da carta ou no ✕ para voltar' : 'clique fora da carta, ✕ ou Esc para voltar')
-    : (t ? 'arraste para trocar · toque na carta para abrir' : 'setas, arrastar ou rodinha para trocar · clique ou Enter para abrir · Esc volta');
-}
+// As instruções de controle da tela das cartas ficam no tutorial (botão ?), não na tela. Esta função continua existindo porque várias partes a chamam.
+function setMailHint(reading) { document.getElementById('mailKeys').textContent = ''; }
 function openEnvelope() { // clicou no envelope do meio
   if (mailUi.state !== 'closed' || !letters.length) return;
   stampGrant('cartas'); // ler uma carta rende o selo do Correio

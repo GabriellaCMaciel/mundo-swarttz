@@ -173,12 +173,11 @@ function cinHud() {
   cinEl.title.textContent = f.title; cinEl.meta.textContent = (CIN.idx + 1) + ' / ' + films.length + ' · ' + f.status;
 }
 function cinInit() {
-  ['sel', 'prev', 'next', 'info', 'title', 'meta', 'keys'].forEach(k => { cinEl[k] = document.getElementById('cin' + k[0].toUpperCase() + k.slice(1)); });
+  ['sel', 'prev', 'next', 'info', 'title', 'meta'].forEach(k => { cinEl[k] = document.getElementById('cin' + k[0].toUpperCase() + k.slice(1)); });
   if (!cinEl.sel) return;
   cinEl.prev.addEventListener('click', () => cinemaStep(-1));
   cinEl.next.addEventListener('click', () => cinemaStep(1));
   cinEl.info.addEventListener('click', () => openPanel(CIN.zone));
-  cinEl.keys.hidden = touch; // as teclas [ e ] só fazem sentido com teclado
 }
 
 // ---------- o carrinho de brinquedo: frente para a tela (-z); a traseira, que a câmera vê, leva a placa do filme ----------

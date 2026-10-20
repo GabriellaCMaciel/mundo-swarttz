@@ -82,9 +82,20 @@ const PAGES = [
         '<li><span class="k">Bichinhos e coisas</span>' + hl('clique ou toque') + ' neles, ou aperte ' + kbd('F') + ' perto de um</li>' +
         '<li><span class="k">Fechar</span>' + kbd('Esc') + ', o ' + hl('✕') + ' ou um clique fora da janela</li></ul>' +
         '<p class="g-tip">Também vale: ' + kbd('M') + ' abre o ' + hl('mapa') + ' e ' + kbd('H') + ' abre a ' + hl('acessibilidade') + '.</p>' },
-      { anim: () => guideScene('act', ['Chegue perto e aperte ' + hl('E'), 'Ou ' + hl('clique') + ' / ' + hl('toque') + ' na coisa', 'O painel se abre: é só ler'],
+      { anim: () => guideScene('act', ['Chegue perto e aperte ' + hl('E'), 'Ou ' + hl('clique') + ' / ' + hl('toque') + ' na coisa', 'A janela se abre: é só ler'],
           [kbd('E'), PIC_CLICK, '<span class="ib">' + ICON_ACC + '</span>']),
         extra: '<button class="g-accbtn" type="button" data-act="acc">' + ICON_ACC + '<span>Mais ajuda: ' + hl('Acessibilidade') + '</span></button>' }
+    ] },
+  { title: 'Dentro dos lugares',
+    halves: [
+      { text: '<h2><span class="n">5</span>Nos lugares</h2>' +
+        '<ul class="g-list"><li><span class="k">Biblioteca</span>' + hl('clique num livro') + ' que brilha nas estantes</li>' +
+        '<li><span class="k">Cartas</span>' + kbd('←') + kbd('→') + ' ou ' + hl('arraste') + ' para trocar de carta; ' + kbd('Enter') + ' ou um clique abre; ' + kbd('Esc') + ' volta</li>' +
+        '<li><span class="k">Celular gigante</span>' + hl('toque num ícone') + ' para abrir o perfil</li></ul>' },
+      { text: '<h2><span class="n">6</span>Cinema e lagoa</h2>' +
+        '<ul class="g-list"><li><span class="k">Cinema</span>perto da bilheteria, escolha o filme com as ' + hl('setas') + ' ' + kbd('◀') + kbd('▶') + ' (ou as teclas ' + kbd('[') + kbd(']') + '); dá para clicar nos cartazes e nos carrinhos</li>' +
+        '<li><span class="k">Lagoa</span>' + hl('toque na água') + ' para jogar ração nos peixes</li>' +
+        '<li><span class="k">Árvore e balanço</span>' + hl('toque') + ' para sacudir e empurrar</li></ul>' }
     ] },
   { title: 'Selos',
     halves: [

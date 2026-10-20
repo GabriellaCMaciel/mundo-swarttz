@@ -5,15 +5,15 @@
 // Os textos de cada painel são PROVISÓRIOS: troque as frases (e os depoimentos em config.js).
 const heading = (z, sub) => '<h2 id="sheetTitle" style="color:' + hex(z.color) + '">' + z.name + '</h2><p class="sub">' + sub + '</p>';
 const panels = {
-  sobre: z => heading(z, 'Texto provisório: troque pela sua apresentação.') +
+  sobre: z => heading(z, 'Quem está por trás do mundo.') +
     '<div class="about"><img src="' + ASSETS.photo + '" alt="Foto de Gabriella Swarttz"><div>' +
     ABOUT.map(t => '<p>' + t + '</p>').join('') + '</div></div>', // os textos ficam em config.js (ABOUT)
-  atelie: z => heading(z, 'Soft skills (lista provisória). Depois cada uma vira uma ilustração ou um bordado.') +
+  atelie: z => heading(z, 'As habilidades que levo para qualquer projeto.') +
     '<div class="chips">' + SOFT_SKILLS.map(s => '<span class="chip" style="cursor:default">' + s + '</span>').join('') + '</div>',
-  biblioteca: z => heading(z, 'Cada livro que brilha nas estantes é uma formação. Escolha um aqui ou clique nele no mundo.') +
+  biblioteca: z => heading(z, 'Cada livro que brilha nas estantes é uma formação, um curso ou uma certificação.') +
     '<div class="shelf">' + books.map(b => '<button class="bk" type="button" data-book="' + b.id + '" style="border-left-color:' + hex(b.color) + '"><span>' + b.title +
       '<small>' + b.kind + ' · ' + b.org + '</small></span></button>').join('') + '</div>',
-  cinema: z => heading(z, 'Cada filme em cartaz é um projeto meu. Escolha um para passar na tela gigante (na bilheteria você também escolhe andando até lá).') +
+  cinema: z => heading(z, 'Cada filme em cartaz é um projeto meu.') +
     '<div class="reels">' + films.map((f, i) => '<article class="reel" style="border-left-color:' + hex(f.color) + '">' + (f.shots && f.shots[0] ? '<img class="reel-shot" src="' + f.shots[0] + '" alt="Print do projeto ' + f.title + '" loading="lazy">' : '') + '<h3>' + f.title + '</h3>' +
       '<p class="reel-meta"><span class="pill">' + f.status + '</span> ' + f.year + '</p><p>' + f.text + '</p>' +
       '<div class="chips">' + f.stack.map(t => '<span class="chip" style="cursor:default">' + t + '</span>').join('') + '</div>' +
@@ -21,7 +21,7 @@ const panels = {
       (f.url ? '<a class="link on" href="' + f.url + '" target="_blank" rel="noopener noreferrer"><span>Ver rodando</span><small>↗</small></a>' : '') +
       (f.repo ? '<a class="link on" href="' + f.repo + '" target="_blank" rel="noopener noreferrer"><span>Código</span><small>GitHub ↗</small></a>' : '') +
       (!f.url && !f.repo ? '<span class="link off"><span>links</span><small>em breve</small></span>' : '') + '</div></article>').join('') + '</div>',
-  telefone: z => heading(z, 'Toque num contato (aqui ou no celular gigante) para abrir.') + // a lista SOCIALS fica em config.js
+  telefone: z => heading(z, 'Onde me encontrar na internet.') + // a lista SOCIALS fica em config.js
     '<div class="links">' + SOCIALS.map(s => s.url
       ? '<a class="link on" href="' + s.url + '"' + (/^mailto:/.test(s.url) ? '' : ' target="_blank" rel="noopener noreferrer"') + '><span>' + s.name + '</span><small>' + (s.handle || 'abrir') + ' ↗</small></a>'
       : '<div class="link off"><span>' + s.name + '</span><small>em breve</small></div>').join('') + '</div>'
@@ -33,7 +33,7 @@ function bookHtml(b) {
     '<dl class="facts"><dt>Status</dt><dd>' + b.status + '</dd><dt>Carga horária</dt><dd>' + b.hours + '</dd><dt>Certificado</dt><dd>' + b.cert + '</dd></dl>' +
     '<p>' + b.text + '</p>' +
     (b.topics.length ? '<div class="chips">' + b.topics.map(t => '<span class="chip" style="cursor:default">' + t + '</span>').join('') + '</div>' : '') +
-    '<p class="sub">(conteúdo provisório)</p>';
+    '';
 }
 
 // ----- Painel "Acessibilidade e atalhos": ir direto a um lugar, andar sozinho até lá, reduzir movimento, versão simples -----
@@ -61,7 +61,6 @@ function showSheet(html) { // coloca o conteúdo na folha do painel e leva o foc
   if (hud.panel.hidden && !mailUi.isOpen) lastFocus = document.activeElement;
   hud.sheet.innerHTML = '<button class="close" type="button" aria-label="Fechar">✕</button>' + html;
   hud.panel.hidden = false; syncLoop();
-  document.getElementById('panelHint').textContent = touch ? 'toque fora do painel ou no ✕ para fechar' : 'clique fora do painel, ✕ ou Esc para fechar'; // instrução de "algo aberto": canto inferior direito
   hud.sheet.querySelector('.close').focus();
 }
 function openPanel(z) {
@@ -111,8 +110,8 @@ hud.sheet.addEventListener('change', e => { // caixinhas "Reduzir movimento" e "
   if (e.target.id === 'azCalm') { calm = e.target.checked; try { localStorage.setItem(CALM_KEY, calm ? '1' : '0'); } catch (err) { /* sem armazenamento: vale só nesta visita */ } }
 });
 hud.panel.addEventListener('click', e => { if (e.target === hud.panel) closePanel(); });
-hud.open.addEventListener('click', () => openPanel(activeZone));
-hud.card.addEventListener('click', () => openPanel(activeZone)); // o cartão inteiro também é um botão (bom para o dedo)
+hud.card.addEventListener('click', () => openPanel(activeZone)); // o cartão inteiro é o botão (bom para o dedo); o tutorial explica
+hud.card.addEventListener('keydown', e => { if (e.key === ' ') { e.preventDefault(); openPanel(activeZone); } }); // Espaço no cartão em foco (Enter já é tratado em ui.js, mais abaixo)
 
 // ===== 6. Controles: teclado e joystick de toque =====
 // POR QUE "ANDAR SEM PARAR" ACONTECIA: guardamos quais teclas estão apertadas (keys) e o joystick (stick). Elas só "soltam" quando o navegador avisa (keyup, pointerup).
@@ -199,7 +198,7 @@ function startWorld() {
   announce('Você entrou no mundo 3D. Aperte H para o menu de acessibilidade, onde dá para ir direto a cada lugar. A versão simples, em texto puro, está no menu e no início da página.');
   buildWorldMap(); // o mapa ilustrado no canto superior direito (js/worldmap.js)
   hud.acts.hidden = false; // botões "correr" e "pular": para toque e também para quem usa só o mouse
-  if (touch) { hud.joy.hidden = false; hud.open.textContent = 'abrir'; } // no celular não existe a tecla E (as instruções de controle ficam no menu de acessibilidade e na tela de ajuda)
+  if (touch) hud.joy.hidden = false; // no celular não existe teclado: as instruções de controle ficam no tutorial (botão ?) e no menu de acessibilidade
   camera.position.set(player.position.x, CAM_Y, player.position.z + CAM_Z);
   camera.userData.fovAdd = FOV_ADD; resize();
   lookNow.set(player.position.x, LOOK_Y, player.position.z);
