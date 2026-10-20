@@ -59,3 +59,12 @@ zones.forEach((z, i) => {
 });
 TRAILS.push(makeTrail({ x: -9, z: -43 }, { x: POND.x + 8.5, z: POND.z + 1 }, 301, 2, 2.3)); // biblioteca > lagoa e cerejeira
 TRAILS.push(makeTrail({ x: 9, z: -43 }, { x: SWING.x - 8.5, z: SWING.z + 1 }, 302, 2, 2.3)); // biblioteca > balanço
+
+// Ligações ENTRE as zonas (além das que saem do centro): biblioteca <> cartas, biblioteca <> cinema e cinema <> telefone.
+// Cada uma vai da borda de uma zona até a borda da outra, com a mesma curva suave, e também ganha postes (tr.link) em js/decor.js.
+[['biblioteca', 'cartas'], ['biblioteca', 'cinema'], ['cinema', 'telefone']].forEach(([ia, ib], k) => {
+  const A = zones.find(z => z.id === ia), B = zones.find(z => z.id === ib); if (!A || !B) return;
+  const dx = B.pos[0] - A.pos[0], dz = B.pos[2] - A.pos[2], d = Math.hypot(dx, dz), ux = dx / d, uz = dz / d, ra = trailZoneR(A) * 0.78, rb = trailZoneR(B) * 0.78;
+  const tr = makeTrail({ x: A.pos[0] + ux * ra, z: A.pos[2] + uz * ra }, { x: B.pos[0] - ux * rb, z: B.pos[2] - uz * rb }, 400 + k * 23, Math.min(2.4, d * 0.04), 2.6);
+  tr.link = true; TRAILS.push(tr);
+});

@@ -63,7 +63,7 @@ function buildDecor() {
   const LAMP_STEP = 9, LAMP_SIDE = 3.1, LAMP_MIN = 3.5, LAMP_H = 3.2;
   const lampSpots = spots.map((sp, i) => i < zones.length ? { x: sp.x, z: sp.z, r: zr(zones[i]) * 0.95 } : sp); // perto das zonas os postes vão até a entrada do cenário
   const placed = [];
-  TRAILS.filter(tr => tr.zone).forEach(tr => {
+  TRAILS.filter(tr => tr.zone || tr.link).forEach(tr => { // trilhas do centro até as zonas e também as que ligam uma zona à outra
     const others = TRAILS.filter(o => o !== tr);
     const onOther = (x, z) => others.some(o => { const P = o.pts; for (let i = 1; i < P.length; i++) {
       const ax = P[i - 1].x, az = P[i - 1].z, bx = P[i].x - ax, bz = P[i].z - az, k = Math.max(0, Math.min(1, ((x - ax) * bx + (z - az) * bz) / (bx * bx + bz * bz || 1)));
