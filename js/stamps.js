@@ -50,6 +50,12 @@ const STAMPS = [
     art: '<path d="M46 22 C36 14 22 14 10 18 V64 C22 60 36 60 46 68Z" fill="#f6ecd9"/><path d="M46 22 C56 14 70 14 82 18 V64 C70 60 56 60 46 68Z" fill="#fff6e2"/>' +
       '<path d="M46 22 V68" stroke="#3a2060" stroke-width="2"/><path d="M16 28 Q28 25 40 29 M16 36 Q28 33 40 37 M16 44 Q28 41 40 45 M52 29 Q64 25 76 28 M52 37 Q64 33 76 36 M52 45 Q64 41 76 44" stroke="#9b8ab8" stroke-width="2" fill="none" stroke-linecap="round"/>' +
       '<path d="M62 14 V42 L67 37 L72 42 V16Z" fill="#ff4d6d"/>' + sparkle(18, 10, 5) + sparkle(80, 72, 4, '#ffd98a') },
+  { id: 'estante', name: 'Estante Completa', desc: 'Você abriu todos os livros da Biblioteca, um por um.', hint: 'Abra todos os livros da Biblioteca.', c1: '#f2b84b', c2: '#7b3fe4',
+    art: '<ellipse cx="46" cy="70" rx="30" ry="4.5" fill="#07030d" opacity=".35"/>' +
+      '<rect x="14" y="54" width="64" height="13" rx="2.5" fill="#ff4d6d"/><rect x="14" y="54" width="64" height="3.4" rx="1.7" fill="#ff8aa0"/><rect x="20" y="59" width="40" height="2.4" rx="1.2" fill="#fff3c4"/>' +
+      '<rect x="19" y="41" width="56" height="13" rx="2.5" fill="#37d0c0"/><rect x="19" y="41" width="56" height="3.4" rx="1.7" fill="#8ff0e4"/><rect x="25" y="46.5" width="30" height="2.4" rx="1.2" fill="#fff3c4"/>' +
+      '<rect x="24" y="28" width="48" height="13" rx="2.5" fill="#7b3fe4"/><rect x="24" y="28" width="48" height="3.4" rx="1.7" fill="#b79af5"/><rect x="30" y="33.5" width="26" height="2.4" rx="1.2" fill="#fff3c4"/>' +
+      '<path d="M46 12 L50 20 L59 21 L52.5 27 L54 36 L46 31.5 L38 36 L39.5 27 L33 21 L42 20Z" fill="#fff3c4" stroke="#f2b84b" stroke-width="1.6" stroke-linejoin="round"/>' + sparkle(14, 22, 5) + sparkle(80, 34, 4, '#ffd98a') + sparkle(78, 12, 3) },
   { id: 'cinema', name: 'Sessão Especial', desc: 'Você escolheu um filme na bilheteria do drive-in.', hint: 'Escolha um filme na bilheteria do cinema.', c1: '#f08a3c', c2: '#7b3fe4',
     art: '<rect x="12" y="34" width="68" height="38" rx="4" fill="#1a0f2e"/><g transform="rotate(-12 12 34)"><rect x="12" y="20" width="68" height="14" rx="3" fill="#1a0f2e"/><path d="M20 20 L30 34 M38 20 L48 34 M56 20 L66 34" stroke="#f6ecd9" stroke-width="7"/></g>' +
       '<rect x="12" y="34" width="68" height="8" fill="#f6ecd9"/><path d="M20 34 L12 42 M38 34 L30 42 M56 34 L48 42 M74 34 L66 42" stroke="#1a0f2e" stroke-width="6"/>' +
@@ -136,6 +142,11 @@ function stampCount(key, n = 1) { SEL.stat[key] = (SEL.stat[key] || 0) + n; stam
 // conjuntos: guarda "este item já foi visto" e devolve quantos itens diferentes já foram (para "faça carinho nos 3 filhotes")
 function stampMark(key, item) { const a = SEL.stat[key] || (SEL.stat[key] = []); if (!a.includes(item)) { a.push(item); stampsSave(); } return a.length; }
 
+// abrir um livro: rende o selo de leitora e, quando TODOS os livros já foram abertos (guardamos quais, no navegador), o selo da estante completa
+function stampBook(id) {
+  stampGrant('biblioteca');
+  if (typeof books !== 'undefined' && stampMark('livros', id) >= books.length) stampGrant('estante');
+}
 const ZONE_STAMPS = ['sobre', 'atelie', 'biblioteca', 'cinema', 'telefone', 'cartas'];
 function stampGrant(id) {
   if (!SEL.ready || SEL.got[id]) return false;

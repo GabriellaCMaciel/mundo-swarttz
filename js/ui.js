@@ -69,12 +69,12 @@ function openPanel(z) {
   if (z.id === 'cartas') return openMail(); // a caixa de correio tem tela própria (js/mail.js)
   if (['sobre', 'atelie', 'telefone'].includes(z.id)) stampGrant(z.id); // abrir o painel desses lugares rende o selo deles
   // perto de um livro da biblioteca, abre direto o livro; senão, a lista de livros
-  if (z.id === 'biblioteca' && activeBook) stampGrant('biblioteca');
+  if (z.id === 'biblioteca' && activeBook) stampBook(activeBook.data.id);
   showSheet(z.id === 'biblioteca' && activeBook ? bookHtml(activeBook.data) : panels[z.id](z));
 }
 function openBook(b) { // chamado também pelo clique do mouse em um livro 3D (library.js)
   if (panelOpen) return;
-  panelOpen = true; showSheet(bookHtml(b)); stampGrant('biblioteca');
+  panelOpen = true; showSheet(bookHtml(b)); stampBook(b.id);
 }
 function closePanel() {
   panelOpen = false; hud.panel.hidden = true; if (mailUi.isOpen) closeMail(); syncLoop();
@@ -101,7 +101,7 @@ hud.sheet.addEventListener('click', e => {
   const fm = e.target.closest('[data-film]'); // botão "Passar na tela" do cinema
   if (fm) { cinemaSelect(+fm.dataset.film); showToast('Na tela: ' + films[+fm.dataset.film].title); return; } // escolhe o filme (telão, cartazes e bilheteria mudam juntos)
   const bk = e.target.closest('[data-book]');
-  if (bk) { stampGrant('biblioteca'); return showSheet(bookHtml(books.find(b => b.id === bk.dataset.book))); }
+  if (bk) { stampBook(bk.dataset.book); return showSheet(bookHtml(books.find(b => b.id === bk.dataset.book))); }
   if (e.target.closest('#stReset')) return stampsReset();
   if (e.target.closest('[data-back]')) return showSheet(panels.biblioteca(zones.find(z => z.id === 'biblioteca')));
 });
