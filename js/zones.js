@@ -159,8 +159,8 @@ function checkZones(now) {
     if (book) { hud.cardTitle.textContent = book.data.title; hud.cardText.textContent = book.data.kind + ' · ' + book.data.org; hud.card.hidden = false; }
     else if (found) { hud.cardTitle.textContent = found.name; hud.cardText.textContent = found.text; hud.card.hidden = false; }
     else hud.card.hidden = true;
-    if (book) announce('Perto do livro: ' + book.data.title + '. ' + (touch ? 'Toque em abrir.' : 'Aperte E ou Enter para abrir.'));
-    else if (found) announce('Você chegou em ' + found.name + '. ' + found.text + ' ' + (touch ? 'Toque em abrir.' : 'Aperte E ou Enter para abrir.'));
+    if (book) announce('Perto do livro: ' + book.data.title + '. ' + (touch ? 'Toque no cartão para abrir.' : 'Aperte E ou Enter para abrir.'));
+    else if (found) announce('Você chegou em ' + found.name + '. ' + found.text + ' ' + (touch ? 'Toque no cartão para abrir.' : 'Aperte E ou Enter para abrir.'));
   }
 }
 
