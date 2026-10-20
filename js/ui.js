@@ -30,7 +30,8 @@ const panels = {
 function bookHtml(b) {
   return '<button class="back" type="button" data-back="1">← todos os livros</button>' +
     '<h2 id="sheetTitle" style="color:' + hex(b.color) + '">' + b.title + '</h2><p class="sub">' + b.kind + ' · ' + b.org + '</p>' +
-    '<dl class="facts"><dt>Status</dt><dd>' + b.status + '</dd><dt>Carga horária</dt><dd>' + b.hours + '</dd><dt>Certificado</dt><dd>' + b.cert + '</dd></dl>' +
+    '<dl class="facts"><dt>Status</dt><dd>' + b.status + '</dd>' + (b.period ? '<dt>Período</dt><dd>' + b.period + '</dd>' : '') +
+    (b.hours ? '<dt>Carga horária</dt><dd>' + b.hours + '</dd>' : '') + '<dt>Certificado</dt><dd>' + b.cert + '</dd></dl>' + // linhas opcionais somem se não houver dado
     '<p>' + b.text + '</p>' +
     (b.topics.length ? '<div class="chips">' + b.topics.map(t => '<span class="chip" style="cursor:default">' + t + '</span>').join('') + '</div>' : '') +
     '';

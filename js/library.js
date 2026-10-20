@@ -215,10 +215,12 @@ function buildLibrary(g) {
     }
   });
 
-  // --- Os 6 livros selecionáveis: num arco largo em frente às estantes, bem espaçados (~3,8 unidades) ---
-  for (let i = 0; i < 6; i++) {
+  // --- Os livros selecionáveis: num arco largo em frente às estantes, bem espaçados (~3,2 unidades) ---
+  // O arco ocupa sempre ~173°, então o espaçamento se ajusta sozinho ao número de livros da lista `books`.
+  const nB = books.length, stepB = nB > 1 ? 173 / (nB - 1) : 0;
+  for (let i = 0; i < nB; i++) {
     const data = books[i]; if (!data) continue;
-    const a = (180 - (i - 2.5) * 34.6) * DEG, [x, z] = polar(a, 6.3); // i = 0 fica à esquerda, i = 5 à direita
+    const a = (180 - (i - (nB - 1) / 2) * stepB) * DEG, [x, z] = polar(a, 6.3); // i = 0 fica à esquerda, o último à direita
     const grp = new THREE.Group(); grp.position.set(x, 3.4, z);
     grp.rotation.y = Math.atan2(Math.sin(a + Math.PI), Math.cos(a + Math.PI)) * 0.55; // de frente para o centro, virado um pouco para a câmera
     inner.add(grp);
