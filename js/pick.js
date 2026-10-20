@@ -43,7 +43,12 @@ function pickZone(ev) { // zona cujo cenário está sob o dedo/mouse e perto da 
   const hits = pickRay.intersectObjects(near.map(z => z.group), true);
   for (const h of hits) {
     if (!h.object.isMesh) continue; // brilhos e etiquetas (sprites) não contam: são grandes e transparentes
-    for (let o = h.object; o; o = o.parent) if (o.userData.zoneId) return zones.find(z => z.id === o.userData.zoneId);
+    const mt = h.object.material; if (!h.object.userData.cinScreen && mt && mt.transparent && mt.opacity < 0.3) continue; // feixes de luz e brilhos quase invisíveis também não contam (o raio passa por eles)
+    for (let o = h.object; o; o = o.parent) if (o.userData.zoneId) {
+      // Drive-in: só o TELÃO abre a janela. Clicar no chão do estacionamento (ou em qualquer outra peça) não abre nada: a personagem anda até lá.
+      if (o.userData.zoneId === 'cinema' && !h.object.userData.cinScreen) return null;
+      return zones.find(z => z.id === o.userData.zoneId);
+    }
   }
   return null;
 }

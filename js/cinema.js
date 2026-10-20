@@ -293,7 +293,8 @@ function buildCinema(g) {
   const screen = new THREE.Mesh(new THREE.PlaneGeometry(W, H), CIN.mat); screen.position.set(0, SY, SZ + 0.2); g.add(screen);
   CIN.matB = new THREE.MeshBasicMaterial({ map: CIN.tex, transparent: true, depthWrite: false }); CIN.matB.visible = false; // 2ª camada, só para a transição
   const screenB = new THREE.Mesh(new THREE.PlaneGeometry(W, H), CIN.matB); screenB.position.set(0, SY, SZ + 0.21); screenB.renderOrder = 2; g.add(screenB); CIN.screenB = screenB;
-  box(W + 0.8, H + 0.8, 0.4, 0x1a0f2e, 0, SY, SZ - 0.05, g);                                   // moldura escura
+  screen.userData.cinScreen = screenB.userData.cinScreen = true; // só o telão abre a janela do Drive-in ao ser clicado (veja pickZone em pick.js); o chão do estacionamento não
+  box(W + 0.8, H + 0.8, 0.4, 0x1a0f2e, 0, SY, SZ - 0.05, g).userData.cinScreen = true;          // moldura escura (também conta como telão)
   box(W + 1.1, 0.16, 0.5, 0xf2b84b, 0, SY + H / 2 + 0.46, SZ, g); box(W + 1.1, 0.16, 0.5, 0xf2b84b, 0, SY - H / 2 - 0.46, SZ, g); // frisos dourados
   [-1, 1].forEach(s => box(0.16, H + 1.1, 0.5, 0xf2b84b, s * (W / 2 + 0.46), SY, SZ, g));
   // a parede da base é a vitrine dos cartazes
