@@ -56,35 +56,43 @@ const letters = [
     text: 'Muito obrigado, Gab, por me ajudar e sempre me auxiliar quando eu preciso. Sou muito grato por vc.\nVc arrasou nessa apresentação, e é isso que importa. Vc foi incrível e estamos muito felizes com isso.' }
 ];
 
-// Os filmes do CINEMA DRIVE-IN: cada filme é um projeto seu. A tela gigante passa um por vez e cada carrinho estacionado é um deles.
-// title = nome (cabe na tela grande: prefira até ~16 letras) | tagline = uma frase curta (até ~60 letras) | status = "em cartaz" (pronto), "em produção" ou "em breve"
-// stack = tecnologias | text = descrição do painel | color/color2 = as duas cores do cartaz | plate = a "placa" do carrinho (até 7 letras)
-// url = link para ver o projeto rodando (ou '') | repo = link do código no GitHub (ou '')
+// Os filmes do CINEMA DRIVE-IN: cada filme é um projeto seu.
+//  - Os CARTAZES na parede do cinema mostram as informações do filme (título, frase, status e tecnologias).
+//  - O TELÃO passa as IMAGENS do projeto (lista `shots`: prints dele rodando, em assets/filmes/, de preferência 16:9, ex. 1280x720).
+//  - Na BILHETERIA o visitante escolhe o filme; o telão, os cartazes e o ingresso mudam juntos.
+// title = nome (cabe no cartaz: até ~22 letras) | tagline = frase curta (até ~60 letras) | status = "em cartaz" (pronto), "em produção" ou "em breve"
+// stack = tecnologias (as 4 primeiras vão para o cartaz) | text = descrição do painel | color/color2 = as duas cores do cartaz | plate = placa do carrinho (até 7 letras)
+// shots = prints para o telão (sem prints, o telão mostra "em breve") | url = projeto rodando (ou '') | repo = código no GitHub (só se o repositório for PÚBLICO, senão '')
 const films = [
   { id: 'mundo', title: 'Mundo Swarttz', tagline: 'Este portfólio: um mundo 3D para explorar', status: 'em cartaz', year: 2026, plate: 'MUNDO',
     stack: ['Three.js', 'JavaScript', 'Canvas 2D'], color: 0x7b3fe4, color2: 0xff5fa2,
     text: 'O portfólio que você está explorando: um mundo 3D bordado à mão, com biblioteca, ateliê, gatas, cartas e uma versão simples em texto para leitores de tela.',
+    shots: ['assets/filmes/mundo-1.jpg', 'assets/filmes/mundo-2.jpg', 'assets/filmes/mundo-3.jpg', 'assets/filmes/mundo-4.jpg'],
     url: 'https://gabriellacmaciel.github.io/mundo-swarttz/', repo: 'https://github.com/GabriellaCMaciel/mundo-swarttz' },
-  { id: 'jc', title: 'JC Resolve', tagline: 'Site para um cliente de verdade, com loja e assistente', status: 'em produção', year: 2026, plate: 'JC',
-    stack: ['HTML', 'CSS', 'JavaScript'], color: 0xf2b84b, color2: 0xf08a3c,
-    text: 'Simulação de mercado do curso: site de manutenção residencial com serviços, loja virtual, conta, carrinho e um assistente que entende o problema do cliente.',
-    url: 'https://requirements-engineering-project.vercel.app', repo: 'https://github.com/GabriellaCMaciel/requirements-engineering-project' },
-  { id: 'pixelinha', title: 'PixeLinha', tagline: 'Gráficos de ponto cruz a partir de qualquer imagem', status: 'em produção', year: 2026, plate: 'PIXELIN',
+  { id: 'jc', title: 'JC Resolve', tagline: 'Manutenção residencial com loja e agendamento online', status: 'em produção', year: 2026, plate: 'JC',
+    stack: ['Next.js', 'React', 'TypeScript', 'PostgreSQL'], color: 0xf2b84b, color2: 0x2f8f6b,
+    text: 'Simulação de mercado do curso: site de uma empresa de manutenção residencial, com assistente que entende o problema, loja de materiais, checkout com agendamento de visita e painel administrativo.',
+    shots: ['assets/filmes/jc-1.jpg', 'assets/filmes/jc-2.jpg', 'assets/filmes/jc-3.jpg'],
+    url: 'https://requirements-engineering-project.vercel.app', repo: '' },
+  { id: 'pixelinha', title: 'PixeLinha', tagline: 'Transforme qualquer imagem em gráfico de ponto cruz', status: 'em produção', year: 2026, plate: 'PIXELIN',
     stack: ['React', 'Python', 'FastAPI', 'Supabase'], color: 0xe78faf, color2: 0xf4d56b,
-    text: 'Gerador de gráficos de bordado: você envia uma imagem e recebe o gráfico de ponto cruz com as cores das linhas. Projeto full stack.',
-    url: '', repo: 'https://github.com/GabriellaCMaciel/stitchlab' },
-  { id: 'preco', title: 'Não Trabalho de Graça', tagline: 'Calculadora de preço por hora para freelancers', status: 'em produção', year: 2026, plate: 'PRECO/H',
-    stack: ['React', 'MEI', 'Simples Nacional'], color: 0x37d0c0, color2: 0x5b88b2,
-    text: 'Calculadora que mostra quanto um freelancer brasileiro precisa cobrar por hora, levando em conta as regras de MEI, autônomo e Simples Nacional.',
-    url: '', repo: 'https://github.com/GabriellaCMaciel/nao-trabalho-de-graca' },
-  { id: 'sala3d', title: 'Sala de Aula 3D', tagline: 'Homenagem ao professor, com a turma toda dentro', status: 'em produção', year: 2026, plate: 'SALA3D',
+    text: 'Você escolhe uma foto e recebe o gráfico de ponto cruz com as linhas DMC, a quantidade de novelos e um PDF para imprimir. Projeto full stack.',
+    shots: ['assets/filmes/pixelinha-1.jpg', 'assets/filmes/pixelinha-2.jpg'],
+    url: '', repo: 'https://github.com/GabriellaCMaciel/pixelinha' },
+  { id: 'preco', title: 'Não Trabalho de Graça', tagline: 'Quanto cobrar por hora, já com imposto e férias', status: 'em produção', year: 2026, plate: 'PRECO/H',
+    stack: ['React', 'Vite', 'MEI', 'Simples Nacional'], color: 0x37d0c0, color2: 0x5b88b2,
+    text: 'Calculadora que mostra quanto um freelancer brasileiro precisa cobrar por hora, por dia e por projeto, com as regras de MEI, autônomo e Simples Nacional de 2026.',
+    shots: ['assets/filmes/preco-1.jpg', 'assets/filmes/preco-2.jpg', 'assets/filmes/preco-3.jpg'],
+    url: '', repo: '' },
+  { id: 'sala3d', title: 'Sala de Aula 3D', tagline: 'Homenagem ao professor, com a turma toda dentro', status: 'em breve', year: 2026, plate: 'SALA3D',
     stack: ['Three.js', 'JavaScript'], color: 0xf08a3c, color2: 0xff5fa2,
     text: 'Homenagem da turma de Web e Mobile ao professor: a sala de aula em 3D, com os lugares dos alunos e personagens para conversar.',
-    url: '', repo: '' },
-  { id: 'painel', title: 'Swartz Progress', tagline: 'Meu painel de aprendizados, entregas e conquistas', status: 'em produção', year: 2026, plate: 'PAINEL',
-    stack: ['HTML', 'CSS', 'JavaScript', 'GitHub Pages'], color: 0xb79af5, color2: 0x37d0c0,
-    text: 'Painel próprio para registrar o que aprendo, o que entrego e o que conquisto, publicado no GitHub Pages.',
-    url: '', repo: 'https://github.com/GabriellaCMaciel/swartz-progress-panel' }
+    shots: [], url: '', repo: '' },
+  { id: 'painel', title: 'Swartz Progress', tagline: 'Meu painel de aprendizados, entregas e conquistas', status: 'em cartaz', year: 2026, plate: 'PAINEL',
+    stack: ['HTML', 'CSS', 'JavaScript', 'GitHub API'], color: 0xb79af5, color2: 0x37d0c0,
+    text: 'Painel próprio para registrar o que aprendo, o que entrego e o que conquisto: o formulário fica no próprio site e grava os registros direto no GitHub.',
+    shots: ['assets/filmes/painel-1.jpg', 'assets/filmes/painel-2.jpg'],
+    url: '', repo: 'https://github.com/GabriellaCMaciel/swarttz-progress-panel' }
 ];
 
 // Os livros da biblioteca: cada um vira um livro brilhante nas estantes (a ordem é da esquerda para a direita).
