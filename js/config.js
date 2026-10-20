@@ -95,29 +95,30 @@ const films = [
 
 // Os livros da biblioteca: cada um vira um livro brilhante nas estantes (a ordem é da esquerda para a direita).
 // short = nome curto na capa | kind = tipo | status, period, hours e cert = linhas do painel | topics = assuntos | color = cor da capa.
-// period e hours são opcionais: se faltarem, a linha some do painel (assim nunca aparece "a preencher" para o visitante).
+// period, hours e cert são opcionais: se faltarem, a linha some do painel (assim nunca aparece "a preencher" nem "sem certificado" para o visitante).
+// As horas e os assuntos do EFG vêm da página oficial do curso em efg.org.br (1440 h; a matriz com as disciplinas não é pública).
 // Se o número de livros mudar, a biblioteca 3D (js/library.js) reparte o arco sozinha e a conquista "Estante Completa" passa a exigir todos.
 // As horas das trilhas da Alura vêm da página oficial de cada carreira (conferido em 20/10/2026).
 const books = [
   { id: 'efg', short: 'EFG', kind: 'Curso técnico', title: 'Técnico em Desenvolvimento Web e Mobile', org: 'Escola do Futuro de Goiás',
-    status: 'Em andamento', period: 'Fevereiro de 2026 a agosto de 2027', cert: 'Ao concluir o curso', color: 0x7b3fe4,
+    status: 'Em andamento', period: 'Fevereiro de 2026 a agosto de 2027', hours: '1440 horas', color: 0x7b3fe4,
     text: 'Formação técnica em desenvolvimento de sites e aplicativos para web e celular, com projetos em equipe e simulações de mercado.',
-    topics: ['Desenvolvimento Web', 'Desenvolvimento Mobile'] },
+    topics: ['Desenvolvimento Web', 'Desenvolvimento Mobile', 'Desenvolvimento de sistemas', 'Requisitos e funcionalidades', 'Programação', 'Testes de programas e aplicativos', 'Manutenção e suporte técnico', 'Documentação de sistemas', 'Ferramentas de desenvolvimento'] },
   { id: 'grad', short: 'GRAD', kind: 'Graduação', title: 'Bacharelado em Engenharia de Software', org: 'Gran Faculdade',
-    status: 'Previsão de conclusão: novembro de 2029', period: 'Novembro de 2025 a novembro de 2029', cert: 'Diploma ao concluir a graduação', color: 0xf08a3c,
+    status: 'Em andamento', period: 'Novembro de 2025 a novembro de 2029', color: 0xf08a3c,
     text: 'Graduação em Engenharia de Software: o caminho para projetar, construir e manter sistemas com método e qualidade.',
     topics: ['Engenharia de Software'] },
   { id: 'react', short: 'REACT', kind: 'Carreira Alura', title: 'Desenvolvimento Front-End React', org: 'Alura',
-    status: 'Em andamento', hours: '554 horas de aulas', cert: 'Ainda sem certificado: estou fazendo a carreira', color: 0x37d0c0,
+    status: 'Em andamento', hours: '554 horas de aulas', color: 0x37d0c0,
     text: 'Do primeiro componente à liderança técnica! Minha carreira em desenvolvimento front-end React: do básico ao avançado, com TypeScript, arquitetura e performance. As tecnologias abaixo são as citadas na página oficial da carreira.',
     topics: ['HTML', 'CSS', 'Acessibilidade e SEO', 'Layouts responsivos', 'JavaScript', 'Manipulação do DOM', 'localStorage', 'Requisições HTTP', 'Node.js', 'npm', 'ESLint', 'Git e GitHub', 'Figma',
              'React', 'JSX', 'TypeScript', 'Arquitetura', 'Testes avançados', 'Performance', 'Escalabilidade', 'Liderança técnica'] },
   { id: 'python', short: 'PYTHON', kind: 'Carreira Alura', title: 'Desenvolvimento Back-End Python', org: 'Alura',
-    status: 'Em andamento', hours: '496 horas de aulas', cert: 'Ainda sem certificado: estou fazendo a carreira', color: 0xf2b84b,
+    status: 'Em andamento', hours: '496 horas de aulas', color: 0xf2b84b,
     text: 'Domine o back-end com Python: criar APIs com Django, FastAPI e Flask, aplicar arquitetura, trabalhar com CI/CD e enfrentar desafios reais do mercado. As tecnologias abaixo são as citadas na descrição e nas etapas da carreira.',
     topics: ['Python', 'Pensamento computacional', 'Lógica de programação', 'Django', 'FastAPI', 'Flask', 'APIs', 'Aplicações web', 'Arquitetura', 'Qualidade', 'Segurança', 'Escalabilidade', 'Desempenho', 'CI/CD', 'Deploy em produção'] },
   { id: 'ia', short: 'IA', kind: 'Carreira Alura', title: 'Engenharia de Agentes de IA', org: 'Alura',
-    status: 'Em andamento', hours: '234 horas de aulas, em 24 cursos', cert: 'Ainda sem certificado: estou fazendo a carreira', color: 0xff5fa2,
+    status: 'Em andamento', hours: '234 horas de aulas, em 24 cursos', color: 0xff5fa2,
     text: 'Aprender a criar, implantar e monitorar soluções inteligentes de ponta a ponta, do conceito até a produção em escala. As tecnologias abaixo são as citadas na página oficial da carreira.',
     topics: ['Python', 'Pandas', 'LLMs', 'APIs da OpenAI e do Gemini', 'Agentes de IA', 'RAG', 'Machine Learning', 'Deep Learning', 'Fine tuning', 'MLOps'] },
   { id: 'matera', short: 'MATERA', kind: 'Bootcamp', title: 'Bootcamp Teste de Software', org: 'Instituto Matera',
