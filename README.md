@@ -89,3 +89,10 @@ Use um servidor local (por exemplo, a extensão **Live Server** do VS Code) ou p
 
 ## Ateliê (temporariamente fora)
 O Ateliê (soft skills) está desligado por enquanto. Para trazê-lo de volta, troque `ATELIE_ATIVO` para `true` em `js/config.js`: cenário, cartão, painel, ícone do mapa e o selo "Mãos à Obra" voltam juntos.
+
+## Guia de passeio (tour)
+Para quem não sabe o que fazer no mundo (`js/tour.js` + `css/tour.css`):
+- **Boas-vindas** na primeira visita: "Fazer o tour", "Explorar por conta própria" ou "Como controlar a personagem". Quem já viu não vê de novo (guardado em `localStorage`).
+- **Dock** no pé da tela, sempre visível: "Próximo lugar: Biblioteca · 2 de 5". Um toque começa (ou continua) o tour. No fim vira "Abrir o álbum de selos".
+- **Tour**: a personagem anda sozinha até cada lugar, uma caixinha explica e oferece "Abrir", "Próximo" ou "Sair". Se a pessoa mexer no joystick ou no teclado, o tour espera ("Continuar").
+- A ordem e os textos estão em `TOUR_ORDER` e `TOUR_INFO` no começo de `js/tour.js`. Lugares que saem do mundo (como o Ateliê, por enquanto) saem do tour sozinhos.
