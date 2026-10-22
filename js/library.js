@@ -250,7 +250,7 @@ function buildLibrary(g) {
   const place = (grp, lx, ly, lz) => new THREE.Vector3(lx, ly, lz).applyMatrix4(grp.matrix); // posição local do móvel -> posição no "inner"
   const cush = [0x37d0c0, 0xff5fa2, 0xf2b84b, 0xb79af5];
   function sofa(deg, w) {
-    const sp = new THREE.Group(), [x, z] = polar(deg * DEG, 6.0), UP = 0xd9cfe8, UP2 = 0xc7bbdc;
+    const sp = new THREE.Group(), [x, z] = polar(deg * DEG, 6.0), UP = 0x6b46b0, UP2 = 0x593a98; // roxo mais escuro: a Maria Marta é branca e sumia no sofá claro de antes
     sp.position.set(x, 0, z); sp.rotation.y = deg * DEG + Math.PI; inner.add(sp);
     bx(w, 0.5, 1.2, WICKER, 0, 0.25, 0, sp);
     [-1, 1].forEach(s => bx(w / 2 - 0.25, 0.3, 1.05, UP, s * w / 4, 0.65, 0.06, sp));
