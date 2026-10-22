@@ -66,8 +66,7 @@ function welcomeKey(e) { // chamada por guideKey enquanto as boas-vindas estão 
 // ===== 2 e 3. Dock e tour =====
 function tourStart() {
   const s = tourStops(); if (!s.length) return;
-  const j = tourNextIndex(0); TOUR.on = true; TOUR.i = j < 0 ? 0 : j; // começa no próximo lugar não visitado (ou no primeiro, se já viu tudo)
-  tourGo(TOUR.i);
+  TOUR.on = true; TOUR.i = 0; tourGo(0); // o tour SEMPRE começa pelo primeiro lugar (antes pulava os "já visitados" e parecia que já estava em andamento)
 }
 function tourGo(i) { // vai (andando) até a parada i
   const s = tourStops(); if (i >= s.length) { TOUR.phase = 'end'; tourRender(true); return; }
@@ -84,15 +83,19 @@ function dockEl() {
     const b = e.target.closest('[data-d]'); if (!b) return; const a = b.dataset.d, s = tourStops();
     if (a === 'start') tourStart();
     else if (a === 'open') tourOpenHere();
-    else if (a === 'next') tourGo(TOUR.i + 1)
+    else if (a === 'next') tourGo(TOUR.i + 1);
+    else if (a === 'prev') tourGo(TOUR.i - 1);
+    else if (a === 'goto') tourGo(+b.dataset.i);
     else if (a === 'resume') tourGo(TOUR.i);
     else if (a === 'exit') tourExit();
     else if (a === 'stamps') { TOUR.on = false; TOUR.phase = 'idle'; tourRender(true); openStamps(); }
-    else if (a === 'again') { TOUR.seen = {}; tourGo(0); }
+    else if (a === 'again') tourGo(0);
   });
   TOUR.dock = d; return d;
 }
-const dots = (s, cur) => '<span class="dk-dots" aria-hidden="true">' + s.map((id, k) => '<i class="' + (tourVisited(id) ? 'on ' : '') + (TOUR.on && k === cur ? 'cur' : '') + '"></i>').join('') + '</span>';
+// os pontinhos do topo são botões: tocar num deles leva direto àquele lugar (dá para voltar ou pular para qualquer parada)
+const dots = (s, cur) => '<span class="dk-dots">' + s.map((id, k) => '<button type="button" class="dk-dot ' + (tourVisited(id) ? 'on ' : '') + (TOUR.on && k === cur ? 'cur' : '') + '" data-d="goto" data-i="' + k + '" aria-label="Ir para ' + ((TOUR_INFO[id] || {}).name || id) + (k === cur ? ' (lugar atual)' : '') + '"><i></i></button>').join('') + '</span>';
+const prevBtn = '<button class="dk-btn" type="button" data-d="prev">‹ Voltar</button>';
 function tourRender(force) {
   const d = dockEl(), s = tourStops(), done = s.filter(tourVisited).length;
   const blocked = phase !== 'world' || panelOpen || guideOpen || mailUi.isOpen;              // com uma janela aberta, o dock some (e o foco do teclado não cai nele)
@@ -107,26 +110,26 @@ function tourRender(force) {
   const hadFocus = d.contains(document.activeElement), cur = s[TOUR.i], info = TOUR_INFO[cur] || { name: cur, text: '', open: 'Abrir' };
   let html = '';
   if (!TOUR.on) { // modo compacto: uma frase e um botão
-    if (done >= s.length) html = '<button class="dk-pill" type="button" data-d="stamps"><span class="dk-ic" aria-hidden="true">✦</span><span class="dk-tx"><b>Você viu tudo!</b><small>Abrir o álbum de selos</small></span><span class="dk-go" aria-hidden="true">›</span></button>';
-    else { const j = tourNextIndex(0), nm = (TOUR_INFO[s[j]] || {}).name || s[j];
-      html = '<button class="dk-pill" type="button" data-d="start" aria-label="' + (done ? 'Continuar o tour: próximo lugar, ' : 'Fazer o tour: primeiro lugar, ') + nm + '. ' + done + ' de ' + s.length + ' lugares vistos.">' +
-        '<span class="dk-ic" aria-hidden="true">🧭</span><span class="dk-tx"><b>' + (done ? 'Próximo lugar: ' : 'Fazer o tour: ') + nm + '</b><small>' + done + ' de ' + s.length + ' lugares vistos</small></span><span class="dk-go" aria-hidden="true">›</span></button>'; }
+    if (done >= s.length) html = '<button class="dk-pill" type="button" data-d="start" aria-label="Você viu todos os lugares. Refazer o tour."><span class="dk-ic" aria-hidden="true">✦</span><span class="dk-tx"><b>Você viu tudo!</b><small>Toque para refazer o tour</small></span><span class="dk-go" aria-hidden="true">›</span></button>';
+    else {
+      html = '<button class="dk-pill" type="button" data-d="start" aria-label="Fazer o tour pelos ' + s.length + ' lugares do mundo.' + (done ? ' Você já viu ' + done + '.' : '') + '">' +
+        '<span class="dk-ic" aria-hidden="true">🧭</span><span class="dk-tx"><b>Fazer o tour: ' + s.length + ' lugares</b><small>' + (done ? done + ' de ' + s.length + ' já visitados' : 'a personagem te leva, é rápido') + '</small></span><span class="dk-go" aria-hidden="true">›</span></button>'; }
   } else if (TOUR.phase === 'walk') {
     html = '<div class="dk-box"><p class="dk-top">' + dots(s, TOUR.i) + '<span>' + (TOUR.i + 1) + ' de ' + s.length + '</span></p><h2>Indo para ' + info.name + '…</h2>' +
       '<p class="dk-p">' + (touch ? 'Dica: se quiser andar você mesmo, arraste o joystick (o círculo no canto esquerdo).' : 'Dica: se quiser andar você mesmo, use W A S D ou as setas.') + '</p>' +
-      '<div class="dk-acts"><button class="dk-btn" type="button" data-d="next">Pular este lugar</button><button class="dk-btn quiet" type="button" data-d="exit">Sair do tour</button></div></div>';
+      '<div class="dk-acts">' + (TOUR.i > 0 ? prevBtn : '') + '<button class="dk-btn" type="button" data-d="next">Pular este lugar</button><button class="dk-btn quiet" type="button" data-d="exit">Sair do tour</button></div></div>';
   } else if (TOUR.phase === 'stopped') {
     html = '<div class="dk-box"><p class="dk-top">' + dots(s, TOUR.i) + '<span>' + (TOUR.i + 1) + ' de ' + s.length + '</span></p><h2>Você tomou o controle</h2><p class="dk-p">Sem problema! Quando quiser, eu levo você até ' + info.name + '.</p>' +
-      '<div class="dk-acts"><button class="dk-btn primary" type="button" data-d="resume">Continuar até ' + info.name + '</button><button class="dk-btn quiet" type="button" data-d="exit">Sair do tour</button></div></div>';
+      '<div class="dk-acts"><button class="dk-btn primary" type="button" data-d="resume">Continuar até ' + info.name + '</button>' + (TOUR.i > 0 ? prevBtn : '') + '<button class="dk-btn quiet" type="button" data-d="exit">Sair do tour</button></div></div>';
   } else if (TOUR.phase === 'here') {
     const seen = tourVisited(cur), nx = s[TOUR.i + 1], nxName = nx ? (TOUR_INFO[nx] || {}).name : null;
     html = '<div class="dk-box"><p class="dk-top">' + dots(s, TOUR.i) + '<span>' + (TOUR.i + 1) + ' de ' + s.length + '</span></p><h2>' + info.name + '</h2><p class="dk-p">' + info.text + '</p>' +
       '<div class="dk-acts">' + (seen ? '<button class="dk-btn primary" type="button" data-d="next">' + (nxName ? 'Próximo: ' + nxName + ' ›' : 'Terminar o tour ›') + '</button><button class="dk-btn" type="button" data-d="open">Ver de novo</button>'
         : '<button class="dk-btn primary" type="button" data-d="open">' + info.open + '</button><button class="dk-btn" type="button" data-d="next">' + (nxName ? 'Próximo: ' + nxName + ' ›' : 'Terminar ›') + '</button>') +
-      '<button class="dk-btn quiet" type="button" data-d="exit">Sair</button></div></div>';
+      (TOUR.i > 0 ? prevBtn : '') + '<button class="dk-btn quiet" type="button" data-d="exit">Sair</button></div></div>';
   } else if (TOUR.phase === 'end') {
     html = '<div class="dk-box"><p class="dk-top">' + dots(s, -1) + '<span>fim do tour</span></p><h2>Pronto, agora o mundo é seu ✦</h2><p class="dk-p">Procure as gatas, a lagoa, a cerejeira e o balanço: cada descoberta rende um selo.</p>' +
-      '<div class="dk-acts"><button class="dk-btn primary" type="button" data-d="stamps">Ver o álbum de selos</button><button class="dk-btn" type="button" data-d="exit">Explorar sozinho</button></div></div>';
+      '<div class="dk-acts"><button class="dk-btn primary" type="button" data-d="stamps">Ver o álbum de selos</button>' + prevBtn + '<button class="dk-btn" type="button" data-d="again">Refazer o tour</button><button class="dk-btn quiet" type="button" data-d="exit">Explorar sozinho</button></div></div>';
   }
   d.innerHTML = html;
   if (TOUR.on) announce(TOUR.phase === 'walk' ? 'Indo para ' + info.name + '.' : TOUR.phase === 'here' ? info.name + '. ' + info.text : TOUR.phase === 'stopped' ? 'Tour em pausa.' : 'Fim do tour.');

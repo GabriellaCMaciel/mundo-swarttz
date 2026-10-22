@@ -25,10 +25,12 @@ body.touring .card{display:none} /* durante o tour, a caixa dele substitui o car
 .dk-box h2{margin:2px 0 4px;font:800 20px/1.2 var(--font-body);color:var(--gold);overflow-wrap:anywhere}
 .dk-p{margin:0 0 10px;font:600 14.5px/1.5 var(--font-body)}
 .dk-top{margin:0;display:flex;align-items:center;justify-content:space-between;gap:10px;font:700 11.5px var(--font-mono);letter-spacing:.08em;text-transform:uppercase;color:var(--lilac)}
-.dk-dots{display:flex;gap:6px}
-.dk-dots i{width:9px;height:9px;border-radius:50%;border:1.5px solid var(--lilac);box-sizing:border-box}
-.dk-dots i.on{background:var(--lilac)}
-.dk-dots i.cur{border-color:var(--gold);box-shadow:0 0 0 2px rgba(242,184,75,.35)}
+.dk-dots{display:flex;gap:0}
+.dk-dot{width:28px;height:36px;margin:-10px 0;padding:0;display:grid;place-items:center;background:none;border:0;cursor:pointer;touch-action:manipulation} /* área de toque maior que o pontinho (28x36) */
+.dk-dot:focus-visible{outline:2px solid var(--lilac);outline-offset:-2px;border-radius:8px}
+.dk-dot i{width:10px;height:10px;border-radius:50%;border:1.5px solid var(--lilac);box-sizing:border-box}
+.dk-dot.on i{background:var(--lilac)}
+.dk-dot.cur i{border-color:var(--gold);box-shadow:0 0 0 3px rgba(242,184,75,.4)}
 .dk-acts{display:flex;flex-wrap:wrap;gap:8px}
 .dk-btn{min-height:44px;padding:.5em 1em;font:800 14px/1.2 var(--font-body);color:var(--paper);background:rgba(11,6,19,.7);border:1px solid var(--gold);border-radius:999px;cursor:pointer;touch-action:manipulation}
 .dk-btn:hover{background:var(--gold);color:var(--ink)}
