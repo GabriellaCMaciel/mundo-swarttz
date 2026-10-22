@@ -33,6 +33,7 @@
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Syne:wght@600;800&family=JetBrains+Mono:wght@400;700&family=Caveat:wght@500;700&family=Nunito:wght@600;700;800&display=swap">
   <link rel="stylesheet" href="css/style.css?v=20261021a">
   <link rel="stylesheet" href="css/guide.css?v=20261021a">
+  <link rel="stylesheet" href="css/tour.css?v=20261021a">
 </head>
 <body>
 <a class="skip-link" id="toSimple" href="simples.html">Abrir a versão simples (sem 3D, para leitor de tela e teclado)</a>
@@ -44,7 +45,7 @@
   <button class="btn" id="skip" type="button">pular intro</button>
   <div class="card" id="card" role="button" tabindex="0" hidden><h2 id="cardTitle"></h2><p id="cardText"></p><span class="card-go" aria-hidden="true">›</span></div>
   <div class="cinsel" id="cinSel" role="group" aria-label="Bilheteria do cinema: escolher o filme" hidden><button class="btn cin-arrow" id="cinPrev" type="button" aria-label="Filme anterior">◀</button><div class="cin-mid"><b id="cinTitle"></b><span id="cinMeta"></span></div><button class="btn cin-arrow" id="cinNext" type="button" aria-label="Próximo filme">▶</button><button class="btn cin-info" id="cinInfo" type="button">detalhes</button></div>
-  <div class="hint" id="hint">toque ou aperte uma tecla para abrir o notebook</div>
+  <div class="hint" id="hint">toque ou aperte uma tecla para começar</div>
   <button class="minimap" id="minimap" type="button" aria-expanded="false" aria-label="Mapa do mundo, com um X onde você está. Aperte para ampliar e ver os nomes dos lugares." title="Mapa (M)" hidden><canvas id="mmCanvas" aria-hidden="true"></canvas></button>
   <button class="ibtn a11y-btn" id="a11yBtn" type="button" aria-haspopup="dialog" aria-label="Acessibilidade" data-tip="Acessibilidade" hidden><svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="7.3" r="1.5" fill="currentColor" stroke="none"/><path d="M6.8 9.8 H17.2 M12 9.8 V13.4 M12 13.4 L9.4 18 M12 13.4 L14.6 18"/></svg></button>
   <button class="ibtn stamps-btn" id="stampsBtn" type="button" aria-haspopup="dialog" aria-label="Álbum de selos" data-tip="Álbum de selos" hidden><svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M5 3.5h2.2a1.8 1.8 0 0 0 3.6 0h2.4a1.8 1.8 0 0 0 3.6 0H19v17h-1.2a1.8 1.8 0 0 0-3.6 0h-2.4a1.8 1.8 0 0 0-3.6 0H5z"/><path d="M12 8.2l1.2 2.5 2.7.3-2 1.9.5 2.7-2.4-1.3-2.4 1.3.5-2.7-2-1.9 2.7-.3z" fill="currentColor" stroke="none"/></svg><span class="badge" id="stampsCount" aria-hidden="true"></span></button>

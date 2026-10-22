@@ -207,7 +207,7 @@ function startWorld() {
   requestAnimationFrame(() => requestAnimationFrame(() => {
     hud.flash.style.transition = 'opacity 1.2s'; hud.flash.style.opacity = '0';
   }));
-  setTimeout(openGuide, 1100); // o livro de instruções abre logo depois da entrada (js/guide.js), com o mundo já desenhado atrás
+  setTimeout(() => { if (typeof openWelcome === 'function') openWelcome(); else openGuide(); }, 1100); // as boas-vindas (js/tour.js) abrem na 1ª visita, com o mundo já desenhado atrás; o livro de instruções fica no botão ?
 }
 
 // ===== 8. O coração: o loop que roda ~60 vezes por segundo =====

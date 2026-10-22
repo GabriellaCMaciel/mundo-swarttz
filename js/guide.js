@@ -155,6 +155,7 @@ function closeGuide() {
   const back = (GD.last && document.contains(GD.last) && !GD.last.closest('[hidden]')) ? GD.last : document.getElementById('helpBtn'); if (back) back.focus();
 }
 function guideKey(e) { // chamada por ui.js enquanto o livro está aberto (as teclas do jogo ficam desligadas)
+  if (typeof welcomeOpen !== 'undefined' && welcomeOpen) return welcomeKey(e); // as boas-vindas (js/tour.js) usam o mesmo "modo janela aberta"
   if (e.code === 'Escape') { e.preventDefault(); closeGuide(); }
   else if (e.code === 'ArrowRight') { e.preventDefault(); guidePage(GD.page + 1); }
   else if (e.code === 'ArrowLeft') { e.preventDefault(); guidePage(GD.page - 1); }
