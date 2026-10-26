@@ -7,6 +7,10 @@ O formato segue o [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/) e 
 
 ## [Não lançado]
 
+## [1.2.1] - 2026-10-26
+### Corrigido
+- O botão "Você viu tudo!" do pé da tela não aparece mais para sempre: depois de visitar todos os lugares do tour, ele some.
+
 ## [1.2.0] - 2026-10-26
 ### Adicionado
 - Sistema de versões (Major, Minor e Patch): número da versão no código (`VERSION` em `js/config.js`), no menu de acessibilidade e no rodapé da versão simples.
