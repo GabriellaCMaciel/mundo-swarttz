@@ -96,3 +96,21 @@ Para quem não sabe o que fazer no mundo (`js/tour.js` + `css/tour.css`):
 - **Dock** no pé da tela, sempre visível: "Próximo lugar: Biblioteca · 2 de 5". Um toque começa (ou continua) o tour. No fim vira "Abrir o álbum de selos".
 - **Tour**: a personagem anda sozinha até cada lugar, uma caixinha explica e oferece "Abrir", "Próximo" ou "Sair". Se a pessoa mexer no joystick ou no teclado, o tour espera ("Continuar").
 - A ordem e os textos estão em `TOUR_ORDER` e `TOUR_INFO` no começo de `js/tour.js`. Lugares que saem do mundo (como o Ateliê, por enquanto) saem do tour sozinhos.
+
+## Versionamento
+O portfólio usa o **Versionamento Semântico** (`MAJOR.MINOR.PATCH`, por exemplo `1.2.0`). A versão atual aparece no menu de acessibilidade do mundo 3D, no rodapé da versão simples e no console do navegador. O histórico completo está no [CHANGELOG.md](CHANGELOG.md), e cada versão tem uma _tag_ (`v1.2.0`) e uma Release aqui no GitHub.
+
+| Número | Quando sobe | Exemplos deste projeto |
+| --- | --- | --- |
+| **MAJOR** (`2.0.0`) | Mudança grande, que reformula a experiência ou quebra o que existia | Trocar o conceito do mundo, mudar a forma de navegar por completo |
+| **MINOR** (`1.3.0`) | Função nova que não quebra nada | Um lugar novo, o tour guiado, os selos, o Ateliê voltando |
+| **PATCH** (`1.2.1`) | Correção ou ajuste pequeno | Texto, contraste, bug, desempenho sem função nova |
+
+Sobe o MAJOR: MINOR e PATCH voltam a zero. Sobe o MINOR: o PATCH volta a zero.
+
+**Como lançar uma versão nova** (o número fica em `VERSION`, em `js/config.js`; não edite na mão):
+1. Escreva o que mudou no `CHANGELOG.md`, embaixo de `## [Não lançado]` (grupos: Adicionado, Alterado, Corrigido, Desempenho).
+2. **Pelo GitHub:** aba **Actions** > **Lançar nova versão** > **Run workflow** > escolha `patch`, `minor` ou `major`. Ele sobe o número, cria o commit, a tag e a Release.
+3. **Ou no terminal:** `node scripts/bump-version.js patch` (ou `minor`, `major`), depois `git add -A && git commit -m "chore: release vX.Y.Z" && git tag -a vX.Y.Z -m "vX.Y.Z" && git push --follow-tags`.
+
+O script troca juntos o `VERSION`, o `?v=` do `index.html` (que força o navegador a baixar os arquivos novos) e o rodapé da versão simples. Por isso, o `?v=` agora é sempre o número da versão: toda publicação precisa de uma versão nova (no mínimo um `patch`).
