@@ -1,0 +1,45 @@
+# Lança uma nova versão do portfólio com um clique, sem precisar mexer em arquivos na mão.
+# Como usar: aba Actions > "Lançar nova versão" > Run workflow > escolha patch, minor ou major.
+#   patch = correção pequena (1.2.0 -> 1.2.1)   minor = função nova (1.2.0 -> 1.3.0)   major = mudança grande (1.2.0 -> 2.0.0)
+# ANTES de rodar: escreva o que mudou em CHANGELOG.md, embaixo de "## [Não lançado]".
+# O que a rotina faz: sobe o número (scripts/bump-version.js), faz o commit, cria a tag vX.Y.Z e publica uma Release no GitHub com as notas do CHANGELOG.
+name: Lançar nova versão
+
+on:
+  workflow_dispatch:
+    inputs:
+      tipo:
+        description: 'Tipo de mudança'
+        required: true
+        type: choice
+        options: [patch, minor, major]
+
+permissions:
+  contents: write
+
+jobs:
+  lancar:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Subir a versão
+        run: node scripts/bump-version.js "${{ inputs.tipo }}"
+      - name: Commit, tag e publicação
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          NOVA=$(grep -oP "const VERSION = '\K[^']+" js/config.js)
+          # as notas da Release são o trecho do CHANGELOG dessa versão
+          awk -v v="## [$NOVA]" 'index($0, v) == 1 {on=1; next} on && /^## \[/ {exit} on' CHANGELOG.md > notas.md
+          [ -s notas.md ] || echo "Veja o CHANGELOG.md para os detalhes." > notas.md
+          # o commit sai no nome de quem clicou em "Run workflow" (assim aparece no gráfico de contribuições dessa pessoa)
+          git config user.name "${{ github.actor }}"
+          git config user.email "${{ github.actor_id }}+${{ github.actor }}@users.noreply.github.com"
+          git add js/config.js index.html simples.html CHANGELOG.md
+          git commit -m "chore: release v$NOVA"
+          git tag -a "v$NOVA" -m "v$NOVA"
+          git push --follow-tags
+          gh release create "v$NOVA" --title "v$NOVA" --notes-file notas.md
