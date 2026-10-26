@@ -2,6 +2,12 @@
 // Quase tudo que você vai querer trocar com frequência está aqui.
 'use strict';
 
+// VERSÃO do portfólio, no padrão SemVer: MAJOR.MINOR.PATCH (veja o README, seção "Versionamento", e o CHANGELOG.md).
+// NÃO edite na mão: use `node scripts/bump-version.js patch|minor|major` (ou a ação "Lançar nova versão" no GitHub), que troca este número, o ?v= do index.html e o rodapé da versão simples juntos.
+const VERSION = '1.2.0';
+const CHANGELOG_URL = 'https://github.com/GabriellaCMaciel/mundo-swarttz/blob/main/CHANGELOG.md';
+try { console.info('Mundo Swarttz v' + VERSION); } catch (e) { /* sem console: tudo bem */ }
+
 // Imagens (ficam na pasta assets/)
 const ASSETS = {
   logoDark: 'assets/logo-escuro.svg',   // logo (SVG) para fundos escuros (notebook, terminal)

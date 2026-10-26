@@ -212,6 +212,8 @@ html.paused *,html.paused *::before,html.paused *::after{animation-play-state:pa
 @media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
 
 /* painel de acessibilidade */
+.az-ver{margin:28px 0 0;font:700 13px var(--font-mono);letter-spacing:.06em;color:var(--lilac)}
+.az-ver a{color:var(--gold)}
 .az-h{margin:36px 0 14px;font:800 21px var(--font-body);color:var(--gold)}
 .az-list{list-style:none;margin:0;padding:0;display:grid;gap:12px}
 .az-list li{display:flex;flex-wrap:wrap;gap:12px 16px;align-items:center;justify-content:space-between;padding:14px 18px;border:1px solid rgba(183,154,245,.35);border-radius:14px;font:800 17px var(--font-body)}

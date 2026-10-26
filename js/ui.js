@@ -51,7 +51,8 @@ function a11yHtml() {
     '<ul class="az-keys"><li><b>Teclado:</b> WASD ou setas para andar, Shift para correr (R liga e desliga o "correr sempre"), Espaço para pular, E ou Enter para abrir um lugar, F para interagir com o bichinho ou a coisa mais perto, Esc para fechar, H para esta ajuda.</li>' +
     '<li><b>Mapa:</b> fica no canto superior direito, com um X onde você está. Aperte M (ou toque nele) para ampliar e ver os nomes.</li><li><b>Mouse ou toque:</b> clique ou toque no chão para andar até lá sozinho; toque num lugar para abrir. No celular há o joystick e os botões "correr" e "pular" (também aparecem no computador, para quem usa só o mouse).</li>' +
     '<li><b>Selos:</b> o botão de selo, no canto superior direito, abre o álbum. Explorar e interagir com os bichinhos rende selos, que ficam salvos neste navegador.</li><li><b>Instruções:</b> o botão "?" no canto superior direito reabre o livro com o passo a passo (andar, correr, pular e interagir).</li>' +
-    '<li><b>Sem segurar nada:</b> use "Ir até lá" acima: a personagem anda sozinha.</li></ul>';
+    '<li><b>Sem segurar nada:</b> use "Ir até lá" acima: a personagem anda sozinha.</li></ul>' +
+    '<p class="az-ver">Versão ' + VERSION + ' · <a href="' + CHANGELOG_URL + '" target="_blank" rel="noopener noreferrer">Histórico de mudanças<span class="vh"> (abre em outra aba)</span></a></p>';
 }
 function openA11y() { if (panelOpen || phase !== 'world') return; panelOpen = true; showSheet(a11yHtml()); stampGrant('acess'); }
 document.getElementById('a11yBtn').addEventListener('click', openA11y);
