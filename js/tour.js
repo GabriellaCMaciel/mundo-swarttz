@@ -102,7 +102,7 @@ function tourRender(force) {
   const cinBar = typeof cinEl !== 'undefined' && cinEl.sel && !cinEl.sel.hidden;              // a barra de filmes do cinema ocupa o mesmo lugar: aí o dock sobe para o topo
   const cardOn = !hud.card.hidden;                                                            // o cartão "toque para abrir" ocupa o topo: no modo compacto o dock espera
   const compact = !TOUR.on;
-  const hide = blocked || (compact && (cinBar || cardOn)) || !s.length;
+  const hide = blocked || (compact && (cinBar || cardOn || done >= s.length)) || !s.length; // depois de visitar tudo, o botão compacto some de vez (não fica "Você viu tudo!" para sempre)
   const key = [TOUR.on, TOUR.phase, TOUR.i, done, hide, cinBar].join('|');
   if (!force && key === TOUR.key) return;
   TOUR.key = key; d.hidden = hide; d.classList.toggle('up', !!(TOUR.on && cinBar)); document.body.classList.toggle('touring', TOUR.on);
@@ -110,10 +110,8 @@ function tourRender(force) {
   const hadFocus = d.contains(document.activeElement), cur = s[TOUR.i], info = TOUR_INFO[cur] || { name: cur, text: '', open: 'Abrir' };
   let html = '';
   if (!TOUR.on) { // modo compacto: uma frase e um botão
-    if (done >= s.length) html = '<button class="dk-pill" type="button" data-d="start" aria-label="Você viu todos os lugares. Refazer o tour."><span class="dk-ic" aria-hidden="true">✦</span><span class="dk-tx"><b>Você viu tudo!</b><small>Toque para refazer o tour</small></span><span class="dk-go" aria-hidden="true">›</span></button>';
-    else {
-      html = '<button class="dk-pill" type="button" data-d="start" aria-label="Fazer o tour pelos ' + s.length + ' lugares do mundo.' + (done ? ' Você já viu ' + done + '.' : '') + '">' +
-        '<span class="dk-ic" aria-hidden="true">🧭</span><span class="dk-tx"><b>Fazer o tour: ' + s.length + ' lugares</b><small>' + (done ? done + ' de ' + s.length + ' já visitados' : 'a personagem te leva, é rápido') + '</small></span><span class="dk-go" aria-hidden="true">›</span></button>'; }
+    html = '<button class="dk-pill" type="button" data-d="start" aria-label="Fazer o tour pelos ' + s.length + ' lugares do mundo.' + (done ? ' Você já viu ' + done + '.' : '') + '">' +
+      '<span class="dk-ic" aria-hidden="true">🧭</span><span class="dk-tx"><b>Fazer o tour: ' + s.length + ' lugares</b><small>' + (done ? done + ' de ' + s.length + ' já visitados' : 'a personagem te leva, é rápido') + '</small></span><span class="dk-go" aria-hidden="true">›</span></button>';
   } else if (TOUR.phase === 'walk') {
     html = '<div class="dk-box"><p class="dk-top">' + dots(s, TOUR.i) + '<span>' + (TOUR.i + 1) + ' de ' + s.length + '</span></p><h2>Indo para ' + info.name + '…</h2>' +
       '<p class="dk-p">' + (touch ? 'Dica: se quiser andar você mesmo, arraste o joystick (o círculo no canto esquerdo).' : 'Dica: se quiser andar você mesmo, use W A S D ou as setas.') + '</p>' +
