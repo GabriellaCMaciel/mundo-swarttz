@@ -30,6 +30,17 @@ const FPV_PITCH = [-0.7, 1.1];
 const FPV_KEY = 'swarttz-fpv-dica';
 const fpvTmp = new THREE.Vector3();
 
+// "Estamos dentro da área?" A maioria das áreas é um círculo (raio z.r) em volta do centro. A zona Cartas também cobre o QUINTAL CERCADO inteiro
+// (a casa, o jardim e o portão): lá o formato é um retângulo, girado junto com o "palco" da zona (CARTAS.rot), por isso convertemos o ponto
+// do mundo para as coordenadas do grupo da zona (desfazendo a rotação) e comparamos com os cantos do quintal (YARD, em mailbox.js).
+// margin = folga extra (0 para entrar; FPV_EXIT para só sair depois de afastar um pouco).
+function fpvInside(z, margin) {
+  const dx = player.position.x - z.pos[0], dz = player.position.z - z.pos[2];
+  if (Math.hypot(dx, dz) <= z.r + margin) return true;
+  if (z.id !== 'cartas') return false;
+  const c = Math.cos(CARTAS.rot), s = Math.sin(CARTAS.rot), lx = dx * c - dz * s, lz = dx * s + dz * c;
+  return lx >= YARD.x0 - margin && lx <= YARD.x1 + margin && lz >= YARD.zb - margin && lz <= YARD.zf + margin;
+}
 function fpvDragged() { return FPV.dragged; } // pick.js e library.js ignoram o "click" que vem logo depois de um arrastar
 
 // Para onde olhar ao entrar na área: o que é "a atração" de cada lugar (o telão, o telefone, a estante...)
@@ -55,8 +66,8 @@ function fpvTip() { // dica rápida nas primeiras vezes (depois a pessoa já sab
 function fpvUpdate(dt) {
   const px = player.position.x, pz = player.position.z;
   const dist = z => Math.hypot(px - z.pos[0], pz - z.pos[2]);
-  let zone = FPV.zone && dist(FPV.zone) <= FPV.zone.r + FPV_EXIT ? FPV.zone : null; // continua na mesma área até passar da folga de saída
-  if (!zone) { let best = 1e9; for (const z of zones) { if (!z.built) continue; const d = dist(z); if (d < z.r && d < best) { best = d; zone = z; } } } // senão, entra na mais próxima cujo raio já alcançamos
+  let zone = FPV.zone && fpvInside(FPV.zone, FPV_EXIT) ? FPV.zone : null; // continua na mesma área até passar da folga de saída
+  if (!zone) { let best = 1e9; for (const z of zones) { if (!z.built || !fpvInside(z, 0)) continue; const d = dist(z); if (d < best) { best = d; zone = z; } } } // senão, entra na mais próxima que já alcançamos
   if (zone && zone !== FPV.zone) { fpvAim(zone); fpvTip(); announce('Visão em primeira pessoa em ' + zone.name + '.'); }
   else if (!zone && FPV.zone) announce('Visão de trás.');
   FPV.zone = zone; FPV.on = !!zone;
