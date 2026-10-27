@@ -290,7 +290,7 @@ function buildCinema(g) {
   CIN.cv = document.createElement('canvas'); CIN.cv.width = 1280; CIN.cv.height = Math.round(1280 * H / W); CIN.cx = CIN.cv.getContext('2d');
   CIN.tex = new THREE.CanvasTexture(CIN.cv); CIN.tex.anisotropy = 4;
   CIN.mat = new THREE.MeshBasicMaterial({ map: CIN.tex });
-  const screen = new THREE.Mesh(new THREE.PlaneGeometry(W, H), CIN.mat); screen.position.set(0, SY, SZ + 0.2); g.add(screen);
+  const screen = new THREE.Mesh(new THREE.PlaneGeometry(W, H), CIN.mat); screen.position.set(0, SY, SZ + 0.2); g.add(screen); CIN.screen = screen; // CIN.screen: a visão em 1ª pessoa (fpv.js) olha para ele
   CIN.matB = new THREE.MeshBasicMaterial({ map: CIN.tex, transparent: true, depthWrite: false }); CIN.matB.visible = false; // 2ª camada, só para a transição
   const screenB = new THREE.Mesh(new THREE.PlaneGeometry(W, H), CIN.matB); screenB.position.set(0, SY, SZ + 0.21); screenB.renderOrder = 2; g.add(screenB); CIN.screenB = screenB;
   screen.userData.cinScreen = screenB.userData.cinScreen = true; // só o telão abre a janela do Drive-in ao ser clicado (veja pickZone em pick.js); o chão do estacionamento não

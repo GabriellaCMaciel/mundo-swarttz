@@ -483,7 +483,7 @@ renderer.domElement.addEventListener('pointermove', e => {
   renderer.domElement.style.cursor = hoverBook ? 'pointer' : '';
 });
 renderer.domElement.addEventListener('click', e => {
-  if (phase !== 'world' || panelOpen || !libraryNear()) return;
+  if (phase !== 'world' || panelOpen || !libraryNear() || fpvDragged()) return; // fpvDragged: arrastar para olhar (1ª pessoa) não abre livro
   const b = pickBook(e);
   if (b) openBook(b.data);
 });

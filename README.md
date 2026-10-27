@@ -7,6 +7,7 @@ Você abre o notebook, "hackeia" o perfil e entra num mundo com zonas para explo
 ## Como usar
 
 - Computador: `WASD` ou setas para andar, `Shift` para correr (ou `R` liga/desliga), `Espaço` para pular, `E` (ou clicar na coisa) para abrir uma zona, `M` para ampliar o mapa, `H` para acessibilidade, `Esc` para fechar.
+- Dentro de cada área (Sobre, Biblioteca, Cinema, Telefone, Cartas) a câmera passa para a **1ª pessoa**: `W`/`S` andam para onde você olha, `A`/`D` andam de lado, `←`/`→` ou arrastar o mouse/dedo viram a cabeça. Ao sair da área, a visão volta para trás da personagem.
 - Celular: joystick na tela e botões "correr" e "pular"; toque na coisa (ou no cartão/botão "abrir") para abrir; toque no mapinha para ampliar.
 - Mapa: um mapinha redondo fica fixo no canto superior direito, com um X vermelho que acompanha a pessoa; ampliado, mostra o nome de cada lugar.
 
@@ -34,6 +35,7 @@ js/cinema.js      o cinema drive-in da zona de projetos: telão (16:9) que passa
 js/guide.js       o livro de instruções (2D) que abre ao entrar no mundo: 5 páginas (andar, correr e pular, interagir, nos lugares, selos). Tudo o que antes era dica na tela mora aqui
 js/pick.js        toque/clique nas coisas do mundo: ícones do celular abrem os perfis, zonas abrem o painel
 js/interact.js    o sistema de interações: tudo que dá para clicar/tocar (gatas, filhotes, Zé Porempa, lagoa, cerejeira, balanço) reage com balão de fala, corações etc.; tecla F interage com o mais perto
+js/fpv.js         a visão em 1ª pessoa dentro das áreas: câmera nos olhos, andar relativo ao olhar, girar com setas ou arrastando, e a troca suave com a visão de trás
 js/stamps.js      os selos colecionáveis: lista STAMPS (arte em SVG, nome, descrição, pista), álbum, aviso ao ganhar e salvamento no navegador (localStorage)
 js/boot.js        porta de entrada: manda para simples.html (escolha salva, ?simples ou aparelho sem WebGL) ou carrega o mundo 3D, com os arquivos em ordem
 js/mail.js        a tela das cartas: carrossel de envelopes e a carta dobrada em três (animação por linha do tempo, reversível)

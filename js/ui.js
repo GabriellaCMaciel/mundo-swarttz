@@ -49,6 +49,7 @@ function a11yHtml() {
     '<label class="az-check"><input type="checkbox" id="azRun"' + (runLock ? ' checked' : '') + '> Correr sempre (sem precisar segurar Shift)</label>' +
     '<h3 class="az-h">Como se mover</h3>' +
     '<ul class="az-keys"><li><b>Teclado:</b> WASD ou setas para andar, Shift para correr (R liga e desliga o "correr sempre"), Espaço para pular, E ou Enter para abrir um lugar, F para interagir com o bichinho ou a coisa mais perto, Esc para fechar, H para esta ajuda.</li>' +
+    '<li><b>Dentro de cada lugar (visão em 1ª pessoa):</b> ao chegar numa área, a câmera vai para os olhos da personagem. W e S andam para a frente e para trás, A e D andam de lado, as setas ← → (ou arrastar o mouse ou o dedo na tela) viram a cabeça. No celular, o joystick para cima anda para a frente. Ao sair da área, a visão volta para trás da personagem.</li>' +
     '<li><b>Mapa:</b> fica no canto superior direito, com um X onde você está. Aperte M (ou toque nele) para ampliar e ver os nomes.</li><li><b>Mouse ou toque:</b> clique ou toque no chão para andar até lá sozinho; toque num lugar para abrir. No celular há o joystick e os botões "correr" e "pular" (também aparecem no computador, para quem usa só o mouse).</li>' +
     '<li><b>Selos:</b> o botão de selo, no canto superior direito, abre o álbum. Explorar e interagir com os bichinhos rende selos, que ficam salvos neste navegador.</li><li><b>Instruções:</b> o botão "?" no canto superior direito reabre o livro com o passo a passo (andar, correr, pular e interagir).</li>' +
     '<li><b>Sem segurar nada:</b> use "Ir até lá" acima: a personagem anda sozinha.</li></ul>' +
@@ -240,9 +241,11 @@ function angLerp(a, b, t) { // gira suave pelo caminho mais curto
 
 function updateWorld(dt, now) {
   // 1) ler o que a pessoa apertou (parado enquanto um painel está aberto)
-  let ix = (keys.KeyD || keys.ArrowRight ? 1 : 0) - (keys.KeyA || keys.ArrowLeft ? 1 : 0) + stick.x;
+  fpvUpdate(dt); // visão em 1ª pessoa dentro das áreas (js/fpv.js): nela as setas ← → giram a cabeça em vez de andar de lado
+  let ix = (keys.KeyD || (keys.ArrowRight && !FPV.on) ? 1 : 0) - (keys.KeyA || (keys.ArrowLeft && !FPV.on) ? 1 : 0) + stick.x;
   let iz = (keys.KeyS || keys.ArrowDown ? 1 : 0) - (keys.KeyW || keys.ArrowUp ? 1 : 0) + stick.y;
   if (panelOpen) { ix = 0; iz = 0; auto.on = false; }
+  if (FPV.on && (ix || iz)) [ix, iz] = fpvMove(ix, iz); // em 1ª pessoa, "frente" é para onde você olha (o andar sozinho já usa eixos do mundo)
   if (ix || iz) auto.on = false; // quem aperta uma tecla ou mexe no joystick assume o controle
   if (auto.on) { // andar sozinho: vai na direção do ponto marcado e para quando chega
     const ax = auto.x - player.position.x, az = auto.z - player.position.z, ad = Math.hypot(ax, az);
@@ -261,9 +264,11 @@ function updateWorld(dt, now) {
   if (moving) {
     player.position.x += ix * SPEED * RUN.mul * dt; player.position.z += iz * SPEED * RUN.mul * dt;
     clampToWorld(player.position); // borda do mundo
-    player.rotation.y = angLerp(player.rotation.y, Math.atan2(ix, iz), Math.min(1, dt * 12));
+    if (!FPV.on) player.rotation.y = angLerp(player.rotation.y, Math.atan2(ix, iz), Math.min(1, dt * 12));
     sparkTimer += dt; if (sparkTimer > (running ? 0.04 : 0.07) && !JUMP.air) { emitSpark(); sparkTimer = 0; }
   }
+  if (FPV.on && auto.on && moving) FPV.yaw = angLerp(FPV.yaw, Math.atan2(auto.x - player.position.x, auto.z - player.position.z), Math.min(1, dt * 4)); // andando sozinho, a cabeça acompanha o caminho
+  if (FPV.k > 0) player.rotation.y = FPV.yaw; // o corpo (invisível) já fica virado para onde você olha: ao sair da área, ela continua nessa direção
   // pulo: física simples. Velocidade vertical (vy) diminui com a gravidade; a altura (y) soma a velocidade; chegou ao chão, pousa.
   if (JUMP.air) {
     JUMP.vy -= JUMP.g * dt; player.position.y += JUMP.vy * dt;
@@ -301,8 +306,9 @@ function updateWorld(dt, now) {
   const boost = libraryCamBoost(); // na biblioteca a câmera sobe e se afasta um pouco
   camWant.set(player.position.x, CAM_Y + LIB_CAM.y * boost, player.position.z + CAM_Z + LIB_CAM.z * boost);
   lookWant.set(player.position.x, LOOK_Y + LIB_CAM.look * boost, player.position.z);
-  camera.position.lerp(camWant, k);
-  lookNow.lerp(lookWant, k);
+  const kk = FPV.k > 0 ? k + (1 - k) * fpvBlend(camWant, lookWant) : k; // 1ª pessoa: mistura com a câmera dos olhos; no fim da troca segue direto (sem atraso ao girar a cabeça)
+  camera.position.lerp(camWant, kk);
+  lookNow.lerp(lookWant, kk);
   camera.lookAt(lookNow);
 }
 

@@ -60,7 +60,7 @@ function openSocial(s) {
 }
 
 renderer.domElement.addEventListener('click', e => {
-  if (phase !== 'world' || panelOpen || mailUi.isOpen) return; // o clique em livros da biblioteca é tratado em library.js (vem antes e abre o painel)
+  if (phase !== 'world' || panelOpen || mailUi.isOpen || fpvDragged()) return; // (fpvDragged: o arrastar para olhar em 1ª pessoa não conta como toque) o clique em livros da biblioteca é tratado em library.js (vem antes e abre o painel)
   const s = pickIcon(e); if (s) return openSocial(s);
   const cin = pickCinema(e); if (cin) return cin(); // cartaz, carrinho ou seta da bilheteria: escolhe o filme
   const inter = pickInteract(e); if (inter) return interactDo(inter); // bichinhos, lagoa, árvore, balanço (js/interact.js)

@@ -6,6 +6,8 @@ O formato segue o [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/) e 
 > As versões anteriores à 1.2.0 foram numeradas depois, olhando o histórico do Git. As datas e os pontos de cada uma estão nas _tags_ do repositório.
 
 ## [Não lançado]
+### Adicionado
+- Visão em 1ª pessoa: ao chegar em uma área (Sobre, Biblioteca, Cinema, Telefone, Cartas), a câmera vai para os olhos da personagem, olhando para a atração do lugar. W/S andam para onde você olha, A/D andam de lado, as setas ← → ou arrastar o mouse/dedo viram a cabeça. Ao sair da área, a visão volta sozinha para trás da personagem.
 
 ## [1.3.0] - 2026-10-26
 ### Adicionado
