@@ -6,6 +6,8 @@ O formato segue o [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/) e 
 > As versões anteriores à 1.2.0 foram numeradas depois, olhando o histórico do Git. As datas e os pontos de cada uma estão nas _tags_ do repositório.
 
 ## [Não lançado]
+
+## [1.4.1] - 2026-10-26
 ### Alterado
 - A troca para a visão em 1ª pessoa ficou mais lenta e suave (cerca de 2 segundos para entrar e 1,3 para sair), e o corpo da personagem só some quando a câmera chega na cabeça, para dar tempo de entender o que está acontecendo.
 
