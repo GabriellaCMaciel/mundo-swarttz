@@ -255,3 +255,13 @@ html.paused *,html.paused *::before,html.paused *::after{animation-play-state:pa
 .itip{position:fixed;z-index:60;pointer-events:none;padding:.35em .8em;border-radius:99px;background:rgba(14,7,26,.92);border:1px solid var(--gold);color:var(--paper);font:800 14px var(--font-body);white-space:nowrap}
 @media (prefers-reduced-motion:reduce){.stamp-toast.in,.stamp-toast.out,.stamp-toast .st-art{animation:none;transform:translate(-50%,0);opacity:1}.stamp-toast.out{opacity:0}.st-bar i{transition:none}}
 @media (max-width:520px){.st-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:26px 16px}.st-card .st-art{width:min(128px,100%)}.st-card h3{font-size:17px}.st-card p{font-size:14px}}
+
+/* ----- Botão "Voltar ao topo" (js/totop.js): grudado no canto de baixo da janela que rola ----- */
+.totop-wrap{position:sticky;bottom:14px;height:0;flex:none;display:flex;justify-content:flex-end;z-index:3;pointer-events:none}
+.totop{pointer-events:auto;transform:translateY(-100%);width:46px;height:46px;border-radius:50%;display:grid;place-items:center;padding:0;font:800 22px/1 var(--font-body);color:var(--ink);background:var(--gold);border:2px solid rgba(11,6,19,.55);box-shadow:0 6px 18px rgba(0,0,0,.5);cursor:pointer;touch-action:manipulation}
+.totop[hidden]{display:none}
+.totop:hover{background:#ffd98a}
+.totop:focus-visible{outline:3px solid var(--lilac);outline-offset:3px}
+.paper-page .totop-wrap{display:none} /* a folha 3D da animação da carta nunca leva o botão */
+@media (prefers-reduced-motion:no-preference){.totop{animation:totopIn .2s ease-out}}
+@keyframes totopIn{from{opacity:0;margin-top:8px}to{opacity:1;margin-top:0}}

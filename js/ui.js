@@ -62,6 +62,7 @@ let lastFocus = null; // quem tinha o foco antes de abrir um painel: o foco volt
 function showSheet(html) { // coloca o conteúdo na folha do painel e leva o foco para o botão de fechar
   if (hud.panel.hidden && !mailUi.isOpen) lastFocus = document.activeElement;
   hud.sheet.innerHTML = '<button class="close" type="button" aria-label="Fechar">✕</button>' + html;
+  addTopButton(hud.sheet); // botão "Voltar ao topo" (js/totop.js)
   hud.panel.hidden = false; syncLoop();
   hud.sheet.querySelector('.close').focus();
 }

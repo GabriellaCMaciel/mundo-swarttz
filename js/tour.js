@@ -44,7 +44,7 @@ function openWelcome() {
       '<div class="w-acts"><button class="dk-btn primary" type="button" data-w="tour">Fazer o tour (1 minuto)</button>' +
       '<button class="dk-btn" type="button" data-w="free">Explorar por conta própria</button>' +
       '<button class="dk-btn quiet" type="button" data-w="keys">Como controlar a personagem</button></div></div>';
-    document.body.appendChild(el);
+    document.body.appendChild(el); addTopButton(el.querySelector('.w-card'));
     el.addEventListener('click', e => { const b = e.target.closest('[data-w]'); if (b) closeWelcome(b.dataset.w); });
   }
   welcomeOpen = true; guideOpen = true; el.hidden = false; syncLoop(); // guideOpen pausa o mundo e liga o teclado do "livro" (veja guideKey em guide.js)

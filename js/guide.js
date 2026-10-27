@@ -137,6 +137,7 @@ function openGuide() {
   if (guideOpen || phase !== 'world') return;
   if (!GD.el) {
     GD.el = document.getElementById('guide'); GD.el.innerHTML = renderGuide();
+    GD.el.querySelectorAll('.g-page, .g-half').forEach(addTopButton); // quem rola é a página (celular) ou cada metade (telas grandes): ambas ganham o botão "Voltar ao topo"
     GD.el.addEventListener('click', e => {
       if (e.target === GD.el) return closeGuide();                                  // clicar fora do livro fecha
       const b = e.target.closest('[data-act]'); if (!b) return; const a = b.dataset.act;

@@ -177,6 +177,7 @@ function playLetter(dir) { anim.dir = dir; anim.last = performance.now(); cancel
 function finishOpen() { // a carta está plana e aberta: trocamos a folha 3D pela versão que rola (idêntica por fora)
   mailUi.state = 'open'; mailUi.lock = false;
   mailUi.big.hidden = false; mailUi.big.scrollTop = 0; SHEET.el.style.display = 'none';
+  addTopButton(mailUi.big); // botão "Voltar ao topo" só na carta que rola (a folha 3D da animação não leva o botão)
   mailUi.big.setAttribute('tabindex', '-1'); mailUi.big.setAttribute('aria-label', 'Carta de ' + letters[mailUi.cur].who);
   mailUi.big.focus({ preventScroll: true }); // o leitor de tela começa a ler a carta (as teclas Esc, etc. continuam valendo: o tratamento é na janela)
 }
