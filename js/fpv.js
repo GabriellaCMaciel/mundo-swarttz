@@ -10,7 +10,7 @@
 // CONCEITOS:
 //   - Yaw e pitch: yaw é o giro para os lados (0 olha para +z; π olha para -z, que é "para o fundo do mundo"); pitch é o olhar para cima/baixo.
 //   - Movimento relativo à câmera: o que a pessoa aperta (frente, de lado) é "girado" pelo yaw para virar um passo nos eixos do mundo (x, z).
-//   - Mistura (blend): FPV.k vai de 0 (visão de trás) a 1 (1ª pessoa) em ~0,6 s; a câmera é uma mistura das duas posições, por isso a troca é suave.
+//   - Mistura (blend): FPV.k vai de 0 (visão de trás) a 1 (1ª pessoa) em ~2 s (FPV_IN); a câmera é uma mistura das duas posições, por isso a troca é suave.
 'use strict';
 
 const FPV = {
@@ -20,6 +20,8 @@ const FPV = {
   yaw: Math.PI, pitch: 0,
   dragged: false,   // o último arrastar foi para olhar (e não um toque): quem trata cliques deve ignorar esse clique (veja fpvDragged)
 };
+const FPV_IN = 1.9;       // segundos que a câmera leva para ir de trás da personagem até os olhos (devagar, para dar tempo de entender o que está acontecendo)
+const FPV_OUT = 1.3;      // segundos para voltar para trás ao sair da área
 const FPV_EYE = 2.0;      // altura dos olhos (a personagem tem ~2,5 de altura)
 const FPV_EXIT = 2.5;     // folga na saída: a câmera só volta depois de sair desta distância além do raio da área (evita "piscar" na borda)
 const FPV_TURN = 1.9;     // rad/s com as setas
@@ -58,8 +60,9 @@ function fpvUpdate(dt) {
   if (zone && zone !== FPV.zone) { fpvAim(zone); fpvTip(); announce('Visão em primeira pessoa em ' + zone.name + '.'); }
   else if (!zone && FPV.zone) announce('Visão de trás.');
   FPV.zone = zone; FPV.on = !!zone;
-  FPV.k = calm ? (FPV.on ? 1 : 0) : THREE.MathUtils.clamp(FPV.k + (FPV.on ? dt : -dt) / 0.6, 0, 1); // "reduzir movimento": troca de uma vez
-  player.visible = FPV.k < 0.55; // com a câmera nos olhos o corpo some (senão a câmera ficaria dentro do capuz)
+  FPV.k = calm ? (FPV.on ? 1 : 0) : THREE.MathUtils.clamp(FPV.k + (FPV.on ? dt / FPV_IN : -dt / FPV_OUT), 0, 1); // "reduzir movimento": troca de uma vez
+  // o corpo só some quando a câmera chega bem perto da cabeça (assim ela "entra" na personagem em vez de o corpo sumir de repente no meio da troca)
+  player.visible = Math.hypot(camera.position.x - px, camera.position.y - (player.position.y + FPV_EYE), camera.position.z - pz) > 1.3;
   if (FPV.on) { // setas giram a cabeça
     const t = (keys.ArrowLeft ? 1 : 0) - (keys.ArrowRight ? 1 : 0);
     if (t) FPV.yaw += t * FPV_TURN * dt;
