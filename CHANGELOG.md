@@ -7,6 +7,10 @@ O formato segue o [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/) e 
 
 ## [Não lançado]
 
+## [1.3.0] - 2026-10-26
+### Adicionado
+- Botão "Voltar ao topo" (seta dourada no canto) nas janelas que rolam: painéis dos lugares, álbum de selos, acessibilidade, carta aberta, livro de instruções e boas-vindas. Só aparece depois de rolar um pouco e respeita "reduzir movimento".
+
 ## [1.2.1] - 2026-10-26
 ### Corrigido
 - O botão "Você viu tudo!" do pé da tela não aparece mais para sempre: depois de visitar todos os lugares do tour, ele some.
