@@ -18,6 +18,7 @@ const FPV = {
   k: 0,             // 0..1: quanto da câmera já está nos olhos (a animação da troca)
   zone: null,       // a área em que estamos
   yaw: Math.PI, pitch: 0,
+  always: false,    // preferência da pessoa: "andar sempre em 1ª pessoa" (vale no mundo todo, não só dentro das áreas)
   dragged: false,   // o último arrastar foi para olhar (e não um toque): quem trata cliques deve ignorar esse clique (veja fpvDragged)
 };
 const FPV_IN = 1.9;       // segundos que a câmera leva para ir de trás da personagem até os olhos (devagar, para dar tempo de entender o que está acontecendo)
@@ -28,6 +29,8 @@ const FPV_TURN = 1.9;     // rad/s com as setas
 const FPV_SENS = 0.0045;  // rad por pixel arrastado
 const FPV_PITCH = [-0.7, 1.1];
 const FPV_KEY = 'swarttz-fpv-dica';
+const FPV_ALWAYS_KEY = 'swarttz-fpv-sempre';
+try { FPV.always = localStorage.getItem(FPV_ALWAYS_KEY) === '1'; } catch (e) { /* sem armazenamento: começa desligado */ }
 const fpvTmp = new THREE.Vector3();
 
 // "Estamos dentro da área?" A maioria das áreas é um círculo (raio z.r) em volta do centro. A zona Cartas também cobre o QUINTAL CERCADO inteiro
@@ -41,6 +44,14 @@ function fpvInside(z, margin) {
   const c = Math.cos(CARTAS.rot), s = Math.sin(CARTAS.rot), lx = dx * c - dz * s, lz = dx * s + dz * c;
   return lx >= YARD.x0 - margin && lx <= YARD.x1 + margin && lz >= YARD.zb - margin && lz <= YARD.zf + margin;
 }
+// Liga/desliga "andar sempre em 1ª pessoa" (caixinha em Acessibilidade). Fica salvo no navegador.
+function fpvSetAlways(on) {
+  FPV.always = !!on;
+  try { localStorage.setItem(FPV_ALWAYS_KEY, on ? '1' : '0'); } catch (e) { /* sem armazenamento: vale só nesta visita */ }
+  if (on && !FPV.zone) { FPV.yaw = Math.PI; FPV.pitch = 0; } // fora das áreas, começa olhando para o fundo do mundo (a mesma direção em que a câmera de trás já olhava: sem "pulo")
+  announce(on ? 'Andar sempre em primeira pessoa: ligado.' : 'Andar sempre em primeira pessoa: desligado. A visão de trás volta fora das áreas.');
+}
+
 function fpvDragged() { return FPV.dragged; } // pick.js e library.js ignoram o "click" que vem logo depois de um arrastar
 
 // Para onde olhar ao entrar na área: o que é "a atração" de cada lugar (o telão, o telefone, a estante...)
@@ -68,9 +79,11 @@ function fpvUpdate(dt) {
   const dist = z => Math.hypot(px - z.pos[0], pz - z.pos[2]);
   let zone = FPV.zone && fpvInside(FPV.zone, FPV_EXIT) ? FPV.zone : null; // continua na mesma área até passar da folga de saída
   if (!zone) { let best = 1e9; for (const z of zones) { if (!z.built || !fpvInside(z, 0)) continue; const d = dist(z); if (d < best) { best = d; zone = z; } } } // senão, entra na mais próxima que já alcançamos
-  if (zone && zone !== FPV.zone) { fpvAim(zone); fpvTip(); announce('Visão em primeira pessoa em ' + zone.name + '.'); }
-  else if (!zone && FPV.zone) announce('Visão de trás.');
-  FPV.zone = zone; FPV.on = !!zone;
+  if (!FPV.always) { // com "andar sempre em 1ª pessoa" a câmera já está nos olhos: nada de virar a cabeça sozinha, avisar ou trocar de visão
+    if (zone && zone !== FPV.zone) { fpvAim(zone); fpvTip(); announce('Visão em primeira pessoa em ' + zone.name + '.'); }
+    else if (!zone && FPV.zone) announce('Visão de trás.');
+  }
+  FPV.zone = zone; FPV.on = !!zone || FPV.always;
   FPV.k = calm ? (FPV.on ? 1 : 0) : THREE.MathUtils.clamp(FPV.k + (FPV.on ? dt / FPV_IN : -dt / FPV_OUT), 0, 1); // "reduzir movimento": troca de uma vez
   // o corpo só some quando a câmera chega bem perto da cabeça (assim ela "entra" na personagem em vez de o corpo sumir de repente no meio da troca)
   player.visible = Math.hypot(camera.position.x - px, camera.position.y - (player.position.y + FPV_EYE), camera.position.z - pz) > 1.3;

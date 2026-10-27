@@ -6,6 +6,9 @@ O formato segue o [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/) e 
 > As versões anteriores à 1.2.0 foram numeradas depois, olhando o histórico do Git. As datas e os pontos de cada uma estão nas _tags_ do repositório.
 
 ## [Não lançado]
+### Adicionado
+- Opção "Andar sempre em 1ª pessoa" no menu de acessibilidade (Preferências): a câmera fica nos olhos da personagem no mundo todo, e a escolha fica salva no navegador.
+
 ### Alterado
 - A área de 1ª pessoa das Cartas agora cobre o quintal cercado inteiro (a casa, o jardim e o portão), e não só o entorno da caixa de correio.
 

@@ -47,9 +47,10 @@ function a11yHtml() {
     '<h3 class="az-h">Preferências</h3>' +
     '<label class="az-check"><input type="checkbox" id="azCalm"' + (calm ? ' checked' : '') + '> Reduzir movimento (gatos, borboletas, pétalas e luzes ficam parados)</label>' +
     '<label class="az-check"><input type="checkbox" id="azRun"' + (runLock ? ' checked' : '') + '> Correr sempre (sem precisar segurar Shift)</label>' +
+    '<label class="az-check"><input type="checkbox" id="azFpv"' + (FPV.always ? ' checked' : '') + '> Andar sempre em 1ª pessoa (a câmera fica nos olhos da personagem em todo o mundo, não só dentro dos lugares)</label>' +
     '<h3 class="az-h">Como se mover</h3>' +
     '<ul class="az-keys"><li><b>Teclado:</b> WASD ou setas para andar, Shift para correr (R liga e desliga o "correr sempre"), Espaço para pular, E ou Enter para abrir um lugar, F para interagir com o bichinho ou a coisa mais perto, Esc para fechar, H para esta ajuda.</li>' +
-    '<li><b>Dentro de cada lugar (visão em 1ª pessoa):</b> ao chegar numa área, a câmera vai para os olhos da personagem. W e S andam para a frente e para trás, A e D andam de lado, as setas ← → (ou arrastar o mouse ou o dedo na tela) viram a cabeça. No celular, o joystick para cima anda para a frente. Ao sair da área, a visão volta para trás da personagem.</li>' +
+    '<li><b>Dentro de cada lugar (visão em 1ª pessoa):</b> ao chegar numa área, a câmera vai para os olhos da personagem. W e S andam para a frente e para trás, A e D andam de lado, as setas ← → (ou arrastar o mouse ou o dedo na tela) viram a cabeça. No celular, o joystick para cima anda para a frente. Ao sair da área, a visão volta para trás da personagem. Quem preferir pode ligar "Andar sempre em 1ª pessoa" em Preferências, acima.</li>' +
     '<li><b>Mapa:</b> fica no canto superior direito, com um X onde você está. Aperte M (ou toque nele) para ampliar e ver os nomes.</li><li><b>Mouse ou toque:</b> clique ou toque no chão para andar até lá sozinho; toque num lugar para abrir. No celular há o joystick e os botões "correr" e "pular" (também aparecem no computador, para quem usa só o mouse).</li>' +
     '<li><b>Selos:</b> o botão de selo, no canto superior direito, abre o álbum. Explorar e interagir com os bichinhos rende selos, que ficam salvos neste navegador.</li><li><b>Instruções:</b> o botão "?" no canto superior direito reabre o livro com o passo a passo (andar, correr, pular e interagir).</li>' +
     '<li><b>Sem segurar nada:</b> use "Ir até lá" acima: a personagem anda sozinha.</li></ul>' +
@@ -111,6 +112,7 @@ hud.sheet.addEventListener('click', e => {
 });
 hud.sheet.addEventListener('change', e => { // caixinhas "Reduzir movimento" e "Correr sempre"
   if (e.target.id === 'azRun') setRun(e.target.checked);
+  if (e.target.id === 'azFpv') fpvSetAlways(e.target.checked); // js/fpv.js
   if (e.target.id === 'azCalm') { calm = e.target.checked; try { localStorage.setItem(CALM_KEY, calm ? '1' : '0'); } catch (err) { /* sem armazenamento: vale só nesta visita */ } }
 });
 hud.panel.addEventListener('click', e => { if (e.target === hud.panel) closePanel(); });

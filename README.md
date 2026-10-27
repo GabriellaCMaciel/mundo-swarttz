@@ -7,7 +7,7 @@ Você abre o notebook, "hackeia" o perfil e entra num mundo com zonas para explo
 ## Como usar
 
 - Computador: `WASD` ou setas para andar, `Shift` para correr (ou `R` liga/desliga), `Espaço` para pular, `E` (ou clicar na coisa) para abrir uma zona, `M` para ampliar o mapa, `H` para acessibilidade, `Esc` para fechar.
-- Dentro de cada área (Sobre, Biblioteca, Cinema, Telefone, Cartas) a câmera passa para a **1ª pessoa**: `W`/`S` andam para onde você olha, `A`/`D` andam de lado, `←`/`→` ou arrastar o mouse/dedo viram a cabeça. Ao sair da área, a visão volta para trás da personagem.
+- Dentro de cada área (Sobre, Biblioteca, Cinema, Telefone, Cartas) a câmera passa para a **1ª pessoa**: `W`/`S` andam para onde você olha, `A`/`D` andam de lado, `←`/`→` ou arrastar o mouse/dedo viram a cabeça. Ao sair da área, a visão volta para trás da personagem. Em Acessibilidade (`H`) dá para ligar "Andar sempre em 1ª pessoa", que vale no mundo todo.
 - Celular: joystick na tela e botões "correr" e "pular"; toque na coisa (ou no cartão/botão "abrir") para abrir; toque no mapinha para ampliar.
 - Mapa: um mapinha redondo fica fixo no canto superior direito, com um X vermelho que acompanha a pessoa; ampliado, mostra o nome de cada lugar.
 
