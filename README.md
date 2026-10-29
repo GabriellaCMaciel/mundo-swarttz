@@ -116,3 +116,7 @@ Sobe o MAJOR: MINOR e PATCH voltam a zero. Sobe o MINOR: o PATCH volta a zero.
 3. **Ou no terminal:** `node scripts/bump-version.js patch` (ou `minor`, `major`), depois `git add -A && git commit -m "chore: release vX.Y.Z" && git tag -a vX.Y.Z -m "vX.Y.Z" && git push --follow-tags`.
 
 O script troca juntos o `VERSION`, o `?v=` do `index.html` (que força o navegador a baixar os arquivos novos) e o rodapé da versão simples. Por isso, o `?v=` agora é sempre o número da versão: toda publicação precisa de uma versão nova (no mínimo um `patch`).
+
+## Licença
+
+Todos os direitos reservados (veja o arquivo `LICENSE`). Dá para visitar o site e ler o código; qualquer reutilização de código, textos, fotos, logos ou depoimentos precisa de autorização por escrito.
