@@ -7,6 +7,18 @@ O formato segue o [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/) e 
 
 ## [Não lançado]
 
+## [1.6.0] - 2026-10-29
+### Adicionado
+- Na janela de boas-vindas, o botão "Prefiro ler em texto (versão simples)" leva direto à versão em texto, sem precisar fazer o tour antes.
+- Página `404.html`: quem chega num endereço que não existe vê uma mensagem amigável com links de volta ao mundo 3D e à versão simples.
+- Licença (`LICENSE`): todos os direitos reservados; o site pode ser visitado e lido, mas não copiado ou reaproveitado sem autorização. Também entrou o `.gitignore`.
+- `scripts/build-simples.js`: gera as partes repetidas do `simples.html` (contatos, sobre, depoimentos, livros e projetos) a partir do `js/config.js`, e `--check` avisa quando algo ficou fora de sincronia. Isso já corrigiu duas legendas de depoimentos que estavam diferentes nas duas versões.
+- Testes automáticos (`npm test`): verificações rápidas de consistência e testes de navegador (Playwright) em tela de computador e de celular, que rodam sozinhos no GitHub a cada envio. O lançamento de versão agora só acontece se eles passarem.
+- Modo de diagnóstico `?debug` (`js/debug.js`): mostra quadros por segundo, placa de vídeo, resolução e erros, com botão para copiar o relatório. Acompanha o roteiro de teste em aparelhos reais em `docs/TESTES.md`.
+
+### Corrigido
+- Na janela de boas-vindas, a tecla Tab não circulava direito entre os botões por causa do botão "Voltar ao topo" escondido.
+
 ## [1.5.0] - 2026-10-27
 ### Adicionado
 - Opção "Andar sempre em 1ª pessoa" no menu de acessibilidade (Preferências): a câmera fica nos olhos da personagem no mundo todo, e a escolha fica salva no navegador.
