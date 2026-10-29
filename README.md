@@ -36,6 +36,7 @@ js/guide.js       o livro de instruções (2D) que abre ao entrar no mundo: 5 p�
 js/pick.js        toque/clique nas coisas do mundo: ícones do celular abrem os perfis, zonas abrem o painel
 js/interact.js    o sistema de interações: tudo que dá para clicar/tocar (gatas, filhotes, Zé Porempa, lagoa, cerejeira, balanço) reage com balão de fala, corações etc.; tecla F interage com o mais perto
 js/fpv.js         a visão em 1ª pessoa dentro das áreas: câmera nos olhos, andar relativo ao olhar, girar com setas ou arrastando, e a troca suave com a visão de trás
+js/debug.js       modo de diagnóstico: com ?debug no endereço mostra quadros por segundo, placa de vídeo, resolução e erros (para testar em celular de verdade). Sem ?debug não faz nada
 js/stamps.js      os selos colecionáveis: lista STAMPS (arte em SVG, nome, descrição, pista), álbum, aviso ao ganhar e salvamento no navegador (localStorage)
 js/boot.js        porta de entrada: manda para simples.html (escolha salva, ?simples ou aparelho sem WebGL) ou carrega o mundo 3D, com os arquivos em ordem
 js/mail.js        a tela das cartas: carrossel de envelopes e a carta dobrada em três (animação por linha do tempo, reversível)
@@ -44,6 +45,10 @@ js/trails.js      as trilhas (curvas invisíveis) que ligam o ponto de partida a
 js/worldmap.js    o mapa redondo com o mesmo chão bordado do mundo (mapinha fixo no canto + versão ampliada) com um X vermelho no lugar onde a pessoa está agora
 js/decor.js       decoração do mundo inteiro: flores, árvores floridas, postes e fios de luz ligando as zonas
 js/ui.js          painéis, controles e o loop principal
+404.html          página de "não encontrada" (o GitHub Pages usa sozinho), com links de volta ao mundo e à versão simples
+tests/            testes automáticos: checks.js (verificações rápidas) e mundo.spec.js (navegador, com Playwright)
+scripts/          bump-version.js (sobe a versão) e build-simples.js (gera trechos do simples.html a partir do config.js)
+docs/TESTES.md    guia de testes: como rodar os automáticos e o roteiro para testar em celular de verdade
 assets/           logos (SVG, versões para fundo escuro e claro), foto, og-image.png (cartão de compartilhamento 1200x630), favicon-32.png e apple-touch-icon.png
 ```
 
@@ -52,6 +57,17 @@ Os arquivos JS do mundo 3D dependem uns dos outros, então a ordem da lista em `
 ## Como rodar
 
 Use um servidor local (por exemplo, a extensão **Live Server** do VS Code) ou publique no GitHub Pages. Abrir o `index.html` com duplo clique não carrega as imagens, porque o navegador bloqueia texturas de arquivos locais. Precisa de internet para o Three.js e as fontes.
+
+## Testes
+
+```bash
+npm install                      # só na primeira vez
+npx playwright install chromium  # só na primeira vez
+npm run test:rapido              # verificações de consistência (segundos)
+npm test                         # rápidas + testes de navegador (alguns minutos)
+```
+
+Os testes também rodam sozinhos no GitHub a cada envio (aba **Actions → Testes**), e o lançamento de versão só acontece se eles passarem. O guia completo, com o roteiro para testar em celular e tablet de verdade (use `?debug` no endereço), está em [`docs/TESTES.md`](docs/TESTES.md).
 
 ## Como editar
 
