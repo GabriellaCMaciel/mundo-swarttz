@@ -1,0 +1,15 @@
+# Dependências e saídas dos testes (veja tests/ e o README, seção "Testes")
+node_modules/
+test-results/
+playwright-report/
+
+# Sujeira de sistema e de editores
+.DS_Store
+Thumbs.db
+*.log
+.vscode/
+.idea/
+
+# Segredos nunca vão para o repositório
+.env
+.env.*
