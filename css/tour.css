@@ -50,4 +50,5 @@ body.touring .card{display:none} /* durante o tour, a caixa dele substitui o car
 .w-card .w-kicker{margin-bottom:6px}
 .w-acts{display:flex;flex-direction:column;gap:10px}
 .w-acts .dk-btn{width:100%;font-size:16px;min-height:50px}
+a.dk-btn{display:inline-flex;align-items:center;justify-content:center;box-sizing:border-box;text-decoration:none;text-align:center} /* o botão que é um link (<a>) fica igual aos outros */
 @media (prefers-reduced-motion:no-preference){.dk-pill,.dk-btn{transition:background .15s,color .15s}}

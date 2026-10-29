@@ -43,12 +43,13 @@ function openWelcome() {
       '<p>Cada lugar daqui é uma parte do portfólio: quem ela é, o que estuda, os projetos que fez e como falar com ela. Você pode passear por conta própria ou deixar que eu te leve.</p>' +
       '<div class="w-acts"><button class="dk-btn primary" type="button" data-w="tour">Fazer o tour (1 minuto)</button>' +
       '<button class="dk-btn" type="button" data-w="free">Explorar por conta própria</button>' +
-      '<button class="dk-btn quiet" type="button" data-w="keys">Como controlar a personagem</button></div></div>';
+      '<button class="dk-btn quiet" type="button" data-w="keys">Como controlar a personagem</button>' +
+      '<a class="dk-btn quiet" href="simples.html">Prefiro ler em texto (versão simples)</a></div></div>'; // um LINK de verdade (leva a outra página), sem data-w: o clique não passa por closeWelcome
     document.body.appendChild(el); addTopButton(el.querySelector('.w-card'));
     el.addEventListener('click', e => { const b = e.target.closest('[data-w]'); if (b) closeWelcome(b.dataset.w); });
   }
   welcomeOpen = true; guideOpen = true; el.hidden = false; syncLoop(); // guideOpen pausa o mundo e liga o teclado do "livro" (veja guideKey em guide.js)
-  announce('Boas-vindas. Escolha: fazer o tour guiado, explorar por conta própria ou ver como controlar a personagem.');
+  announce('Boas-vindas. Escolha: fazer o tour guiado, explorar por conta própria, ver como controlar a personagem ou ler a versão simples, em texto.');
   el.querySelector('[data-w="tour"]').focus();
 }
 function closeWelcome(choice) {
@@ -59,7 +60,7 @@ function closeWelcome(choice) {
 function welcomeKey(e) { // chamada por guideKey enquanto as boas-vindas estão abertas
   if (e.code === 'Escape') { e.preventDefault(); closeWelcome('free'); return; }
   if (e.code !== 'Tab') return;
-  const f = [...document.querySelectorAll('#welcome button')]; const i = f.indexOf(document.activeElement);
+  const f = [...document.querySelectorAll('#welcome button, #welcome a')].filter(el => el.offsetParent !== null), i = f.indexOf(document.activeElement); // só os visíveis: o botão "Voltar ao topo" fica escondido até rolar e não pode entrar na roda do Tab
   e.preventDefault(); f[e.shiftKey ? (i <= 0 ? f.length - 1 : i - 1) : (i === f.length - 1 ? 0 : i + 1)].focus();
 }
 
