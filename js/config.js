@@ -28,7 +28,7 @@ const SOCIALS = [
   { name: 'E-mail',   url: 'mailto:gabriellacunhamaciel@gmail.com', handle: 'gabriellacunhamaciel@gmail.com' }
 ];
 
-// Textos do painel do mundo 3D (ui.js). A versão simples (simples.html) é uma página estática, sem JavaScript: se mudar o texto aqui, mude lá também.
+// Textos do painel do mundo 3D (ui.js). A versão simples (simples.html) é uma página estática, sem JavaScript: depois de mudar SOCIALS, ABOUT ou letters, rode `node scripts/build-simples.js` (ele copia para lá; veja o README). Formação e projeto em destaque do simples.html são escritos à mão: o `--check` avisa se ficarem para trás.
 const ABOUT = [
   'Sou a Gabriella Swarttz. Estudo Desenvolvimento Web e Mobile, sou monitora no projeto START e estou construindo meu caminho até a engenharia de IA.',
   'Gosto de livros, gatos, pintura, bordado, selos e de tudo que é colorido.'
