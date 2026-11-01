@@ -6,6 +6,14 @@ O formato segue o [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/) e 
 > As versões anteriores à 1.2.0 foram numeradas depois, olhando o histórico do Git. As datas e os pontos de cada uma estão nas _tags_ do repositório.
 
 ## [Não lançado]
+### Corrigido
+- Celular: o aviso "Novo selo!" ficou menor e some sozinho quando uma janela abre; antes ele tampava o título e o botão de fechar dos painéis.
+- Celular em pé: o nome "Gabriella Swarttz" no topo não passa mais por baixo dos botões redondos (quebra em duas linhas quando falta espaço).
+- Celular deitado: a boas-vindas cabe inteira (botões em duas colunas), os painéis ficaram mais enxutos, o livro de instruções voltou a ter as duas páginas lado a lado, e a barra de filmes do cinema e o tour ficam no pé da tela, entre o joystick e os botões, sem cobrir o cartão do lugar nem o mapinha.
+- O mapa ampliado não desce mais por cima dos botões correr/pular no celular deitado.
+- O e-mail no painel Telefone e na versão simples quebra antes do "@", e não no meio do ".com".
+- Carta aberta no celular: a letra cursiva ficou maior e mais fácil de ler.
+- Versão simples: o menu do topo, que rola de lado no celular, mostra um degradê no fim para indicar que há mais itens.
 
 ## [1.6.0] - 2026-10-29
 ### Adicionado
