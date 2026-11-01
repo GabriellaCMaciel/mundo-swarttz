@@ -272,3 +272,6 @@ html.paused *,html.paused *::before,html.paused *::after{animation-play-state:pa
   .stamp-toast .st-art{width:50px}
   .st-txt small{font-size:11px}.st-txt b{font-size:17px}.st-txt span{font-size:13px;line-height:1.35}
 }
+/* celular em pé: o nome no topo (fonte Syne, bem larga) passava por baixo dos 3 botões redondos da direita.
+   Agora ele tem uma largura máxima e, se não couber, quebra em duas linhas (GABRIELLA / SWARTTZ). 176px = os 3 botões + folga */
+@media (max-width:480px){.brand{max-width:calc(100% - var(--sl) - var(--sr) - 176px);font-size:11px;line-height:1.4;letter-spacing:.12em}}
