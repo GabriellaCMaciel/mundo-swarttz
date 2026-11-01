@@ -275,3 +275,16 @@ html.paused *,html.paused *::before,html.paused *::after{animation-play-state:pa
 /* celular em pé: o nome no topo (fonte Syne, bem larga) passava por baixo dos 3 botões redondos da direita.
    Agora ele tem uma largura máxima e, se não couber, quebra em duas linhas (GABRIELLA / SWARTTZ). 176px = os 3 botões + folga */
 @media (max-width:480px){.brand{max-width:calc(100% - var(--sl) - var(--sr) - 176px);font-size:11px;line-height:1.4;letter-spacing:.12em}}
+/* celular DEITADO (pouca altura): janelas mais enxutas e as barras do pé da tela ENTRE o joystick e os botões correr/pular.
+   (max-height:500px) pega celular deitado sem pegar tablet nem notebook; 300px = joystick (124) + botões (130) + folgas */
+@media (max-height:500px) and (orientation:landscape){
+  .sheet{padding:22px 26px 26px;border-radius:18px}
+  .sheet h2{font-size:26px;margin-bottom:6px}
+  .sheet .sub{margin-bottom:18px;font-size:15px}
+  .close{top:14px;right:14px}
+  .cinsel{bottom:var(--sb);width:min(440px,calc(100% - var(--sl) - var(--sr) - 300px))}
+  .toast{bottom:calc(var(--sb) + 118px)}
+  .mail-head h2{font-size:22px}
+  .mail-stage{top:calc(var(--st) + 40px);bottom:92px} /* mais altura para os envelopes (eles se ajustam ao espaço) */
+  .mail-foot{gap:4px}
+}

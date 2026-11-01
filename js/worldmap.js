@@ -144,7 +144,7 @@ function drawMapBase(S, labels) { // a ilustração inteira (parada), desenhada 
 }
 
 // ---------- o mapa na tela ----------
-function mapSize() { return WMAP.open ? Math.min(innerWidth * 0.92, innerHeight * 0.66, 460) : (innerWidth <= 640 ? 92 : 116); } // tamanho em pixels da tela (CSS)
+function mapSize() { return WMAP.open ? Math.min(innerWidth * 0.92, innerHeight * 0.66, innerHeight - 150, 460) : (innerWidth <= 640 || innerHeight <= 500 ? 92 : 116); } // tamanho em pixels da tela (CSS). innerHeight - 150 e innerHeight <= 500: no celular DEITADO o mapa não desce por cima dos botões correr/pular
 function mapPick() { // escolhe/recria a base certa e acerta o tamanho do canvas visível
   const css = Math.round(mapSize()), dpr = Math.min(window.devicePixelRatio || 1, 2), S = Math.round(css * dpr), kind = WMAP.open ? 'big' : 'small';
   const key = kind + S; if (!WMAP.base[key]) { WMAP.base = {}; WMAP.base[key] = drawMapBase(S, WMAP.open); } // só guarda a base em uso (a outra é refeita quando precisar)

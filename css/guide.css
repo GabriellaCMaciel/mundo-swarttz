@@ -131,6 +131,19 @@ kbd{display:inline-block;min-width:26px;box-sizing:border-box;padding:3px 9px;ma
   .g-page{overflow-y:auto;overflow-x:hidden;padding-bottom:20px}
   .g-done{font-size:12px;padding:.8em 1em}
 }
+/* celular DEITADO: empilhado, sobrava pouca altura e quase tudo ficava escondido. Volta às duas metades lado a lado, e cada metade rola sozinha */
+@media (max-height:500px) and (orientation:landscape) and (min-width:600px){
+  .g-pages{bottom:56px}
+  .g-spread{grid-template-columns:minmax(0,1fr) minmax(0,1fr);height:100%;min-height:0}
+  .g-spread::before,.g-spread::after{display:block}
+  .g-half,.g-half.left,.g-half.right{padding:14px 18px 12px;overflow:auto;justify-content:flex-start;min-height:0}
+  .g-half:first-child{padding-top:14px}
+  .g-half.right{padding-top:58px} /* espaço para os botões de fechar e acessibilidade, no canto de cima */
+  .g-page{overflow:hidden;padding-bottom:0}
+  .g-half h2{font-size:20px}.g-half .lead{font-size:14px}.g-list{gap:10px}.g-list li{font-size:14px;line-height:1.5}
+  .g-foot{height:56px}
+  .g-nav{width:44px;height:44px}
+}
 /* "reduzir movimento": tudo parado, e as legendas ficam todas à mostra (sem se revezar) */
 .guide.calm *,.guide.calm *::before,.guide.calm *::after{animation:none!important;transition:none!important}
 .guide.calm .g-caps{height:auto}.guide.calm .g-caps span{position:static;display:block;opacity:1}
