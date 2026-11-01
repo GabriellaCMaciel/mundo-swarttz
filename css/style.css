@@ -265,3 +265,10 @@ html.paused *,html.paused *::before,html.paused *::after{animation-play-state:pa
 .paper-page .totop-wrap{display:none} /* a folha 3D da animação da carta nunca leva o botão */
 @media (prefers-reduced-motion:no-preference){.totop{animation:totopIn .2s ease-out}}
 @keyframes totopIn{from{opacity:0;margin-top:8px}to{opacity:1;margin-top:0}}
+/* ===== Celular: telas pequenas e celular DEITADO ===== */
+/* aviso "Novo selo!" compacto: em tela pequena ele ocupava quase 1/4 da altura e tampava os botões do topo e o mapinha */
+@media (max-width:640px),(max-height:500px){
+  .stamp-toast{gap:12px;width:min(380px,calc(100% - 24px));padding:9px 14px 9px 10px;border-radius:16px;top:calc(var(--st) + 4px)}
+  .stamp-toast .st-art{width:50px}
+  .st-txt small{font-size:11px}.st-txt b{font-size:17px}.st-txt span{font-size:13px;line-height:1.35}
+}

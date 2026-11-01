@@ -162,9 +162,12 @@ function stampGrant(id) {
 
 // ---------- o aviso que aparece ao ganhar (um por vez) ----------
 function stampNext() {
+  const coberto = panelOpen || guideOpen || mailUi.isOpen;
+  // abriu uma janela com o aviso ainda na tela (ex.: fechou um painel e já abriu outro): o aviso sai na hora, senão tampa o título e o botão de fechar (no celular cobria quase o topo inteiro)
+  if (coberto && SEL.showing && SEL.toast.classList.contains('in')) { clearTimeout(SEL.timer); stampHide(); return; }
   if (SEL.showing || !SEL.queue.length) return;
   // com uma janela aberta (painel, tutorial, cartas) o aviso espera: assim ele nunca tampa o que a pessoa está lendo. syncLoop (ui.js) chama stampNext ao fechar.
-  if (panelOpen || guideOpen || mailUi.isOpen) return;
+  if (coberto) return;
   const s = SEL.queue.shift(); SEL.showing = true;
   const t = SEL.toast; t.innerHTML = '<div class="st-art">' + stampSvg(s) + '</div><div class="st-txt"><small>Novo selo!</small><b>' + s.name + '</b><span>' + s.desc + '</span></div>';
   t.hidden = false; t.classList.remove('out'); void t.offsetWidth; t.classList.add('in'); // void offsetWidth: força o navegador a "ver" a mudança, para a animação recomeçar
