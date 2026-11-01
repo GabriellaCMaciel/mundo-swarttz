@@ -174,7 +174,8 @@ body{margin:0;background:var(--ink);color:var(--paper);font-family:var(--font-di
 .paper-big .paper-sign b{display:block;font-size:32px;line-height:34px;color:#d63a7a}
 .mail-cat{min-height:1.5em;text-align:center;max-width:min(92vw,520px);text-transform:none;letter-spacing:.02em}
 .mail-foot p.mail-cat{font:700 13px/1.4 var(--font-mono);color:var(--gold)}
-@media (max-width:520px){.paper-big{padding:34px 18px 34px 46px;font-size:21px}.paper-big{background-position:0 0}.paper-back{margin-left:-24px}.paper-greet{font-size:26px}.mail-nav{width:44px;height:44px;font-size:26px}}
+/* celular: letra cursiva (Caveat) em 21px ficava miúda; 24px ainda cabe em cada linha da folha (34px) */
+@media (max-width:520px){.paper-big{padding:34px 18px 34px 46px;font-size:24px}.paper-big{background-position:0 0}.paper-back{margin-left:-24px}.paper-greet{font-size:28px}.mail-nav{width:44px;height:44px;font-size:26px}}
 @media (prefers-reduced-motion:reduce){.mail-petals i{animation:none;opacity:0}.env.cur .env-bob{animation:none}}
 @media (max-width:520px){.about{grid-template-columns:1fr}.about img{max-width:220px}}
 @media (prefers-reduced-motion:reduce){.hint{animation:none}}
@@ -265,6 +266,7 @@ html.paused *,html.paused *::before,html.paused *::after{animation-play-state:pa
 .paper-page .totop-wrap{display:none} /* a folha 3D da animação da carta nunca leva o botão */
 @media (prefers-reduced-motion:no-preference){.totop{animation:totopIn .2s ease-out}}
 @keyframes totopIn{from{opacity:0;margin-top:8px}to{opacity:1;margin-top:0}}
+
 /* ===== Celular: telas pequenas e celular DEITADO ===== */
 /* aviso "Novo selo!" compacto: em tela pequena ele ocupava quase 1/4 da altura e tampava os botões do topo e o mapinha */
 @media (max-width:640px),(max-height:500px){
