@@ -64,7 +64,7 @@ const gen = {
       '        <a class="tile tile-' + ic.k + '" href="' + escAttr(s.url) + '"' + (isMail(s) ? '' : ext) + '>',
       '          ' + svg(ic, ic.t),
       '          <span class="tile-n">' + esc(s.name) + (isMail(s) ? '' : vh) + '</span>',
-      '          <span class="tile-h">' + esc(s.handle) + '</span>',
+      '          <span class="tile-h">' + esc(s.handle).replace('@', '<wbr>@') + '</span>', // <wbr>: se o e-mail não couber, a quebra acontece antes do @ (e não no meio do .com)
       '        </a>', '      </li>'].join('\n'); }).join('\n')
 };
 

@@ -163,7 +163,7 @@ ul, ol { margin: 0; padding: 0; list-style: none; }
 .tile:hover { color: #fff; transform: translateY(-4px); filter: brightness(1.12); }
 .tile svg { margin-bottom: auto; }
 .tile-n { font: 800 26px/1.1 var(--font-display); }
-.tile-h { font: 700 15px var(--font-mono); }
+.tile-h { font: 700 clamp(12px, 3.6vw, 15px) var(--font-mono); } /* em celular de 360px o e-mail inteiro cabe numa linha */
 .tile-gh { background: linear-gradient(145deg, #4b3a8f, #251648); }
 .tile-li { background: linear-gradient(145deg, #3a6df0, #2a4fb8); }
 .tile-ml { background: linear-gradient(145deg, #8a52f0, #5e2cc4); }
