@@ -52,3 +52,14 @@ body.touring .card{display:none} /* durante o tour, a caixa dele substitui o car
 .w-acts .dk-btn{width:100%;font-size:16px;min-height:50px}
 a.dk-btn{display:inline-flex;align-items:center;justify-content:center;box-sizing:border-box;text-decoration:none;text-align:center} /* o botão que é um link (<a>) fica igual aos outros */
 @media (prefers-reduced-motion:no-preference){.dk-pill,.dk-btn{transition:background .15s,color .15s}}
+
+/* celular DEITADO: a boas-vindas não cabia (só o primeiro botão aparecia) — texto mais enxuto e os 4 botões em 2 colunas.
+   O dock do tour desce para o pé da tela, entre o joystick e os botões correr/pular (300px = os dois + folgas) */
+@media (max-height:500px) and (orientation:landscape){
+  .w-card{width:min(640px,100%);padding:16px 20px}
+  .w-card h2{font-size:22px;margin-bottom:6px}
+  .w-card p{font-size:14px;line-height:1.5;margin-bottom:12px}
+  .w-acts{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+  .w-acts .dk-btn{min-height:44px;font-size:14px}
+  .dock{bottom:var(--sb);width:min(440px,calc(100% - var(--sl) - var(--sr) - 300px))}
+}
