@@ -2,6 +2,8 @@
 
 Portfólio 3D interativo de **Gabriella Swarttz**, feito com HTML, CSS, JavaScript e [Three.js](https://threejs.org/).
 
+🔗 **Acesse:** [gabriellacmaciel.github.io/mundo-swarttz](https://gabriellacmaciel.github.io/mundo-swarttz/) · [versão simples, sem 3D](https://gabriellacmaciel.github.io/mundo-swarttz/simples.html)
+
 Você abre o notebook, "hackeia" o perfil e entra num mundo com zonas para explorar: Sobre, Biblioteca, Cinema drive-in (os projetos), Telefone e Cartas. As gatas Kiara, Maria Marta, Zé Porempa, Mel e os três filhotes (Bangula, Ônix e Cat Noir) moram por lá.
 
 ## Como usar
