@@ -25,7 +25,7 @@ npm test
 
 ### Rodam sozinhos no GitHub
 
-Todo `push` na `main` e todo pull request dispara o fluxo **Testes** (`.github/workflows/test.yml`). Veja em **Actions → Testes**: bolinha verde = tudo certo, vermelha = algo quebrou. O lançamento de versão (`release.yml`) também roda os testes antes e **não lança** se algum falhar.
+Todo `push` na `main` e todo pull request dispara o fluxo **Testes** (`.github/workflows/test.yml`). Veja em **Actions → Testes**: bolinha verde = tudo certo, vermelha = algo quebrou. O lançamento de versão (`release.yml`) só roda **depois** que os testes da `main` passam: se algum falhar, nenhuma versão sai. Nos PRs, os testes também conferem se quem mudou o site escreveu o que mudou no `CHANGELOG.md`, porque é esse texto que faz a versão subir sozinha.
 
 ### Se um teste falhar
 

@@ -23,6 +23,22 @@ jobs:
     timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2          # o pai do commit: serve para ver quais arquivos o PR mudou
+      # Trava do lançamento automático: PR que mexe no site precisa contar o que mudou no CHANGELOG.md (embaixo de "## [Não lançado]").
+      # É esse texto que faz a versão subir sozinha depois que o PR é aceito (veja release.yml). Sem ele, a mudança iria ao ar sem versão nova
+      # e o ?v= não mudaria, então quem já visitou o site poderia continuar vendo os arquivos antigos guardados no navegador.
+      - name: PR que muda o site tem anotação no CHANGELOG
+        if: github.event_name == 'pull_request'
+        run: |
+          MUDOU=$(git diff --name-only HEAD^1 HEAD)
+          SITE=$(echo "$MUDOU" | grep -E '^(js/|css/|assets/|index\.html$|simples\.html$|404\.html$)' || true)
+          if [ -n "$SITE" ] && ! echo "$MUDOU" | grep -qx 'CHANGELOG.md'; then
+            echo "Este PR muda o site, mas não escreveu nada no CHANGELOG.md:"; echo "$SITE"
+            echo "Escreva o que mudou embaixo de '## [Não lançado]' (Adicionado, Alterado, Corrigido ou Desempenho)."
+            exit 1
+          fi
+          echo "ok"
       - uses: actions/setup-node@v4
         with:
           node-version: 20
