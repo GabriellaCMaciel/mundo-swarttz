@@ -1,57 +1,94 @@
-# Lança uma nova versão do portfólio com um clique, sem precisar mexer em arquivos na mão.
-# Como usar: aba Actions > "Lançar nova versão" > Run workflow > escolha patch, minor ou major.
-#   patch = correção pequena (1.2.0 -> 1.2.1)   minor = função nova (1.2.0 -> 1.3.0)   major = mudança grande (1.2.0 -> 2.0.0)
-# ANTES de rodar: escreva o que mudou em CHANGELOG.md, embaixo de "## [Não lançado]".
-# O que a rotina faz: PRIMEIRO roda os testes (se algum falhar, nada é lançado); depois sobe o número (scripts/bump-version.js), faz o commit, cria a tag vX.Y.Z e publica uma Release no GitHub com as notas do CHANGELOG.
+# LANÇAMENTO AUTOMÁTICO de versão. Ninguém precisa clicar em nada.
+#
+# Quando roda: toda vez que os "Testes" terminam com sucesso na main (ou seja, depois que um PR é aceito).
+# O que faz:
+#   1. Cria no GitHub as tags e Releases das versões antigas que ainda não têm (só na primeira vez; depois não acha nada faltando).
+#   2. Olha o "## [Não lançado]" do CHANGELOG.md (scripts/release.js decide):
+#        - tem "### Adicionado"        -> MINOR (1.6.0 -> 1.7.0), porque entrou função nova
+#        - só correções/ajustes        -> PATCH (1.6.0 -> 1.6.1)
+#        - vazio                       -> não lança nada
+#   3. Sobe o número em todo lugar (scripts/bump-version.js: VERSION, ?v= do index.html, rodapé da versão simples, CHANGELOG),
+#      faz o commit "chore: release vX.Y.Z", cria a tag e publica a Release com as notas do CHANGELOG.
+#
+# MAJOR (2.0.0) nunca sai sozinho: aba Actions > "Lançar nova versão" > Run workflow > major.
+# O mesmo botão serve para forçar um patch ou minor na mão.
 name: Lançar nova versão
 
 on:
+  workflow_run:
+    workflows: [Testes]
+    types: [completed]
+    branches: [main]
   workflow_dispatch:
     inputs:
       tipo:
-        description: 'Tipo de mudança'
+        description: 'Tipo de versão (automático = decide pelo CHANGELOG)'
         required: true
+        default: automatico
         type: choice
-        options: [patch, minor, major]
+        options: [automatico, patch, minor, major]
 
 permissions:
   contents: write
 
+# um lançamento por vez (se dois PRs forem aceitos seguidos, o segundo espera o primeiro terminar)
+concurrency:
+  group: lancamento
+  cancel-in-progress: false
+
 jobs:
   lancar:
-    # Ubuntu fixo (e não "ubuntu-latest"): quando o GitHub troca a versão do "latest", o navegador de teste (Playwright) pode ainda não ter suporte e tudo falha.
-    # Para atualizar: subir o @playwright/test no package.json e depois trocar a versão aqui.
+    # só depois de testes que PASSARAM num envio para a main (testes de PR não lançam nada)
+    if: github.event_name == 'workflow_dispatch' || (github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.event == 'push')
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0          # histórico completo: precisa dele para achar o commit de cada versão antiga
       - uses: actions/setup-node@v4
         with:
           node-version: 20
-          cache: npm
-      # Trava de segurança: não lança versão se os testes estiverem falhando
-      - name: Instalar dependências
-        run: npm ci
-      - name: Verificações rápidas
-        run: npm run test:rapido
-      - name: Instalar o Chromium do Playwright
-        run: npx playwright install --with-deps chromium
-      - name: Testes de navegador
-        run: npx playwright test
-      - name: Subir a versão
-        run: node scripts/bump-version.js "${{ inputs.tipo }}"
-      - name: Commit, tag e publicação
+
+      - name: Quem assina os commits
+        # o commit sai no nome de quem aceitou o PR (assim conta no gráfico de contribuições dessa pessoa)
+        run: |
+          git config user.name "${{ github.actor }}"
+          git config user.email "${{ github.actor_id }}+${{ github.actor }}@users.noreply.github.com"
+
+      - name: Tags e Releases das versões antigas (só as que faltam)
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
+          node scripts/release.js tags > faltam.txt
+          [ -s faltam.txt ] || { echo "Nenhuma versão antiga sem tag."; exit 0; }
+          while read -r TAG COMMIT; do
+            git tag -a "$TAG" "$COMMIT" -m "$TAG"
+            git push origin "$TAG"
+            node scripts/release.js notas "${TAG#v}" > notas.md
+            gh release create "$TAG" --verify-tag --title "$TAG" --notes-file notas.md
+            echo "Criada: $TAG"
+          done < faltam.txt
+
+      - name: Lançar a versão nova
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          TIPO="${{ inputs.tipo }}"
+          if [ -z "$TIPO" ] || [ "$TIPO" = automatico ]; then TIPO=$(node scripts/release.js tipo); fi
+          if [ "$TIPO" = nenhum ]; then echo "Nada escrito em [Não lançado] no CHANGELOG.md: nada para lançar."; exit 0; fi
+          node scripts/bump-version.js "$TIPO"
           NOVA=$(grep -oP "const VERSION = '\K[^']+" js/config.js)
-          # as notas da Release são o trecho do CHANGELOG dessa versão
-          awk -v v="## [$NOVA]" 'index($0, v) == 1 {on=1; next} on && /^## \[/ {exit} on' CHANGELOG.md > notas.md
-          [ -s notas.md ] || echo "Veja o CHANGELOG.md para os detalhes." > notas.md
-          # o commit sai no nome de quem clicou em "Run workflow" (assim aparece no gráfico de contribuições dessa pessoa)
-          git config user.name "${{ github.actor }}"
-          git config user.email "${{ github.actor_id }}+${{ github.actor }}@users.noreply.github.com"
+          node scripts/release.js notas "$NOVA" > notas.md
           git add js/config.js index.html simples.html CHANGELOG.md
           git commit -m "chore: release v$NOVA"
+          # se outro envio chegou na main nesse meio-tempo (ex.: o robô da atividade), pega ele e tenta de novo (nunca força)
+          for TENTATIVA in 1 2 3; do
+            git push origin HEAD:main && break
+            [ "$TENTATIVA" = 3 ] && { echo "Não consegui enviar depois de 3 tentativas."; exit 1; }
+            git fetch origin main && git rebase origin/main
+          done
           git tag -a "v$NOVA" -m "v$NOVA"
-          git push --follow-tags
-          gh release create "v$NOVA" --title "v$NOVA" --notes-file notas.md
+          git push origin "v$NOVA"
+          gh release create "v$NOVA" --verify-tag --title "v$NOVA" --notes-file notas.md
+          echo "Lançada: v$NOVA ($TIPO)"

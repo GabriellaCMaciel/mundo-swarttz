@@ -128,12 +128,17 @@ O portfólio usa o **Versionamento Semântico** (`MAJOR.MINOR.PATCH`, por exempl
 
 Sobe o MAJOR: MINOR e PATCH voltam a zero. Sobe o MINOR: o PATCH volta a zero.
 
-**Como lançar uma versão nova** (o número fica em `VERSION`, em `js/config.js`; não edite na mão):
-1. Escreva o que mudou no `CHANGELOG.md`, embaixo de `## [Não lançado]` (grupos: Adicionado, Alterado, Corrigido, Desempenho).
-2. **Pelo GitHub:** aba **Actions** > **Lançar nova versão** > **Run workflow** > escolha `patch`, `minor` ou `major`. Ele sobe o número, cria o commit, a tag e a Release.
-3. **Ou no terminal:** `node scripts/bump-version.js patch` (ou `minor`, `major`), depois `git add -A && git commit -m "chore: release vX.Y.Z" && git tag -a vX.Y.Z -m "vX.Y.Z" && git push --follow-tags`.
+**Lançamento automático** (ninguém precisa clicar em nada; o número fica em `VERSION`, em `js/config.js`, e nunca é editado na mão):
+1. Todo PR que mexe no site escreve o que mudou no `CHANGELOG.md`, embaixo de `## [Não lançado]` (grupos: Adicionado, Alterado, Corrigido, Desempenho). Se esquecer, os testes do PR falham e avisam.
+2. Quando o PR é aceito e os testes da `main` passam, a rotina **Lançar nova versão** (`.github/workflows/release.yml`) roda sozinha:
+   - tem **Adicionado** → sobe o **MINOR** (`1.6.0` → `1.7.0`);
+   - só correções e ajustes → sobe o **PATCH** (`1.6.0` → `1.6.1`);
+   - `[Não lançado]` vazio → não lança nada.
+3. Ela troca juntos o `VERSION`, o `?v=` do `index.html` (que força o navegador a baixar os arquivos novos) e o rodapé da versão simples, transforma `[Não lançado]` na seção da versão nova com a data, faz o commit `chore: release vX.Y.Z`, cria a tag e publica a Release com as notas.
 
-O script troca juntos o `VERSION`, o `?v=` do `index.html` (que força o navegador a baixar os arquivos novos) e o rodapé da versão simples. Por isso, o `?v=` agora é sempre o número da versão: toda publicação precisa de uma versão nova (no mínimo um `patch`).
+**MAJOR nunca sai sozinho**, porque mudança grande é decisão de pessoa: aba **Actions** > **Lançar nova versão** > **Run workflow** > `major`. O mesmo botão força um `patch` ou `minor` na mão. No terminal, o equivalente é `node scripts/bump-version.js patch` (ou `minor`, `major`), mas o caminho normal é o automático.
+
+A decisão de que tipo lançar fica em `scripts/release.js`, que também cria as tags e Releases de versões antigas que estejam faltando no GitHub.
 
 ## Licença
 
