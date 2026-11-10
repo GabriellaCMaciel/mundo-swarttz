@@ -138,7 +138,7 @@ erDiagram
     comentario {
         int id PK
         int moderado_por FK
-        text texto
+        varchar texto
         enum status
     }
 ```
