@@ -19,7 +19,9 @@ permissions:
 
 jobs:
   lancar:
-    runs-on: ubuntu-latest
+    # Ubuntu fixo (e não "ubuntu-latest"): quando o GitHub troca a versão do "latest", o navegador de teste (Playwright) pode ainda não ter suporte e tudo falha.
+    # Para atualizar: subir o @playwright/test no package.json e depois trocar a versão aqui.
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
