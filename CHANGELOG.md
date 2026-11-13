@@ -6,6 +6,8 @@ O formato segue o [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/) e 
 > As versões anteriores à 1.2.0 foram numeradas depois, olhando o histórico do Git. As datas e os pontos de cada uma estão nas _tags_ do repositório.
 
 ## [Não lançado]
+
+## [1.7.0] - 2026-11-13
 ### Adicionado
 - Lançamento automático de versão: quando um PR é aceito e os testes passam, a versão sobe sozinha (função nova = minor, correção = patch), junto com o `?v=` que faz o navegador baixar os arquivos novos, o rodapé da versão simples, a tag e a Release no GitHub. As tags e Releases das versões antigas também são criadas automaticamente.
 - Os testes de PR avisam quando uma mudança no site não foi anotada no CHANGELOG.
