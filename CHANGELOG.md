@@ -84,7 +84,7 @@ O formato segue o [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/) e 
 - Sofás da biblioteca mais escuros, para a Maria Marta (branca) aparecer.
 
 ## [1.0.0] - 2026-10-20
-Primeira versão completa, apresentada ao professor.
+Primeira versão completa.
 
 ### Adicionado
 - Cinema drive-in: cada filme na tela gigante é um projeto, com prints reais, bilheteria e links.

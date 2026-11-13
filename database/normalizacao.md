@@ -1,6 +1,6 @@
 # Normalização do banco do Mundo Swarttz (até a 3FN)
 
-Ponto de partida: o modelo da Aula 02 (`modelo_conceitual.png` e `modelo_logico.png`, que seguem `docs/BANCO-DE-DADOS.md`).
+Ponto de partida: o primeiro modelo lógico (`modelo_conceitual.png` e `modelo_logico.png`, que seguem `docs/BANCO-DE-DADOS.md`).
 Resultado: `modelo_logico_3fn.png`, com o detalhe de cada coluna em `dicionario_dados.md`.
 
 ## As três formas normais, em uma linha cada
@@ -12,7 +12,7 @@ Resultado: `modelo_logico_3fn.png`, com o detalhe de cada coluna em `dicionario_
 
 ## Problema 1: tecnologias numa coluna de texto (viola a 1FN)
 
-No desenho original do banco, as tecnologias de cada projeto ficavam numa coluna só, separadas por vírgula. Encontramos isso ao montar o DER da Aula 02, e o DER já foi entregue com a correção. O antes e o depois ficam registrados aqui.
+No desenho original do banco, as tecnologias de cada projeto ficavam numa coluna só, separadas por vírgula. Isso foi encontrado ao montar o primeiro DER, que já saiu com a correção. O antes e o depois ficam registrados aqui.
 
 **Antes:**
 
@@ -52,7 +52,7 @@ No desenho original do banco, as tecnologias de cada projeto ficavam numa coluna
 
 ## Problema 2: dados do autor repetidos em cada depoimento (viola a 3FN)
 
-Na Aula 02, a tabela `depoimento` guardava o nome, a relação e a foto de quem escreveu.
+No primeiro modelo, a tabela `depoimento` guardava o nome, a relação e a foto de quem escreveu.
 
 **Antes:** `depoimento`
 
@@ -85,7 +85,7 @@ Na Aula 02, a tabela `depoimento` guardava o nome, a relação e a foto de quem 
 
 ## Problema 3: coluna calculada e dois tipos de voto na mesma tabela de curtidas (viola a 3FN)
 
-Na Aula 02, a tabela `curtida` guardava os votos do site todo (com `projeto_id` vazio) e os votos de cada projeto. Ela também tinha a coluna `alvo`, calculada a partir de `projeto_id`, só para conseguir impedir votos repetidos.
+No primeiro modelo, a tabela `curtida` guardava os votos do site todo (com `projeto_id` vazio) e os votos de cada projeto. Ela também tinha a coluna `alvo`, calculada a partir de `projeto_id`, só para conseguir impedir votos repetidos.
 
 **Antes:** `curtida`
 
@@ -122,6 +122,6 @@ A 2FN só pode ser violada em tabelas com **chave primária composta**. No model
 
 | Mudança | Forma normal |
 |---|---|
-| `projeto.tecnologias` → tabelas `tecnologia` + `projeto_tecnologia` | 1FN (corrigida no DER da Aula 02) |
+| `projeto.tecnologias` → tabelas `tecnologia` + `projeto_tecnologia` | 1FN (corrigida já no primeiro DER) |
 | `depoimento.autor`, `relacao`, `foto` → tabela `autor` + `depoimento.autor_id` | 3FN |
 | `curtida` (com `alvo`) → tabelas `curtida_site` + `curtida_projeto` | 3FN |
