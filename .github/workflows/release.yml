@@ -64,7 +64,13 @@ jobs:
           [ -s faltam.txt ] || { echo "Nenhuma versão antiga sem tag."; exit 0; }
           while read -r TAG COMMIT; do
             git tag -a "$TAG" "$COMMIT" -m "$TAG"
-            git push origin "$TAG"
+            # O GitHub não deixa o token do Actions criar tag em commit que altera arquivos de workflow.
+            # Nesse caso a versão antiga é pulada (com aviso) em vez de travar o lançamento da versão nova.
+            if ! git push origin "$TAG"; then
+              echo "::warning::Pulei $TAG: o GitHub bloqueia o robô de criar tag nesse commit. Crie essa tag e a Release à mão."
+              git tag -d "$TAG"
+              continue
+            fi
             node scripts/release.js notas "${TAG#v}" > notas.md
             gh release create "$TAG" --verify-tag --title "$TAG" --notes-file notas.md
             echo "Criada: $TAG"
