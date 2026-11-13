@@ -2,6 +2,8 @@
 
 Modelo normalizado até a 3FN (veja `normalizacao.md`). Banco: MySQL (TiDB Cloud Starter).
 
+> **Sobre os tipos no brModelo Web:** os tipos deste dicionário são os do MySQL, que é o banco usado no projeto. O brModelo Web não oferece `BIGINT` nem `TEXT`, então no modelo feito lá (`modelo_logico_3fn_brmodelo.pdf`) usamos `INT` no lugar de `BIGINT` e `VARCHAR` no lugar de `TEXT`. O brModelo também não tem a opção de marcar NOT NULL, por isso os campos obrigatórios foram listados numa nota dentro do modelo.
+
 **Legenda:** PK = chave primária · FK = chave estrangeira · Obrigatório "sim" = `NOT NULL` · Regras: `UNIQUE` (valor não se repete), `DEFAULT` (valor automático quando nada é informado), `ON DELETE` (o que acontece com esta linha quando a linha "mãe" é apagada: `RESTRICT` impede apagar a mãe, `CASCADE` apaga junto, `SET NULL` deixa o campo vazio).
 
 | Tabela | Coluna | Tipo | Chave | Obrigatório | Regras | Descrição |
