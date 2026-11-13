@@ -1,19 +1,11 @@
-# Squad Mundo Swarttz
+# Modelo de dados do Mundo Swarttz
 
-## Integrantes
-- Gabriella Cunha Maciel
-
-## Descrição do projeto
+## O projeto
 O Mundo Swarttz é o portfólio tech interativo de Gabriella Swarttz, com um mundo 3D e uma versão simples em texto.
 O visitante conhece os projetos, as formações e os depoimentos, e pode curtir, comentar e mandar mensagens.
 Um painel admin, ligado a um banco MySQL, permite cadastrar o conteúdo, moderar comentários e ver o contador de visitas.
 
-## Arquivos desta pasta
-- `modelo_conceitual.png`: modelo conceitual (entidades, atributos, relacionamentos e cardinalidades)
-- `modelo_logico.png`: modelo lógico (tabelas, chaves primárias e chaves estrangeiras)
-- `projeto_squad.md`: este arquivo
-
-O detalhe de cada coluna está em [`docs/BANCO-DE-DADOS.md`](../docs/BANCO-DE-DADOS.md).
+Os arquivos desta pasta (modelos, dicionário de dados e scripts SQL) estão listados no [`README.md`](README.md). O detalhe de cada coluna está em [`dicionario_dados.md`](dicionario_dados.md), e o plano completo do banco em [`docs/BANCO-DE-DADOS.md`](../docs/BANCO-DE-DADOS.md).
 
 ## Entidades
 | Entidade | O que guarda |

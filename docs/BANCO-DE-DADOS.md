@@ -262,11 +262,11 @@ Regra: **(visitante, alvo) é único**. Isso impede o mesmo navegador de votar d
 
 ---
 
-## 6. Modelo para a atividade do Excel
+## 6. Dados de exemplo
 
-A atividade pede de 3 a 4 entidades. Use **4 das tabelas acima**, uma por aba, com os mesmos nomes de coluna, mais a aba **Perfis** (seção 5). Assim o Excel é exatamente o desenho do banco real.
+Quatro das tabelas acima com três linhas de exemplo cada, para conferir se as chaves se ligam como esperado. Os perfis de acesso estão na seção 5.
 
-**Aba `usuario`**
+**Tabela `usuario`**
 
 | id | nome | email | perfil |
 |---|---|---|---|
@@ -274,7 +274,7 @@ A atividade pede de 3 a 4 entidades. Use **4 das tabelas acima**, uma por aba, c
 | 2 | Ana Lima | ana@exemplo.com | editor |
 | 3 | Bruno Reis | bruno@exemplo.com | editor |
 
-**Aba `projeto`** (`usuario_id` → usuario)
+**Tabela `projeto`** (`usuario_id` → usuario)
 
 | id | usuario_id | titulo | status | publicado |
 |---|---|---|---|---|
@@ -282,7 +282,7 @@ A atividade pede de 3 a 4 entidades. Use **4 das tabelas acima**, uma por aba, c
 | 2 | 1 | PixeLinha | em cartaz | sim |
 | 3 | 2 | JC Resolve | em produção | não |
 
-**Aba `mensagem`** (`respondida_por` → usuario)
+**Tabela `mensagem`** (`respondida_por` → usuario)
 
 | id | nome | email | status | respondida_por |
 |---|---|---|---|---|
@@ -290,7 +290,7 @@ A atividade pede de 3 a 4 entidades. Use **4 das tabelas acima**, uma por aba, c
 | 2 | Diego Melo | diego@exemplo.com | lida | |
 | 3 | Elisa Rocha | elisa@exemplo.com | nova | |
 
-**Aba `visita`** (`projeto_id` → projeto)
+**Tabela `visita`** (`projeto_id` → projeto)
 
 | id | visitante | lugar | projeto_id | dispositivo |
 |---|---|---|---|---|
