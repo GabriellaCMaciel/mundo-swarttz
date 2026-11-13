@@ -1,7 +1,7 @@
 -- =============================================================
--- Mundo Swarttz: criação do banco (Aula 04)
+-- Mundo Swarttz: criação do banco MySQL
 -- Segue database/dicionario_dados.md (modelo normalizado até a 3FN).
--- Como usar: phpMyAdmin > aba "SQL" > colar este arquivo > "Executar".
+-- Como rodar: veja database/README.md.
 -- Atenção: este script APAGA e recria o banco mundo_swarttz.
 -- =============================================================
 
