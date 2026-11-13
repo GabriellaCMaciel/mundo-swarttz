@@ -5,6 +5,12 @@ Banco **`mundo_swarttz`**, criado a partir do modelo lógico normalizado até a 
 ## Arquivos
 | Arquivo | O que é |
 |---|---|
+| `visao_geral.md` | Visão geral do modelo: entidades, relacionamentos e perfis |
+| `modelo_conceitual.png` / `modelo_conceitual_brmodelo.pdf` | Modelo conceitual (entidades, atributos e cardinalidades) |
+| `modelo_logico.png` | Primeiro modelo lógico (tabelas, PK e FK) |
+| `normalizacao.md` | Normalização até a 3FN, com o antes e o depois de cada mudança |
+| `modelo_logico_3fn.png` / `modelo_logico_3fn_brmodelo.pdf` | Modelo lógico normalizado, usado para criar o banco |
+| `dicionario_dados.md` | Dicionário de dados: cada coluna com tipo e regras |
 | `criar_banco.sql` | Cria o banco e as 12 tabelas (tipos, PK com `AUTO_INCREMENT`, `NOT NULL`, `UNIQUE`, `DEFAULT` e chaves estrangeiras) |
 | `teste_integridade.sql` | Confere se o banco recusa um registro com chave estrangeira inexistente |
 | `schema.sql` | Estrutura do banco exportada do phpMyAdmin |
